@@ -2,16 +2,88 @@
   "version": 1,
   "created_at": "2026-08-11T08:44:11.443Z",
   "lifetime": {
-    "total_tokens_estimated": 0,
-    "total_reads": 0,
+    "total_tokens_estimated": 156,
+    "total_reads": 7,
     "total_writes": 0,
-    "total_sessions": 0,
-    "anatomy_hits": 0,
-    "anatomy_misses": 0,
-    "repeated_reads_blocked": 0,
-    "estimated_savings_vs_bare_cli": 0
+    "total_sessions": 1,
+    "anatomy_hits": 3,
+    "anatomy_misses": 4,
+    "repeated_reads_blocked": 4,
+    "estimated_savings_vs_bare_cli": 756,
+    "real_input_tokens": 280,
+    "real_output_tokens": 95867,
+    "real_cache_read_tokens": 16594320,
+    "real_cache_creation_tokens": 167696,
+    "real_api_calls": 140
   },
-  "sessions": [],
+  "sessions": [
+    {
+      "id": "session-2026-08-11-1549",
+      "agent": "claude",
+      "started": "2026-08-11T08:49:30.100Z",
+      "ended": "2026-08-11T09:12:12.612Z",
+      "reads": [
+        {
+          "file": "/home/tanhn/workspace/projects/NovaCore/FrontEnd/Common/frontend-nextjs/package.json",
+          "tokens_estimated": 78,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/tanhn/workspace/projects/NovaCore/FrontEnd/Common/frontend-nextjs/packages/shadcn/package.json",
+          "tokens_estimated": 78,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/tanhn/workspace/projects/NovaCore/FrontEnd/Common/frontend-nextjs/packages/shadcn/src/components/admin/data-table.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/claude-1000/-home-tanhn-workspace-projects-NovaCore-FrontEnd-Common-frontend-nextjs/d3dd105d-737d-4e98-9902-bdac26a1ead5/scratchpad/components.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/claude-1000/-home-tanhn-workspace-projects-NovaCore-FrontEnd-Common-frontend-nextjs/d3dd105d-737d-4e98-9902-bdac26a1ead5/scratchpad/users.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/claude-1000/-home-tanhn-workspace-projects-NovaCore-FrontEnd-Common-frontend-nextjs/d3dd105d-737d-4e98-9902-bdac26a1ead5/scratchpad/theme.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/home/tanhn/workspace/projects/NovaCore/FrontEnd/Common/frontend-nextjs/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 156,
+        "output_tokens_estimated": 0,
+        "reads_count": 7,
+        "writes_count": 0,
+        "repeated_reads_blocked": 4,
+        "anatomy_lookups": 3
+      },
+      "real_usage": {
+        "input_tokens": 280,
+        "output_tokens": 95867,
+        "cache_read_input_tokens": 16594320,
+        "cache_creation_input_tokens": 167696,
+        "api_calls": 140
+      }
+    }
+  ],
   "daemon_usage": [],
   "waste_flags": [],
   "optimization_report": {

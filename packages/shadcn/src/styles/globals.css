@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Fallback tokens (zinc-blue / medium / light+dark) rendered before
+ * <AdminProvider> hydrates and applies the resolved theme via inline
+ * CSS variables on :root. Prevents unstyled flash on first paint.
+ */
+@layer base {
+  :root {
+    --nc-background: 0 0% 100%;
+    --nc-foreground: 240 12.5% 3.9%;
+    --nc-card: 0 0% 100%;
+    --nc-card-foreground: 240 12.5% 3.9%;
+    --nc-popover: 0 0% 100%;
+    --nc-popover-foreground: 240 12.5% 3.9%;
+    --nc-primary: 221.2 83.2% 53.3%;
+    --nc-primary-foreground: 0 0% 98%;
+    --nc-secondary: 240 5% 95.9%;
+    --nc-secondary-foreground: 240 7.5% 10%;
+    --nc-muted: 240 5% 95.9%;
+    --nc-muted-foreground: 240 4% 46.1%;
+    --nc-accent: 240 5% 95.9%;
+    --nc-accent-foreground: 240 7.5% 10%;
+    --nc-destructive: 0 84.2% 60.2%;
+    --nc-destructive-foreground: 0 0% 98%;
+    --nc-success: 142.1 76.2% 36.3%;
+    --nc-success-foreground: 0 0% 98%;
+    --nc-warning: 32.5 94.6% 43.7%;
+    --nc-warning-foreground: 0 0% 98%;
+    --nc-info: 199.4 89.1% 48.4%;
+    --nc-info-foreground: 0 0% 98%;
+    --nc-border: 240 5% 90%;
+    --nc-input: 240 5% 90%;
+    --nc-ring: 221.2 83.2% 53.3%;
+    --nc-radius: 0.5rem;
+  }
+
+  .dark {
+    --nc-background: 240 12.5% 3.9%;
+    --nc-foreground: 0 0% 98%;
+    --nc-card: 240 12.5% 3.9%;
+    --nc-card-foreground: 0 0% 98%;
+    --nc-popover: 240 12.5% 3.9%;
+    --nc-popover-foreground: 0 0% 98%;
+    --nc-primary: 217.2 91.2% 59.8%;
+    --nc-primary-foreground: 0 0% 98%;
+    --nc-secondary: 240 4% 15.9%;
+    --nc-secondary-foreground: 0 0% 98%;
+    --nc-muted: 240 4% 15.9%;
+    --nc-muted-foreground: 240 5% 64.9%;
+    --nc-accent: 240 4% 15.9%;
+    --nc-accent-foreground: 0 0% 98%;
+    --nc-destructive: 0 62.8% 30.6%;
+    --nc-destructive-foreground: 0 0% 98%;
+    --nc-success: 142.1 70.6% 45.3%;
+    --nc-success-foreground: 0 0% 98%;
+    --nc-warning: 32.5 94.6% 43.7%;
+    --nc-warning-foreground: 0 0% 98%;
+    --nc-info: 199.4 89.1% 48.4%;
+    --nc-info-foreground: 0 0% 98%;
+    --nc-border: 240 4% 15.9%;
+    --nc-input: 240 4% 15.9%;
+    --nc-ring: 217.2 91.2% 59.8%;
+    --nc-radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+}

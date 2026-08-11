@@ -1,13 +1,18 @@
 {
-  "name": "frontend-admin-nextjs",
+  "name": "novacore-frontend-next",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "NovaCore Next.js frontend ecosystem (UI-library packages + playground apps)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm --filter=./packages/* build",
+    "dev:playground": "pnpm --filter @novacore/playground dev",
+    "typecheck": "pnpm -r typecheck"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.15.0"
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp"]
+  }
 }

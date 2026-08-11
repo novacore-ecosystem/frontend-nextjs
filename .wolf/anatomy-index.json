@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-11T08:44:11.462Z",
-    "fileCount": 9,
+    "lastScanned": "2026-08-11T09:11:45.254Z",
+    "fileCount": 71,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "2ba03ca2cbd71a8432c1d37b89a8101cc916c9dee8e6b6e35107d1c65eac3261",
-    "storeUpdatedAt": "2026-08-11T08:44:11.463Z"
+    "renderedHash": "b6d994d00cc8b2630edc644b5ab67483cde6e1c52635f9769847b409fc767f89",
+    "storeUpdatedAt": "2026-08-11T09:11:45.255Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -14,8 +14,8 @@
       "tokens": 551,
       "hash": "17a75695be5d4629",
       "size": 2221,
-      "mtimeMs": 1786437851451.71,
-      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "mtimeMs": 1786438114737.0137,
+      "updatedAt": "2026-08-11T09:11:45.240Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -23,8 +23,8 @@
       "tokens": 510,
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
-      "mtimeMs": 1786437851451.6804,
-      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "mtimeMs": 1786438114737.0728,
+      "updatedAt": "2026-08-11T09:11:45.240Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -32,8 +32,8 @@
       "tokens": 328,
       "hash": "6d735b2c1c54a916",
       "size": 1323,
-      "mtimeMs": 1786437851444.4375,
-      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "mtimeMs": 1786438114737.0728,
+      "updatedAt": "2026-08-11T09:11:45.241Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -41,8 +41,8 @@
       "tokens": 514,
       "hash": "f68759bb50af5ee4",
       "size": 1799,
-      "mtimeMs": 1786437851443.4375,
-      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "mtimeMs": 1786438114737.1897,
+      "updatedAt": "2026-08-11T09:11:45.241Z",
       "source": "scan"
     },
     ".claude/settings.local.json": {
@@ -51,7 +51,7 @@
       "hash": "0225dd8212b2b110",
       "size": 199,
       "mtimeMs": 1786437756557.5662,
-      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "updatedAt": "2026-08-11T09:11:45.241Z",
       "source": "scan"
     },
     ".codegraph/.gitignore": {
@@ -59,8 +59,141 @@
       "tokens": 61,
       "hash": "47c0dacebca9f56c",
       "size": 229,
-      "mtimeMs": 1786437821274.5293,
-      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "mtimeMs": 1786438114737.1897,
+      "updatedAt": "2026-08-11T09:11:45.241Z",
+      "source": "scan"
+    },
+    "apps/playground/next-env.d.ts": {
+      "description": "/ <reference types=\"next\" />",
+      "tokens": 75,
+      "hash": "85ae5aee75f01196",
+      "size": 262,
+      "mtimeMs": 1786439279317.4424,
+      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "source": "scan"
+    },
+    "apps/playground/next.config.mjs": {
+      "description": "Next.js configuration",
+      "tokens": 25,
+      "hash": "1e3206cb200e264f",
+      "size": 92,
+      "mtimeMs": 1786438884600.1323,
+      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "source": "scan"
+    },
+    "apps/playground/package.json": {
+      "description": "Node.js package manifest",
+      "tokens": 157,
+      "hash": "d19d5d6ba96f95b7",
+      "size": 548,
+      "mtimeMs": 1786438880720.692,
+      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/admin/dashboard/page.tsx": {
+      "description": "stats",
+      "tokens": 242,
+      "hash": "e002622729a2c62f",
+      "size": 844,
+      "mtimeMs": 1786438946113.4902,
+      "updatedAt": "2026-08-11T09:11:45.243Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/admin/layout.tsx": {
+      "description": "AdminAreaLayout",
+      "tokens": 226,
+      "hash": "80ad7b3219b2e217",
+      "size": 788,
+      "mtimeMs": 1786438940000.434,
+      "updatedAt": "2026-08-11T09:11:45.243Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/admin/users/page.tsx": {
+      "description": "USERS — renders table — uses useState",
+      "tokens": 654,
+      "hash": "5bc3e76e29c2e096",
+      "size": 2286,
+      "mtimeMs": 1786439036084.3164,
+      "updatedAt": "2026-08-11T09:11:45.244Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "User",
+          "kind": "section",
+          "startLine": 14,
+          "endLine": 42,
+          "tokens": 213
+        },
+        {
+          "name": "UsersPage",
+          "kind": "fn",
+          "startLine": 43,
+          "endLine": 82,
+          "tokens": 383
+        }
+      ]
+    },
+    "apps/playground/src/app/components/page.tsx": {
+      "description": "ComponentsPage — renders form, modal — uses useState",
+      "tokens": 1346,
+      "hash": "fc61b9d561ff8f81",
+      "size": 4727,
+      "mtimeMs": 1786438926470.3098,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ComponentsPage",
+          "kind": "fn",
+          "startLine": 39,
+          "endLine": 153,
+          "tokens": 1196
+        }
+      ]
+    },
+    "apps/playground/src/app/layout.tsx": {
+      "description": "metadata",
+      "tokens": 145,
+      "hash": "8cb35eb4844c2626",
+      "size": 507,
+      "mtimeMs": 1786438901450.08,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/page.tsx": {
+      "description": "links",
+      "tokens": 388,
+      "hash": "26a0c6bc1962eebe",
+      "size": 1360,
+      "mtimeMs": 1786438909868.1575,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/providers.tsx": {
+      "description": "Providers",
+      "tokens": 80,
+      "hash": "8791c1d13b82e872",
+      "size": 277,
+      "mtimeMs": 1786438896415.0337,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/theme/page.tsx": {
+      "description": "ThemePage",
+      "tokens": 129,
+      "hash": "deec314cdf7bb922",
+      "size": 453,
+      "mtimeMs": 1786438934031.3792,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "apps/playground/tsconfig.json": {
+      "description": "TypeScript configuration",
+      "tokens": 162,
+      "hash": "dcb8b4973accda3f",
+      "size": 566,
+      "mtimeMs": 1786438890088.4033,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
       "source": "scan"
     },
     "CLAUDE.md": {
@@ -68,26 +201,859 @@
       "tokens": 323,
       "hash": "37c811f4697b18bb",
       "size": 1294,
-      "mtimeMs": 1786437851444.583,
-      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "mtimeMs": 1786438114738.7546,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
       "source": "scan"
     },
     "package.json": {
       "description": "Node.js package manifest",
-      "tokens": 78,
-      "hash": "1b1c1f704f7e02f1",
-      "size": 271,
-      "mtimeMs": 1786436859508.324,
-      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "tokens": 146,
+      "hash": "52b32b9cbb33373c",
+      "size": 510,
+      "mtimeMs": 1786439073765.9238,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "packages/shadcn/package.json": {
+      "description": "Node.js package manifest",
+      "tokens": 725,
+      "hash": "b9edd85bf544d39a",
+      "size": 2535,
+      "mtimeMs": 1786439232504.1794,
+      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "source": "scan"
+    },
+    "packages/shadcn/postcss.config.js": {
+      "description": "PostCSS configuration",
+      "tokens": 24,
+      "hash": "e32657baf631d7c5",
+      "size": 81,
+      "mtimeMs": 1786438350595.0212,
+      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "source": "scan"
+    },
+    "packages/shadcn/scripts/postbuild-use-client.mjs": {
+      "description": "tsup/esbuild strips the \"use client\" directive during bundling (it isn't",
+      "tokens": 600,
+      "hash": "40766fce43fff27d",
+      "size": 2250,
+      "mtimeMs": 1786439169034.98,
+      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "walk",
+          "kind": "fn",
+          "startLine": 17,
+          "endLine": 66,
+          "tokens": 392
+        }
+      ]
+    },
+    "packages/shadcn/src/components/admin/admin-header.tsx": {
+      "description": "AdminHeader",
+      "tokens": 156,
+      "hash": "d1c429644b03e4f8",
+      "size": 544,
+      "mtimeMs": 1786438764127.8188,
+      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/admin/admin-layout.tsx": {
+      "description": "Generic admin shell: responsive sidebar + header + content. No domain assumptions.",
+      "tokens": 665,
+      "hash": "75a4673aa91363b0",
+      "size": 2327,
+      "mtimeMs": 1786438741678.6128,
+      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "AdminLayoutContextValue",
+          "kind": "section",
+          "startLine": 7,
+          "endLine": 13,
+          "tokens": 55
+        },
+        {
+          "name": "useAdminLayout",
+          "kind": "fn",
+          "startLine": 14,
+          "endLine": 19,
+          "tokens": 60
+        },
+        {
+          "name": "AdminLayoutProps",
+          "kind": "section",
+          "startLine": 20,
+          "endLine": 27,
+          "tokens": 68
+        },
+        {
+          "name": "AdminLayout",
+          "kind": "fn",
+          "startLine": 28,
+          "endLine": 59,
+          "tokens": 307
+        },
+        {
+          "name": "AdminSidebarToggle",
+          "kind": "fn",
+          "startLine": 60,
+          "endLine": 73,
+          "tokens": 140
+        }
+      ]
+    },
+    "packages/shadcn/src/components/admin/admin-sidebar.tsx": {
+      "description": "AdminSidebar",
+      "tokens": 385,
+      "hash": "6d51a198b029f286",
+      "size": 1345,
+      "mtimeMs": 1786438749237.6821,
+      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/admin/data-table.tsx": {
+      "description": "Renders a cell for the row. Defaults to reading `row[id]` when omitted.",
+      "tokens": 2428,
+      "hash": "587bd8584ed099a6",
+      "size": 8501,
+      "mtimeMs": 1786439015635.1287,
+      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "DataTableColumn",
+          "kind": "section",
+          "startLine": 11,
+          "endLine": 21,
+          "tokens": 86
+        },
+        {
+          "name": "DataTableSortState",
+          "kind": "section",
+          "startLine": 22,
+          "endLine": 32,
+          "tokens": 112
+        },
+        {
+          "name": "DataTablePaginationState",
+          "kind": "section",
+          "startLine": 33,
+          "endLine": 39,
+          "tokens": 56
+        },
+        {
+          "name": "fromPaginatedResult",
+          "kind": "fn",
+          "startLine": 40,
+          "endLine": 49,
+          "tokens": 80
+        },
+        {
+          "name": "DataTableProps",
+          "kind": "section",
+          "startLine": 50,
+          "endLine": 69,
+          "tokens": 175
+        },
+        {
+          "name": "DataTable",
+          "kind": "fn",
+          "startLine": 70,
+          "endLine": 241,
+          "tokens": 1810
+        }
+      ]
+    },
+    "packages/shadcn/src/components/admin/page.tsx": {
+      "description": "AdminPage",
+      "tokens": 681,
+      "hash": "1d9b0f217da298c7",
+      "size": 2383,
+      "mtimeMs": 1786438775687.925,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "AdminPage",
+          "kind": "fn",
+          "startLine": 4,
+          "endLine": 7,
+          "tokens": 57
+        },
+        {
+          "name": "PageContainer",
+          "kind": "fn",
+          "startLine": 8,
+          "endLine": 11,
+          "tokens": 56
+        },
+        {
+          "name": "PageSection",
+          "kind": "fn",
+          "startLine": 12,
+          "endLine": 40,
+          "tokens": 218
+        },
+        {
+          "name": "PageHeaderProps",
+          "kind": "section",
+          "startLine": 41,
+          "endLine": 48,
+          "tokens": 46
+        },
+        {
+          "name": "PageHeader",
+          "kind": "fn",
+          "startLine": 49,
+          "endLine": 63,
+          "tokens": 166
+        },
+        {
+          "name": "Toolbar",
+          "kind": "fn",
+          "startLine": 64,
+          "endLine": 67,
+          "tokens": 57
+        },
+        {
+          "name": "ContentPanel",
+          "kind": "fn",
+          "startLine": 68,
+          "endLine": 71,
+          "tokens": 62
+        }
+      ]
+    },
+    "packages/shadcn/src/components/admin/permission-gate.tsx": {
+      "description": "Injected by the consumer — decides whether the current actor has the permission(s).",
+      "tokens": 204,
+      "hash": "b5470587265cf22b",
+      "size": 718,
+      "mtimeMs": 1786438798715.1365,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/admin/states.tsx": {
+      "description": "EmptyState",
+      "tokens": 672,
+      "hash": "7445552224b431a8",
+      "size": 2351,
+      "mtimeMs": 1786438786080.0205,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "EmptyState",
+          "kind": "fn",
+          "startLine": 7,
+          "endLine": 31,
+          "tokens": 204
+        },
+        {
+          "name": "LoadingState",
+          "kind": "fn",
+          "startLine": 32,
+          "endLine": 40,
+          "tokens": 98
+        },
+        {
+          "name": "ErrorState",
+          "kind": "fn",
+          "startLine": 41,
+          "endLine": 67,
+          "tokens": 224
+        },
+        {
+          "name": "SkeletonList",
+          "kind": "fn",
+          "startLine": 68,
+          "endLine": 77,
+          "tokens": 85
+        }
+      ]
+    },
+    "packages/shadcn/src/components/admin/status-badge.tsx": {
+      "description": "TONE_TO_VARIANT",
+      "tokens": 186,
+      "hash": "a2cb4c853b5175ab",
+      "size": 651,
+      "mtimeMs": 1786438791700.072,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/composed/confirm-dialog.tsx": {
+      "description": "ConfirmDialog — renders modal",
+      "tokens": 385,
+      "hash": "912cb98ab2e32be4",
+      "size": 1345,
+      "mtimeMs": 1786438727726.4846,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/composed/form-field.tsx": {
+      "description": "FormField",
+      "tokens": 450,
+      "hash": "3c8cee332b78e9fa",
+      "size": 1572,
+      "mtimeMs": 1786438720644.4197,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/composed/password-input.tsx": {
+      "description": "PasswordInput — uses useState",
+      "tokens": 295,
+      "hash": "a12816299c54b01d",
+      "size": 1030,
+      "mtimeMs": 1786438711636.337,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/composed/search-input.tsx": {
+      "description": "SearchInput",
+      "tokens": 394,
+      "hash": "515df9168db9a1d2",
+      "size": 1378,
+      "mtimeMs": 1786438705323.2788,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/avatar.tsx": {
+      "description": "Avatar",
+      "tokens": 271,
+      "hash": "f77d67d9ddea8a27",
+      "size": 947,
+      "mtimeMs": 1786438578125.1108,
+      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/badge.tsx": {
+      "description": "badgeVariants",
+      "tokens": 379,
+      "hash": "d8649716fddb32fb",
+      "size": 1324,
+      "mtimeMs": 1786438540007.7607,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/button.tsx": {
+      "description": "Renders children as the root element (e.g. a Link) instead of a <button>.",
+      "tokens": 638,
+      "hash": "c7002435d68999e3",
+      "size": 2233,
+      "mtimeMs": 1786438507504.4622,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ButtonProps",
+          "kind": "section",
+          "startLine": 38,
+          "endLine": 63,
+          "tokens": 231
+        }
+      ]
+    },
+    "packages/shadcn/src/components/ui/card.tsx": {
+      "description": "Card",
+      "tokens": 504,
+      "hash": "c56e043350441519",
+      "size": 1762,
+      "mtimeMs": 1786438548926.8425,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/checkbox.tsx": {
+      "description": "Checkbox",
+      "tokens": 368,
+      "hash": "9266a41790edf1f9",
+      "size": 1288,
+      "mtimeMs": 1786438585639.1797,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/dialog.tsx": {
+      "description": "Dialog — renders modal",
+      "tokens": 803,
+      "hash": "4fea6643df893761",
+      "size": 2810,
+      "mtimeMs": 1786438665465.9128,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "DialogProps",
+          "kind": "section",
+          "startLine": 8,
+          "endLine": 14,
+          "tokens": 42
+        },
+        {
+          "name": "Dialog",
+          "kind": "fn",
+          "startLine": 15,
+          "endLine": 24,
+          "tokens": 85
+        },
+        {
+          "name": "DialogContentProps",
+          "kind": "section",
+          "startLine": 25,
+          "endLine": 30,
+          "tokens": 35
+        },
+        {
+          "name": "DialogContent",
+          "kind": "fn",
+          "startLine": 31,
+          "endLine": 52,
+          "tokens": 282
+        },
+        {
+          "name": "DialogHeader",
+          "kind": "fn",
+          "startLine": 53,
+          "endLine": 56,
+          "tokens": 58
+        },
+        {
+          "name": "DialogFooter",
+          "kind": "fn",
+          "startLine": 57,
+          "endLine": 76,
+          "tokens": 252
+        }
+      ]
+    },
+    "packages/shadcn/src/components/ui/dropdown-menu.tsx": {
+      "description": "DropdownMenu",
+      "tokens": 952,
+      "hash": "3806a06515233fad",
+      "size": 3331,
+      "mtimeMs": 1786438690538.143,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "DropdownMenuItemProps",
+          "kind": "section",
+          "startLine": 32,
+          "endLine": 57,
+          "tokens": 268
+        },
+        {
+          "name": "DropdownMenuCheckboxItem",
+          "kind": "fn",
+          "startLine": 58,
+          "endLine": 87,
+          "tokens": 268
+        },
+        {
+          "name": "DropdownMenuLabel",
+          "kind": "fn",
+          "startLine": 88,
+          "endLine": 91,
+          "tokens": 56
+        },
+        {
+          "name": "DropdownMenuSeparator",
+          "kind": "fn",
+          "startLine": 92,
+          "endLine": 95,
+          "tokens": 52
+        }
+      ]
+    },
+    "packages/shadcn/src/components/ui/input.tsx": {
+      "description": "Input",
+      "tokens": 229,
+      "hash": "a548d2d05d111eb8",
+      "size": 800,
+      "mtimeMs": 1786438522896.6035,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/label.tsx": {
+      "description": "Label",
+      "tokens": 213,
+      "hash": "6cd3338c15dcbb4d",
+      "size": 743,
+      "mtimeMs": 1786438533381.7,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/popover.tsx": {
+      "description": "Popover",
+      "tokens": 354,
+      "hash": "6d6db80409804998",
+      "size": 1236,
+      "mtimeMs": 1786438653772.8054,
+      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/select.tsx": {
+      "description": "Select",
+      "tokens": 744,
+      "hash": "60fda505795c2f6c",
+      "size": 2604,
+      "mtimeMs": 1786438676201.0115,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "SelectOption",
+          "kind": "section",
+          "startLine": 8,
+          "endLine": 13,
+          "tokens": 26
+        },
+        {
+          "name": "SelectProps",
+          "kind": "section",
+          "startLine": 14,
+          "endLine": 24,
+          "tokens": 66
+        },
+        {
+          "name": "Select",
+          "kind": "fn",
+          "startLine": 25,
+          "endLine": 63,
+          "tokens": 597
+        }
+      ]
+    },
+    "packages/shadcn/src/components/ui/separator.tsx": {
+      "description": "Separator",
+      "tokens": 224,
+      "hash": "21e7ac06b65d738f",
+      "size": 783,
+      "mtimeMs": 1786438562350.9658,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/skeleton.tsx": {
+      "description": "Skeleton",
+      "tokens": 72,
+      "hash": "30d0d8b48247f5be",
+      "size": 252,
+      "mtimeMs": 1786438571939.054,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/switch.tsx": {
+      "description": "Switch",
+      "tokens": 354,
+      "hash": "86b9b6e3b3a92ace",
+      "size": 1239,
+      "mtimeMs": 1786438593359.2507,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/tabs.tsx": {
+      "description": "Tabs",
+      "tokens": 466,
+      "hash": "e82c4b66d24cf011",
+      "size": 1629,
+      "mtimeMs": 1786438618141.4783,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/textarea.tsx": {
+      "description": "Textarea",
+      "tokens": 234,
+      "hash": "23d3ec7e08d28cd2",
+      "size": 818,
+      "mtimeMs": 1786438528117.6516,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/components/ui/tooltip.tsx": {
+      "description": "TooltipProvider",
+      "tokens": 322,
+      "hash": "be3dfe13359c61b0",
+      "size": 1125,
+      "mtimeMs": 1786438646561.7393,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/exports/data.ts": {
+      "description": "Declares DataTableProps",
+      "tokens": 122,
+      "hash": "11197713cf02a578",
+      "size": 425,
+      "mtimeMs": 1786439026146.0164,
+      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/exports/forms.ts": {
+      "description": "Declares InputProps",
+      "tokens": 209,
+      "hash": "ce6a4af49f04177e",
+      "size": 729,
+      "mtimeMs": 1786438845833.7852,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/exports/layout.ts": {
+      "description": "Declares AdminLayoutProps",
+      "tokens": 155,
+      "hash": "86f8450b8dd7a99f",
+      "size": 542,
+      "mtimeMs": 1786438854962.653,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/index.ts": {
+      "description": "Declares ButtonProps",
+      "tokens": 866,
+      "hash": "75881a34b5cb4483",
+      "size": 3030,
+      "mtimeMs": 1786439021243.328,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/lib/cn.ts": {
+      "description": "Exports cn",
+      "tokens": 49,
+      "hash": "4acbc7165a8d5473",
+      "size": 169,
+      "mtimeMs": 1786438477113.183,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/styles/globals.css": {
+      "description": "Styles: 4 rules, 52 vars, 1 layers",
+      "tokens": 630,
+      "hash": "287546f6f3a24c18",
+      "size": 2202,
+      "mtimeMs": 1786438495170.1968,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/theme/admin-provider.tsx": {
+      "description": "ThemeContext — uses useMemo, useEffect, useContext",
+      "tokens": 776,
+      "hash": "f911cda5352f913e",
+      "size": 2714,
+      "mtimeMs": 1786438445135.8894,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ThemeContextValue",
+          "kind": "section",
+          "startLine": 7,
+          "endLine": 15,
+          "tokens": 80
+        },
+        {
+          "name": "getSystemMode",
+          "kind": "fn",
+          "startLine": 16,
+          "endLine": 20,
+          "tokens": 60
+        },
+        {
+          "name": "applyTokens",
+          "kind": "fn",
+          "startLine": 21,
+          "endLine": 27,
+          "tokens": 58
+        },
+        {
+          "name": "AdminProviderProps",
+          "kind": "section",
+          "startLine": 28,
+          "endLine": 32,
+          "tokens": 27
+        },
+        {
+          "name": "AdminProvider",
+          "kind": "fn",
+          "startLine": 33,
+          "endLine": 65,
+          "tokens": 428
+        },
+        {
+          "name": "useAdminTheme",
+          "kind": "fn",
+          "startLine": 66,
+          "endLine": 75,
+          "tokens": 68
+        }
+      ]
+    },
+    "packages/shadcn/src/theme/index.ts": {
+      "description": "",
+      "tokens": 146,
+      "hash": "335ca379fea42413",
+      "size": 509,
+      "mtimeMs": 1786438473268.1477,
+      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/theme/presets.ts": {
+      "description": "Named, ready-made combinations. Consumers can also compose base/color/style/radius manually.",
+      "tokens": 351,
+      "hash": "aec5dbccdd7750df",
+      "size": 1226,
+      "mtimeMs": 1786438423058.6868,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan"
+    },
+    "packages/shadcn/src/theme/resolve-theme.ts": {
+      "description": "Config -> Resolved Theme -> Semantic Tokens.",
+      "tokens": 519,
+      "hash": "c5d638333ef95d39",
+      "size": 1816,
+      "mtimeMs": 1786438431612.7651,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "resolveTheme",
+          "kind": "fn",
+          "startLine": 10,
+          "endLine": 45,
+          "tokens": 302
+        },
+        {
+          "name": "tokensToCssVars",
+          "kind": "fn",
+          "startLine": 46,
+          "endLine": 59,
+          "tokens": 98
+        }
+      ]
+    },
+    "packages/shadcn/src/theme/theme-customizer.tsx": {
+      "description": "Dev/demo control panel for previewing mode, base palette, accent color, and radius live.",
+      "tokens": 1214,
+      "hash": "ceb57cb7c013e2b6",
+      "size": 4249,
+      "mtimeMs": 1786438459940.0254,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ThemeCustomizerProps",
+          "kind": "section",
+          "startLine": 13,
+          "endLine": 17,
+          "tokens": 46
+        },
+        {
+          "name": "ThemeCustomizer",
+          "kind": "fn",
+          "startLine": 18,
+          "endLine": 123,
+          "tokens": 1045
+        }
+      ]
+    },
+    "packages/shadcn/src/theme/tokens.ts": {
+      "description": "Neutral scale generator, parameterized by hue/saturation — avoids hand-writing 5 full palettes.",
+      "tokens": 1100,
+      "hash": "5aa8e5d4c190bca7",
+      "size": 3852,
+      "mtimeMs": 1786438414452.6077,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "buildBaseTokens",
+          "kind": "fn",
+          "startLine": 4,
+          "endLine": 50,
+          "tokens": 444
+        },
+        {
+          "name": "resolveBaseTokens",
+          "kind": "fn",
+          "startLine": 51,
+          "endLine": 55,
+          "tokens": 39
+        },
+        {
+          "name": "AccentDefinition",
+          "kind": "section",
+          "startLine": 56,
+          "endLine": 78,
+          "tokens": 230
+        },
+        {
+          "name": "resolveAccentTokens",
+          "kind": "fn",
+          "startLine": 79,
+          "endLine": 124,
+          "tokens": 336
+        }
+      ]
+    },
+    "packages/shadcn/src/theme/types.ts": {
+      "description": "Semantic design tokens every component consumes. Values are HSL triplets (\"H S% L%\").",
+      "tokens": 486,
+      "hash": "297b34aa940722f7",
+      "size": 1702,
+      "mtimeMs": 1786438395685.4353,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan"
+    },
+    "packages/shadcn/tailwind.config.ts": {
+      "description": "Tailwind CSS configuration",
+      "tokens": 830,
+      "hash": "d53b5db39ccef30c",
+      "size": 2907,
+      "mtimeMs": 1786438364092.9753,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan"
+    },
+    "packages/shadcn/tsconfig.json": {
+      "description": "TypeScript configuration",
+      "tokens": 135,
+      "hash": "61cea246c3ed8f6a",
+      "size": 470,
+      "mtimeMs": 1786438331022.8416,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan"
+    },
+    "packages/shadcn/tsup.config.ts": {
+      "description": "/*.{ts,tsx}\"],",
+      "tokens": 192,
+      "hash": "77555922fbec9fd2",
+      "size": 672,
+      "mtimeMs": 1786439220210.0054,
+      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "source": "scan"
+    },
+    "pnpm-lock.yaml": {
+      "description": "pnpm lock file",
+      "tokens": 32686,
+      "hash": "7914db22cfd5ce61",
+      "size": 114399,
+      "mtimeMs": 1786439059395.9448,
+      "updatedAt": "2026-08-11T09:11:45.253Z",
+      "source": "scan"
+    },
+    "pnpm-workspace.yaml": {
+      "description": "",
+      "tokens": 12,
+      "hash": "08d75840c97ab0e7",
+      "size": 40,
+      "mtimeMs": 1786438264266.1658,
+      "updatedAt": "2026-08-11T09:11:45.253Z",
       "source": "scan"
     },
     "README.md": {
       "description": "Project documentation",
-      "tokens": 0,
-      "hash": "e3b0c44298fc1c14",
-      "size": 0,
-      "mtimeMs": 1786437692525.9783,
-      "updatedAt": "2026-08-11T08:44:11.462Z",
+      "tokens": 1213,
+      "hash": "511def32fd8ed1d1",
+      "size": 4914,
+      "mtimeMs": 1786439400332.0115,
+      "updatedAt": "2026-08-11T09:11:45.253Z",
       "source": "scan"
     }
   }

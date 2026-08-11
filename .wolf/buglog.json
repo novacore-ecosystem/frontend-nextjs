@@ -1,4 +1,17 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-08-11T00:00:00.000Z",
+      "error_message": "Compiled dist/**/*.js contained no \"use client\" directives anywhere after `tsup` build (verified via `head -c N` on every output file) — RSC client/server boundaries would have been silently broken for any Server Component importing an interactive package component.",
+      "file": "packages/shadcn/tsup.config.ts",
+      "root_cause": "tsup's default esbuild bundling (bundle: true, ESM code-splitting across 5 barrel entry points) merges multiple source modules into shared chunks. esbuild treats the bare `\"use client\";` string-literal expression statement as dead code (it isn't part of the ECMAScript spec) and strips it during bundling, regardless of which source files it came from.",
+      "fix": "Set `bundle: false` in tsup.config.ts so every src/**/*.{ts,tsx} file transpiles 1:1 into dist/ with no chunk merging, which preserves the directive naturally per file. Added packages/shadcn/scripts/postbuild-use-client.mjs as a safety net that reads each dist file's .js.map `sources` array and re-prepends \"use client\" if a compiled file traces back to a source file that has it but the directive is missing.",
+      "tags": ["tsup", "esbuild", "use-client", "rsc", "nextjs", "bundling"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-11T00:00:00.000Z"
+    }
+  ]
 }
