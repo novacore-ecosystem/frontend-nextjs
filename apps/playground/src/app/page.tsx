@@ -1,10 +1,13 @@
 import Link from "next/link";
 
 const links = [
-  { href: "/components", label: "Component showcase", description: "Buttons, badges, cards, dialogs, tabs…" },
-  { href: "/theme", label: "Theme customizer", description: "Live preview of mode, base, accent, radius, presets" },
-  { href: "/admin/dashboard", label: "Admin dashboard", description: "AdminLayout + AdminSidebar + AdminHeader" },
-  { href: "/admin/users", label: "Users (DataTable)", description: "PageHeader + DataTable + ConfirmDialog" },
+  { href: "/components", label: "shadcn: Component showcase", description: "Buttons, badges, cards, dialogs, tabs…" },
+  { href: "/theme", label: "shadcn: Theme customizer", description: "Live preview of mode, base, accent, radius, presets" },
+  { href: "/admin/dashboard", label: "shadcn: Admin dashboard", description: "AdminLayout + AdminSidebar + AdminHeader" },
+  { href: "/admin/users", label: "shadcn: Users (DataTable)", description: "PageHeader + DataTable + ConfirmDialog" },
+  { href: "/mui", label: "mui: Storefront home", description: "Header, Hero, ProductGrid, Testimonials, CTA, Footer" },
+  { href: "/mui/components", label: "mui: Component showcase", description: "Forms, feedback, product configurator, toasts" },
+  { href: "/mui/theme", label: "mui: Theme customizer", description: "Live preview of mode, preset, radius, density" },
 ];
 
 export default function Home() {
@@ -13,7 +16,7 @@ export default function Home() {
       <div>
         <h1 className="text-2xl font-semibold">NovaCore Playground</h1>
         <p className="text-sm text-muted-foreground">
-          Manual inspection app for @novacore/frontend-next-shadcn. Not a test suite.
+          Manual inspection app for @novacore/frontend-next-shadcn and @novacore/frontend-next-mui. Not a test suite.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

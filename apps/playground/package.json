@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@novacore/frontend-next-mui": "workspace:*",
     "@novacore/frontend-next-shadcn": "workspace:*",
     "next": "^15.1.6",
     "react": "^18.3.1",

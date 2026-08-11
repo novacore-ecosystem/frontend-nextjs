@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-11T09:11:45.254Z",
-    "fileCount": 71,
+    "lastScanned": "2026-08-11T09:59:55.061Z",
+    "fileCount": 152,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "b6d994d00cc8b2630edc644b5ab67483cde6e1c52635f9769847b409fc767f89",
-    "storeUpdatedAt": "2026-08-11T09:11:45.255Z"
+    "renderedHash": "cccba879eb4c0a4f1babc2512af8a56e6167af7fbc4909811b20231569bbd4b7",
+    "storeUpdatedAt": "2026-08-11T09:59:55.062Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -15,7 +15,7 @@
       "hash": "17a75695be5d4629",
       "size": 2221,
       "mtimeMs": 1786438114737.0137,
-      "updatedAt": "2026-08-11T09:11:45.240Z",
+      "updatedAt": "2026-08-11T09:59:55.029Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -24,7 +24,7 @@
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
       "mtimeMs": 1786438114737.0728,
-      "updatedAt": "2026-08-11T09:11:45.240Z",
+      "updatedAt": "2026-08-11T09:59:55.029Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -33,7 +33,7 @@
       "hash": "6d735b2c1c54a916",
       "size": 1323,
       "mtimeMs": 1786438114737.0728,
-      "updatedAt": "2026-08-11T09:11:45.241Z",
+      "updatedAt": "2026-08-11T09:59:55.030Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -42,7 +42,7 @@
       "hash": "f68759bb50af5ee4",
       "size": 1799,
       "mtimeMs": 1786438114737.1897,
-      "updatedAt": "2026-08-11T09:11:45.241Z",
+      "updatedAt": "2026-08-11T09:59:55.030Z",
       "source": "scan"
     },
     ".claude/settings.local.json": {
@@ -51,7 +51,7 @@
       "hash": "0225dd8212b2b110",
       "size": 199,
       "mtimeMs": 1786437756557.5662,
-      "updatedAt": "2026-08-11T09:11:45.241Z",
+      "updatedAt": "2026-08-11T09:59:55.031Z",
       "source": "scan"
     },
     ".codegraph/.gitignore": {
@@ -60,7 +60,16 @@
       "hash": "47c0dacebca9f56c",
       "size": 229,
       "mtimeMs": 1786438114737.1897,
-      "updatedAt": "2026-08-11T09:11:45.241Z",
+      "updatedAt": "2026-08-11T09:59:55.031Z",
+      "source": "scan"
+    },
+    ".gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 172,
+      "hash": "6bae4d41243bc3a3",
+      "size": 648,
+      "mtimeMs": 1786440112227.7642,
+      "updatedAt": "2026-08-11T09:59:55.032Z",
       "source": "scan"
     },
     "apps/playground/next-env.d.ts": {
@@ -69,25 +78,25 @@
       "hash": "85ae5aee75f01196",
       "size": 262,
       "mtimeMs": 1786439279317.4424,
-      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "updatedAt": "2026-08-11T09:59:55.032Z",
       "source": "scan"
     },
     "apps/playground/next.config.mjs": {
       "description": "Next.js configuration",
-      "tokens": 25,
-      "hash": "1e3206cb200e264f",
-      "size": 92,
-      "mtimeMs": 1786438884600.1323,
-      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "tokens": 49,
+      "hash": "92f6f9ef255c9131",
+      "size": 182,
+      "mtimeMs": 1786442175509.8906,
+      "updatedAt": "2026-08-11T09:59:55.032Z",
       "source": "scan"
     },
     "apps/playground/package.json": {
       "description": "Node.js package manifest",
-      "tokens": 157,
-      "hash": "d19d5d6ba96f95b7",
-      "size": 548,
-      "mtimeMs": 1786438880720.692,
-      "updatedAt": "2026-08-11T09:11:45.242Z",
+      "tokens": 171,
+      "hash": "9214a86ea370980d",
+      "size": 598,
+      "mtimeMs": 1786441783390.232,
+      "updatedAt": "2026-08-11T09:59:55.032Z",
       "source": "scan"
     },
     "apps/playground/src/app/admin/dashboard/page.tsx": {
@@ -96,7 +105,7 @@
       "hash": "e002622729a2c62f",
       "size": 844,
       "mtimeMs": 1786438946113.4902,
-      "updatedAt": "2026-08-11T09:11:45.243Z",
+      "updatedAt": "2026-08-11T09:59:55.033Z",
       "source": "scan"
     },
     "apps/playground/src/app/admin/layout.tsx": {
@@ -105,7 +114,7 @@
       "hash": "80ad7b3219b2e217",
       "size": 788,
       "mtimeMs": 1786438940000.434,
-      "updatedAt": "2026-08-11T09:11:45.243Z",
+      "updatedAt": "2026-08-11T09:59:55.034Z",
       "source": "scan"
     },
     "apps/playground/src/app/admin/users/page.tsx": {
@@ -114,7 +123,7 @@
       "hash": "5bc3e76e29c2e096",
       "size": 2286,
       "mtimeMs": 1786439036084.3164,
-      "updatedAt": "2026-08-11T09:11:45.244Z",
+      "updatedAt": "2026-08-11T09:59:55.034Z",
       "source": "scan",
       "symbols": [
         {
@@ -139,7 +148,7 @@
       "hash": "fc61b9d561ff8f81",
       "size": 4727,
       "mtimeMs": 1786438926470.3098,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.035Z",
       "source": "scan",
       "symbols": [
         {
@@ -157,17 +166,80 @@
       "hash": "8cb35eb4844c2626",
       "size": 507,
       "mtimeMs": 1786438901450.08,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.035Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/mui/components/page.tsx": {
+      "description": "MuiComponentsPage — renders form — uses useState",
+      "tokens": 1346,
+      "hash": "36b965113fbe51a8",
+      "size": 4728,
+      "mtimeMs": 1786441849226.0684,
+      "updatedAt": "2026-08-11T09:59:55.035Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "MuiComponentsPage",
+          "kind": "fn",
+          "startLine": 34,
+          "endLine": 148,
+          "tokens": 1222
+        }
+      ]
+    },
+    "apps/playground/src/app/mui/layout.tsx": {
+      "description": "MuiSectionLayout",
+      "tokens": 96,
+      "hash": "c37d32b187136282",
+      "size": 335,
+      "mtimeMs": 1786441806277.6755,
+      "updatedAt": "2026-08-11T09:59:55.036Z",
+      "source": "scan"
+    },
+    "apps/playground/src/app/mui/page.tsx": {
+      "description": "NAV_ITEMS",
+      "tokens": 1366,
+      "hash": "76aaa27482fbd239",
+      "size": 4781,
+      "mtimeMs": 1786441880896.358,
+      "updatedAt": "2026-08-11T09:59:55.036Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "MuiHomePage",
+          "kind": "fn",
+          "startLine": 32,
+          "endLine": 137,
+          "tokens": 1035
+        }
+      ]
+    },
+    "apps/playground/src/app/mui/theme/page.tsx": {
+      "description": "MuiThemePage",
+      "tokens": 135,
+      "hash": "606fcb44f52fa751",
+      "size": 474,
+      "mtimeMs": 1786441832189.9126,
+      "updatedAt": "2026-08-11T09:59:55.036Z",
       "source": "scan"
     },
     "apps/playground/src/app/page.tsx": {
       "description": "links",
-      "tokens": 388,
-      "hash": "26a0c6bc1962eebe",
-      "size": 1360,
-      "mtimeMs": 1786438909868.1575,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
-      "source": "scan"
+      "tokens": 512,
+      "hash": "252c42c0dcd8f3ea",
+      "size": 1791,
+      "mtimeMs": 1786441862092.186,
+      "updatedAt": "2026-08-11T09:59:55.036Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "Home",
+          "kind": "fn",
+          "startLine": 13,
+          "endLine": 37,
+          "tokens": 253
+        }
+      ]
     },
     "apps/playground/src/app/providers.tsx": {
       "description": "Providers",
@@ -175,7 +247,7 @@
       "hash": "8791c1d13b82e872",
       "size": 277,
       "mtimeMs": 1786438896415.0337,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.037Z",
       "source": "scan"
     },
     "apps/playground/src/app/theme/page.tsx": {
@@ -184,7 +256,7 @@
       "hash": "deec314cdf7bb922",
       "size": 453,
       "mtimeMs": 1786438934031.3792,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.037Z",
       "source": "scan"
     },
     "apps/playground/tsconfig.json": {
@@ -193,7 +265,16 @@
       "hash": "dcb8b4973accda3f",
       "size": 566,
       "mtimeMs": 1786438890088.4033,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.037Z",
+      "source": "scan"
+    },
+    "apps/playground/tsconfig.tsbuildinfo": {
+      "description": "",
+      "tokens": 37727,
+      "hash": "813e6f5fdae691ef",
+      "size": 141476,
+      "mtimeMs": 1786441890481.092,
+      "updatedAt": "2026-08-11T09:59:55.038Z",
       "source": "scan"
     },
     "CLAUDE.md": {
@@ -202,7 +283,7 @@
       "hash": "37c811f4697b18bb",
       "size": 1294,
       "mtimeMs": 1786438114738.7546,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.038Z",
       "source": "scan"
     },
     "package.json": {
@@ -211,7 +292,1258 @@
       "hash": "52b32b9cbb33373c",
       "size": 510,
       "mtimeMs": 1786439073765.9238,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.038Z",
+      "source": "scan"
+    },
+    "packages/mui/package.json": {
+      "description": "Node.js package manifest",
+      "tokens": 566,
+      "hash": "3eaea2e00bdd4517",
+      "size": 1979,
+      "mtimeMs": 1786440771824.0703,
+      "updatedAt": "2026-08-11T09:59:55.038Z",
+      "source": "scan"
+    },
+    "packages/mui/scripts/postbuild-use-client.mjs": {
+      "description": "tsup/esbuild strips the \"use client\" directive during bundling (it isn't",
+      "tokens": 600,
+      "hash": "40766fce43fff27d",
+      "size": 2250,
+      "mtimeMs": 1786440791279.882,
+      "updatedAt": "2026-08-11T09:59:55.038Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "walk",
+          "kind": "fn",
+          "startLine": 17,
+          "endLine": 66,
+          "tokens": 392
+        }
+      ]
+    },
+    "packages/mui/src/components/actions/button.tsx": {
+      "description": "VARIANT_MAP",
+      "tokens": 621,
+      "hash": "68566e86a16cdb43",
+      "size": 2172,
+      "mtimeMs": 1786441713926.8308,
+      "updatedAt": "2026-08-11T09:59:55.038Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ButtonProps",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 36,
+          "tokens": 275
+        },
+        {
+          "name": "Button",
+          "kind": "fn",
+          "startLine": 37,
+          "endLine": 71,
+          "tokens": 250
+        }
+      ]
+    },
+    "packages/mui/src/components/actions/icon-button.tsx": {
+      "description": "SIZE_MAP",
+      "tokens": 212,
+      "hash": "1f55f3d0926bfcb3",
+      "size": 739,
+      "mtimeMs": 1786441646863.802,
+      "updatedAt": "2026-08-11T09:59:55.038Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/actions/link-button.tsx": {
+      "description": "Semantic alias for Button used as a navigational link.",
+      "tokens": 86,
+      "hash": "4aca318ac42932cc",
+      "size": 300,
+      "mtimeMs": 1786441110575.3123,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/card/card.tsx": {
+      "description": "ELEVATION_MAP",
+      "tokens": 561,
+      "hash": "f2ace96776aa00dd",
+      "size": 1963,
+      "mtimeMs": 1786441646864.7332,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "CardProps",
+          "kind": "section",
+          "startLine": 8,
+          "endLine": 18,
+          "tokens": 82
+        },
+        {
+          "name": "Card",
+          "kind": "fn",
+          "startLine": 19,
+          "endLine": 38,
+          "tokens": 172
+        },
+        {
+          "name": "CardHeader",
+          "kind": "fn",
+          "startLine": 39,
+          "endLine": 46,
+          "tokens": 78
+        },
+        {
+          "name": "CardContent",
+          "kind": "fn",
+          "startLine": 47,
+          "endLine": 54,
+          "tokens": 65
+        },
+        {
+          "name": "CardFooter",
+          "kind": "fn",
+          "startLine": 55,
+          "endLine": 62,
+          "tokens": 83
+        }
+      ]
+    },
+    "packages/mui/src/components/card/feature-card.tsx": {
+      "description": "FeatureCard",
+      "tokens": 554,
+      "hash": "4b4cc2c1c42a6c83",
+      "size": 1937,
+      "mtimeMs": 1786441251588.6023,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "FeatureCardProps",
+          "kind": "section",
+          "startLine": 7,
+          "endLine": 14,
+          "tokens": 46
+        },
+        {
+          "name": "FeatureCard",
+          "kind": "fn",
+          "startLine": 15,
+          "endLine": 48,
+          "tokens": 243
+        },
+        {
+          "name": "ActionCardProps",
+          "kind": "section",
+          "startLine": 49,
+          "endLine": 56,
+          "tokens": 46
+        },
+        {
+          "name": "ActionCard",
+          "kind": "fn",
+          "startLine": 57,
+          "endLine": 74,
+          "tokens": 159
+        }
+      ]
+    },
+    "packages/mui/src/components/card/media-card.tsx": {
+      "description": "MediaCard",
+      "tokens": 381,
+      "hash": "d83fad5b66d04aaf",
+      "size": 1332,
+      "mtimeMs": 1786441242827.5222,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/data/avatar.tsx": {
+      "description": "SIZE_MAP",
+      "tokens": 197,
+      "hash": "d48ad4ae35fd1492",
+      "size": 689,
+      "mtimeMs": 1786441646862.7722,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/data/badge.tsx": {
+      "description": "TONE_TO_COLOR",
+      "tokens": 426,
+      "hash": "69a14d9d782f1b28",
+      "size": 1491,
+      "mtimeMs": 1786441646862.7183,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/data/rating.tsx": {
+      "description": "SIZE_MAP",
+      "tokens": 330,
+      "hash": "769a0551ac3a99f8",
+      "size": 1153,
+      "mtimeMs": 1786441960066.082,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/data/stat.tsx": {
+      "description": "Stat",
+      "tokens": 244,
+      "hash": "928799001be9770a",
+      "size": 855,
+      "mtimeMs": 1786441701015.7126,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/feedback/alert.tsx": {
+      "description": "Alert",
+      "tokens": 202,
+      "hash": "6c7dad3ab8cdfe7f",
+      "size": 707,
+      "mtimeMs": 1786441646863.1504,
+      "updatedAt": "2026-08-11T09:59:55.039Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/feedback/confirm-dialog.tsx": {
+      "description": "ConfirmDialog — renders modal",
+      "tokens": 384,
+      "hash": "39c72964571b13df",
+      "size": 1344,
+      "mtimeMs": 1786441506066.9297,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/feedback/dialog.tsx": {
+      "description": "Dialog",
+      "tokens": 494,
+      "hash": "236510293e67f1b6",
+      "size": 1728,
+      "mtimeMs": 1786441646863.4495,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/feedback/drawer.tsx": {
+      "description": "Drawer",
+      "tokens": 211,
+      "hash": "380ce30c9a1ba0dd",
+      "size": 738,
+      "mtimeMs": 1786441646862.8801,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/feedback/progress.tsx": {
+      "description": "Progress",
+      "tokens": 504,
+      "hash": "3a38714c875431cb",
+      "size": 1764,
+      "mtimeMs": 1786441646862.8298,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ProgressProps",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 15,
+          "tokens": 36
+        },
+        {
+          "name": "Progress",
+          "kind": "fn",
+          "startLine": 16,
+          "endLine": 22,
+          "tokens": 122
+        },
+        {
+          "name": "SkeletonProps",
+          "kind": "section",
+          "startLine": 23,
+          "endLine": 30,
+          "tokens": 51
+        },
+        {
+          "name": "Skeleton",
+          "kind": "fn",
+          "startLine": 31,
+          "endLine": 34,
+          "tokens": 60
+        },
+        {
+          "name": "Loading",
+          "kind": "fn",
+          "startLine": 35,
+          "endLine": 48,
+          "tokens": 139
+        }
+      ]
+    },
+    "packages/mui/src/components/feedback/toast.tsx": {
+      "description": "ToastContext — uses useCallback, useMemo, useContext",
+      "tokens": 561,
+      "hash": "e10928a06652aadc",
+      "size": 1961,
+      "mtimeMs": 1786441531926.1663,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ToastOptions",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 14,
+          "tokens": 27
+        },
+        {
+          "name": "ToastContextValue",
+          "kind": "section",
+          "startLine": 15,
+          "endLine": 22,
+          "tokens": 51
+        },
+        {
+          "name": "ActiveToast",
+          "kind": "section",
+          "startLine": 23,
+          "endLine": 26,
+          "tokens": 18
+        },
+        {
+          "name": "ToastProvider",
+          "kind": "fn",
+          "startLine": 27,
+          "endLine": 62,
+          "tokens": 348
+        },
+        {
+          "name": "useToast",
+          "kind": "fn",
+          "startLine": 63,
+          "endLine": 70,
+          "tokens": 57
+        }
+      ]
+    },
+    "packages/mui/src/components/feedback/tooltip.tsx": {
+      "description": "SIDE_TO_PLACEMENT",
+      "tokens": 174,
+      "hash": "2f3daa0dc2997d87",
+      "size": 607,
+      "mtimeMs": 1786441512800.9912,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/autocomplete.tsx": {
+      "description": "Autocomplete",
+      "tokens": 343,
+      "hash": "239f0c18030099dd",
+      "size": 1200,
+      "mtimeMs": 1786441995686.4077,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/checkbox-radio-switch.tsx": {
+      "description": "Checkbox",
+      "tokens": 750,
+      "hash": "d74f842f2be8d25c",
+      "size": 2624,
+      "mtimeMs": 1786442014726.582,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "CheckboxProps",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 20,
+          "tokens": 70
+        },
+        {
+          "name": "Checkbox",
+          "kind": "fn",
+          "startLine": 21,
+          "endLine": 35,
+          "tokens": 146
+        },
+        {
+          "name": "SwitchProps",
+          "kind": "section",
+          "startLine": 36,
+          "endLine": 47,
+          "tokens": 69
+        },
+        {
+          "name": "Switch",
+          "kind": "fn",
+          "startLine": 48,
+          "endLine": 62,
+          "tokens": 144
+        },
+        {
+          "name": "RadioOption",
+          "kind": "section",
+          "startLine": 63,
+          "endLine": 68,
+          "tokens": 28
+        },
+        {
+          "name": "RadioGroupProps",
+          "kind": "section",
+          "startLine": 69,
+          "endLine": 78,
+          "tokens": 55
+        },
+        {
+          "name": "RadioGroup",
+          "kind": "fn",
+          "startLine": 79,
+          "endLine": 88,
+          "tokens": 142
+        }
+      ]
+    },
+    "packages/mui/src/components/forms/date-field.tsx": {
+      "description": "Wraps the native `<input type=\"date\">` (via MUI TextField) rather than",
+      "tokens": 575,
+      "hash": "b4c2bdcbbf26c8d3",
+      "size": 2014,
+      "mtimeMs": 1786442021495.6438,
+      "updatedAt": "2026-08-11T09:59:55.040Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "DateFieldProps",
+          "kind": "section",
+          "startLine": 6,
+          "endLine": 25,
+          "tokens": 148
+        },
+        {
+          "name": "DateField",
+          "kind": "fn",
+          "startLine": 26,
+          "endLine": 44,
+          "tokens": 161
+        },
+        {
+          "name": "DateRangeFieldProps",
+          "kind": "section",
+          "startLine": 45,
+          "endLine": 55,
+          "tokens": 72
+        },
+        {
+          "name": "DateRangeField",
+          "kind": "fn",
+          "startLine": 56,
+          "endLine": 64,
+          "tokens": 146
+        }
+      ]
+    },
+    "packages/mui/src/components/forms/file-upload.tsx": {
+      "description": "Presentational drag/drop + click-to-browse area. Upload transport (to S3, an API, ...) is the application's responsibility.",
+      "tokens": 691,
+      "hash": "a83f7f27bda24362",
+      "size": 2418,
+      "mtimeMs": 1786441646864.3123,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "FileUploadProps",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 20,
+          "tokens": 100
+        },
+        {
+          "name": "FileUpload",
+          "kind": "fn",
+          "startLine": 21,
+          "endLine": 78,
+          "tokens": 524
+        }
+      ]
+    },
+    "packages/mui/src/components/forms/form-field.tsx": {
+      "description": "FormField",
+      "tokens": 310,
+      "hash": "2b2b055f21c876bb",
+      "size": 1082,
+      "mtimeMs": 1786441646864.2065,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/form.tsx": {
+      "description": "Form",
+      "tokens": 276,
+      "hash": "2e47d10de15b52ee",
+      "size": 964,
+      "mtimeMs": 1786441646864.933,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/password-field.tsx": {
+      "description": "PasswordField — uses useState",
+      "tokens": 550,
+      "hash": "8831debbac8c3eb1",
+      "size": 1922,
+      "mtimeMs": 1786441646864.2593,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "PasswordFieldProps",
+          "kind": "section",
+          "startLine": 11,
+          "endLine": 27,
+          "tokens": 98
+        },
+        {
+          "name": "PasswordField",
+          "kind": "fn",
+          "startLine": 28,
+          "endLine": 77,
+          "tokens": 340
+        }
+      ]
+    },
+    "packages/mui/src/components/forms/search-field.tsx": {
+      "description": "SearchField",
+      "tokens": 454,
+      "hash": "0c1e2694e41506b1",
+      "size": 1588,
+      "mtimeMs": 1786441646864.8364,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/select.tsx": {
+      "description": "Select",
+      "tokens": 476,
+      "hash": "21da2d922604377c",
+      "size": 1665,
+      "mtimeMs": 1786441990674.362,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/text-field.tsx": {
+      "description": "TextField",
+      "tokens": 427,
+      "hash": "2d0f851e56cdd8aa",
+      "size": 1492,
+      "mtimeMs": 1786441975705.225,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/forms/textarea.tsx": {
+      "description": "Textarea",
+      "tokens": 338,
+      "hash": "948fc79d59ea06b8",
+      "size": 1180,
+      "mtimeMs": 1786441985985.319,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/hero/cta-section.tsx": {
+      "description": "CTASection",
+      "tokens": 459,
+      "hash": "16c31f4687083192",
+      "size": 1604,
+      "mtimeMs": 1786441646863.3987,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/hero/feature-section.tsx": {
+      "description": "FeatureGrid",
+      "tokens": 655,
+      "hash": "f229ee6175ef28df",
+      "size": 2291,
+      "mtimeMs": 1786441646862.9355,
+      "updatedAt": "2026-08-11T09:59:55.041Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "FeatureItem",
+          "kind": "section",
+          "startLine": 9,
+          "endLine": 14,
+          "tokens": 29
+        },
+        {
+          "name": "FeatureGridProps",
+          "kind": "section",
+          "startLine": 15,
+          "endLine": 23,
+          "tokens": 56
+        },
+        {
+          "name": "FeatureGrid",
+          "kind": "fn",
+          "startLine": 24,
+          "endLine": 68,
+          "tokens": 479
+        }
+      ]
+    },
+    "packages/mui/src/components/hero/hero-section.tsx": {
+      "description": "HeroSection",
+      "tokens": 584,
+      "hash": "14aedee1201945a5",
+      "size": 2041,
+      "mtimeMs": 1786441646863.2017,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "HeroSectionProps",
+          "kind": "section",
+          "startLine": 8,
+          "endLine": 18,
+          "tokens": 71
+        },
+        {
+          "name": "HeroSection",
+          "kind": "fn",
+          "startLine": 19,
+          "endLine": 62,
+          "tokens": 438
+        }
+      ]
+    },
+    "packages/mui/src/components/hero/stats-section.tsx": {
+      "description": "StatsSection",
+      "tokens": 333,
+      "hash": "a9df37abed8eecb4",
+      "size": 1163,
+      "mtimeMs": 1786441646863.5574,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/hero/testimonial-section.tsx": {
+      "description": "TestimonialSection",
+      "tokens": 592,
+      "hash": "345b08b18c990e94",
+      "size": 2076,
+      "mtimeMs": 1786441646864.626,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "Testimonial",
+          "kind": "section",
+          "startLine": 10,
+          "endLine": 16,
+          "tokens": 30
+        },
+        {
+          "name": "TestimonialSectionProps",
+          "kind": "section",
+          "startLine": 17,
+          "endLine": 23,
+          "tokens": 38
+        },
+        {
+          "name": "TestimonialSection",
+          "kind": "fn",
+          "startLine": 24,
+          "endLine": 62,
+          "tokens": 425
+        }
+      ]
+    },
+    "packages/mui/src/components/image/responsive-image.tsx": {
+      "description": "Thin wrapper over `next/image` — keeps Next's image optimization/loading",
+      "tokens": 443,
+      "hash": "aa9d7eaa9f70cafb",
+      "size": 1550,
+      "mtimeMs": 1786441646863.61,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/aspect-ratio.tsx": {
+      "description": "AspectRatio",
+      "tokens": 185,
+      "hash": "495747975b786aa0",
+      "size": 645,
+      "mtimeMs": 1786441646863.7537,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/box.tsx": {
+      "description": "Box",
+      "tokens": 168,
+      "hash": "05cb8fe029bd3c73",
+      "size": 585,
+      "mtimeMs": 1786441658942.328,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/container.tsx": {
+      "description": "MAX_WIDTH_MAP",
+      "tokens": 231,
+      "hash": "7260a61c9d2a1084",
+      "size": 807,
+      "mtimeMs": 1786441646863.3489,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/divider.tsx": {
+      "description": "Divider",
+      "tokens": 120,
+      "hash": "e5e196dad3d211b5",
+      "size": 420,
+      "mtimeMs": 1786441646863.8484,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/flex.tsx": {
+      "description": "Row-oriented convenience wrapper over Stack.",
+      "tokens": 66,
+      "hash": "402e9107630bc207",
+      "size": 230,
+      "mtimeMs": 1786441049175.7507,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/grid.tsx": {
+      "description": "CSS-grid based layout — own responsive contract, not MUI's Grid item/xs/sm/md API.",
+      "tokens": 506,
+      "hash": "a3a687fd17f1b3cf",
+      "size": 1772,
+      "mtimeMs": 1786441646863.5024,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "GridProps",
+          "kind": "section",
+          "startLine": 5,
+          "endLine": 11,
+          "tokens": 41
+        },
+        {
+          "name": "toTemplateColumns",
+          "kind": "fn",
+          "startLine": 12,
+          "endLine": 22,
+          "tokens": 154
+        },
+        {
+          "name": "Grid",
+          "kind": "fn",
+          "startLine": 23,
+          "endLine": 33,
+          "tokens": 91
+        },
+        {
+          "name": "GridItemProps",
+          "kind": "section",
+          "startLine": 34,
+          "endLine": 39,
+          "tokens": 37
+        },
+        {
+          "name": "GridItem",
+          "kind": "fn",
+          "startLine": 40,
+          "endLine": 53,
+          "tokens": 138
+        }
+      ]
+    },
+    "packages/mui/src/components/layout/section.tsx": {
+      "description": "PADDING_MAP",
+      "tokens": 342,
+      "hash": "0e6768b9a6c5d77a",
+      "size": 1196,
+      "mtimeMs": 1786441646863.252,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/spacer.tsx": {
+      "description": "Spacer",
+      "tokens": 120,
+      "hash": "86fdfa7eb1cf7c1d",
+      "size": 417,
+      "mtimeMs": 1786441039701.664,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/layout/stack.tsx": {
+      "description": "ALIGN_MAP",
+      "tokens": 388,
+      "hash": "d1767fce4b5640b0",
+      "size": 1355,
+      "mtimeMs": 1786442160096.9116,
+      "updatedAt": "2026-08-11T09:59:55.042Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/motion/motion.tsx": {
+      "description": "Optional, tasteful entrance animations. Respects `prefers-reduced-motion`. Only loaded by files that import it.",
+      "tokens": 475,
+      "hash": "cf406a570e8ffd79",
+      "size": 1660,
+      "mtimeMs": 1786441542442.2625,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/navigation/breadcrumb.tsx": {
+      "description": "Breadcrumb",
+      "tokens": 290,
+      "hash": "27aa3fb2bb7e920e",
+      "size": 1013,
+      "mtimeMs": 1786441646863.301,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/navigation/footer.tsx": {
+      "description": "Footer",
+      "tokens": 440,
+      "hash": "d9f6207485109ca9",
+      "size": 1538,
+      "mtimeMs": 1786441646863.66,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/navigation/header.tsx": {
+      "description": "Rendered inside the mobile drawer when the menu button is tapped.",
+      "tokens": 670,
+      "hash": "e86c87b06908dde7",
+      "size": 2344,
+      "mtimeMs": 1786441646864.7834,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "HeaderProps",
+          "kind": "section",
+          "startLine": 13,
+          "endLine": 23,
+          "tokens": 83
+        },
+        {
+          "name": "Header",
+          "kind": "fn",
+          "startLine": 24,
+          "endLine": 61,
+          "tokens": 464
+        }
+      ]
+    },
+    "packages/mui/src/components/navigation/navigation-menu.tsx": {
+      "description": "NavigationMenu",
+      "tokens": 255,
+      "hash": "2e75790eaa416c96",
+      "size": 891,
+      "mtimeMs": 1786441646862.9905,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/price.tsx": {
+      "description": "Formats amounts via `@novacore/frontend-foundation`'s `formatCurrency` (Intl-backed, locale/CLDR-correct).",
+      "tokens": 403,
+      "hash": "525928956cd8a846",
+      "size": 1409,
+      "mtimeMs": 1786441646863.9001,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/product-badge.tsx": {
+      "description": "KIND_TO_TONE",
+      "tokens": 181,
+      "hash": "028b6fcfbbb6c7d2",
+      "size": 631,
+      "mtimeMs": 1786441314640.179,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/product-card.tsx": {
+      "description": "Renders a `ProductCardViewModel` — map your ProductService DTO into this shape at the call site.",
+      "tokens": 622,
+      "hash": "c7f5648a9617d695",
+      "size": 2179,
+      "mtimeMs": 1786441325153.2751,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ProductCardViewModel",
+          "kind": "section",
+          "startLine": 11,
+          "endLine": 24,
+          "tokens": 76
+        },
+        {
+          "name": "ProductCardProps",
+          "kind": "section",
+          "startLine": 25,
+          "endLine": 33,
+          "tokens": 84
+        },
+        {
+          "name": "ProductCard",
+          "kind": "fn",
+          "startLine": 34,
+          "endLine": 62,
+          "tokens": 343
+        }
+      ]
+    },
+    "packages/mui/src/components/product/product-gallery.tsx": {
+      "description": "ProductGallery — uses useState",
+      "tokens": 436,
+      "hash": "5f61b74493c6b989",
+      "size": 1525,
+      "mtimeMs": 1786441646864.0535,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/product-grid.tsx": {
+      "description": "ProductGrid",
+      "tokens": 257,
+      "hash": "0ddd461392264923",
+      "size": 899,
+      "mtimeMs": 1786441339444.4058,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/product-quantity-selector.tsx": {
+      "description": "ProductQuantitySelector",
+      "tokens": 383,
+      "hash": "d602737c386596ad",
+      "size": 1339,
+      "mtimeMs": 1786441646864.3608,
+      "updatedAt": "2026-08-11T09:59:55.043Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/product/product-variant-selector.tsx": {
+      "description": "Fully controlled — no internal state, so it stays composable inside either server- or client-rendered trees.",
+      "tokens": 555,
+      "hash": "9008499d87e793bd",
+      "size": 1943,
+      "mtimeMs": 1786442034340.7615,
+      "updatedAt": "2026-08-11T09:59:55.044Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ProductVariantOption",
+          "kind": "section",
+          "startLine": 6,
+          "endLine": 11,
+          "tokens": 28
+        },
+        {
+          "name": "ProductVariantSelectorProps",
+          "kind": "section",
+          "startLine": 12,
+          "endLine": 21,
+          "tokens": 89
+        },
+        {
+          "name": "ProductVariantSelector",
+          "kind": "fn",
+          "startLine": 22,
+          "endLine": 61,
+          "tokens": 391
+        }
+      ]
+    },
+    "packages/mui/src/components/typography/heading.tsx": {
+      "description": "SIZE_TO_VARIANT",
+      "tokens": 384,
+      "hash": "8c62182940529ce7",
+      "size": 1342,
+      "mtimeMs": 1786441646864.986,
+      "updatedAt": "2026-08-11T09:59:55.044Z",
+      "source": "scan"
+    },
+    "packages/mui/src/components/typography/misc.tsx": {
+      "description": "Label",
+      "tokens": 652,
+      "hash": "b6305463178adc19",
+      "size": 2281,
+      "mtimeMs": 1786441646863.102,
+      "updatedAt": "2026-08-11T09:59:55.044Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "LabelProps",
+          "kind": "section",
+          "startLine": 6,
+          "endLine": 12,
+          "tokens": 38
+        },
+        {
+          "name": "Label",
+          "kind": "fn",
+          "startLine": 13,
+          "endLine": 30,
+          "tokens": 151
+        },
+        {
+          "name": "CaptionProps",
+          "kind": "section",
+          "startLine": 31,
+          "endLine": 35,
+          "tokens": 27
+        },
+        {
+          "name": "Caption",
+          "kind": "fn",
+          "startLine": 36,
+          "endLine": 43,
+          "tokens": 78
+        },
+        {
+          "name": "LinkProps",
+          "kind": "section",
+          "startLine": 44,
+          "endLine": 51,
+          "tokens": 49
+        },
+        {
+          "name": "Link",
+          "kind": "fn",
+          "startLine": 52,
+          "endLine": 66,
+          "tokens": 106
+        },
+        {
+          "name": "CodeProps",
+          "kind": "section",
+          "startLine": 67,
+          "endLine": 71,
+          "tokens": 26
+        },
+        {
+          "name": "Code",
+          "kind": "fn",
+          "startLine": 72,
+          "endLine": 86,
+          "tokens": 124
+        }
+      ]
+    },
+    "packages/mui/src/components/typography/text.tsx": {
+      "description": "SIZE_TO_FONT_SIZE",
+      "tokens": 435,
+      "hash": "d5dfc32355f1eeb6",
+      "size": 1521,
+      "mtimeMs": 1786441646863.9504,
+      "updatedAt": "2026-08-11T09:59:55.044Z",
+      "source": "scan"
+    },
+    "packages/mui/src/exports/forms.ts": {
+      "description": "Declares FormProps",
+      "tokens": 308,
+      "hash": "30f04d7fc6a4461b",
+      "size": 1076,
+      "mtimeMs": 1786441582846.632,
+      "updatedAt": "2026-08-11T09:59:55.044Z",
+      "source": "scan"
+    },
+    "packages/mui/src/exports/layout.ts": {
+      "description": "Declares ContainerProps",
+      "tokens": 360,
+      "hash": "546334d6bb5af41e",
+      "size": 1259,
+      "mtimeMs": 1786441576351.5725,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan"
+    },
+    "packages/mui/src/exports/navigation.ts": {
+      "description": "Declares HeaderProps",
+      "tokens": 114,
+      "hash": "e22027be20e02deb",
+      "size": 397,
+      "mtimeMs": 1786441595561.7483,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan"
+    },
+    "packages/mui/src/exports/product.ts": {
+      "description": "Declares ProductCardProps",
+      "tokens": 239,
+      "hash": "9bd4adc20a0d54b8",
+      "size": 834,
+      "mtimeMs": 1786441588784.6863,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan"
+    },
+    "packages/mui/src/index.ts": {
+      "description": "Declares ContainerProps",
+      "tokens": 1636,
+      "hash": "a1072a0c079ebf56",
+      "size": 5725,
+      "mtimeMs": 1786441568737.503,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan"
+    },
+    "packages/mui/src/lib/types.ts": {
+      "description": "Structural escape hatch for advanced style overrides (mirrors MUI's `sx`",
+      "tokens": 191,
+      "hash": "c8a075ec4790ee7d",
+      "size": 670,
+      "mtimeMs": 1786440918307.5532,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan"
+    },
+    "packages/mui/src/theme/client-provider.tsx": {
+      "description": "Single high-level provider: MUI's Emotion cache (App Router SSR-safe via",
+      "tokens": 934,
+      "hash": "4312f60f8a9a9927",
+      "size": 3269,
+      "mtimeMs": 1786440880057.2034,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "ThemeContextValue",
+          "kind": "section",
+          "startLine": 11,
+          "endLine": 19,
+          "tokens": 80
+        },
+        {
+          "name": "getSystemMode",
+          "kind": "fn",
+          "startLine": 20,
+          "endLine": 24,
+          "tokens": 60
+        },
+        {
+          "name": "ClientProviderProps",
+          "kind": "section",
+          "startLine": 25,
+          "endLine": 35,
+          "tokens": 104
+        },
+        {
+          "name": "ClientProvider",
+          "kind": "fn",
+          "startLine": 36,
+          "endLine": 75,
+          "tokens": 506
+        },
+        {
+          "name": "useClientTheme",
+          "kind": "fn",
+          "startLine": 76,
+          "endLine": 83,
+          "tokens": 60
+        }
+      ]
+    },
+    "packages/mui/src/theme/create-mui-theme.ts": {
+      "description": "Semantic Tokens -> MUI Theme. The only file in the package allowed to",
+      "tokens": 589,
+      "hash": "9d8901c2732b01b0",
+      "size": 2062,
+      "mtimeMs": 1786440859955.0193,
+      "updatedAt": "2026-08-11T09:59:55.045Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "createMuiTheme",
+          "kind": "fn",
+          "startLine": 10,
+          "endLine": 49,
+          "tokens": 468
+        }
+      ]
+    },
+    "packages/mui/src/theme/index.ts": {
+      "description": "",
+      "tokens": 111,
+      "hash": "d952eed825f16249",
+      "size": 388,
+      "mtimeMs": 1786440899869.3845,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan"
+    },
+    "packages/mui/src/theme/resolve-theme.ts": {
+      "description": "Config -> Resolved Theme -> Semantic Tokens.",
+      "tokens": 453,
+      "hash": "41ba5094ddae25cd",
+      "size": 1586,
+      "mtimeMs": 1786440842656.861,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan"
+    },
+    "packages/mui/src/theme/theme-customizer.tsx": {
+      "description": "Dev/demo control panel for previewing mode, preset, radius, and density live.",
+      "tokens": 997,
+      "hash": "a60459fd87113eb5",
+      "size": 3488,
+      "mtimeMs": 1786441693203.6414,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "chipButtonStyle",
+          "kind": "fn",
+          "startLine": 16,
+          "endLine": 31,
+          "tokens": 136
+        },
+        {
+          "name": "ThemeCustomizer",
+          "kind": "fn",
+          "startLine": 32,
+          "endLine": 113,
+          "tokens": 695
+        }
+      ]
+    },
+    "packages/mui/src/theme/tokens.ts": {
+      "description": "Exports PRESET_NAMES, resolvePresetTokens, RADIUS_VALUES",
+      "tokens": 881,
+      "hash": "e6306ddd8b37c9b1",
+      "size": 3081,
+      "mtimeMs": 1786440833181.7744,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "PresetDefinition",
+          "kind": "section",
+          "startLine": 18,
+          "endLine": 36,
+          "tokens": 398
+        },
+        {
+          "name": "resolvePresetTokens",
+          "kind": "fn",
+          "startLine": 37,
+          "endLine": 65,
+          "tokens": 197
+        }
+      ]
+    },
+    "packages/mui/src/theme/types.ts": {
+      "description": "Semantic design tokens every component consumes. Values are hex/CSS color strings.",
+      "tokens": 407,
+      "hash": "68c172b1175368a3",
+      "size": 1424,
+      "mtimeMs": 1786440806546.5308,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan"
+    },
+    "packages/mui/tsconfig.json": {
+      "description": "TypeScript configuration",
+      "tokens": 135,
+      "hash": "61cea246c3ed8f6a",
+      "size": 470,
+      "mtimeMs": 1786440780352.291,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
+      "source": "scan"
+    },
+    "packages/mui/tsup.config.ts": {
+      "description": "/*.{ts,tsx}\"],",
+      "tokens": 235,
+      "hash": "78a95928600df724",
+      "size": 821,
+      "mtimeMs": 1786440786895.2307,
+      "updatedAt": "2026-08-11T09:59:55.046Z",
       "source": "scan"
     },
     "packages/shadcn/package.json": {
@@ -220,7 +1552,7 @@
       "hash": "b9edd85bf544d39a",
       "size": 2535,
       "mtimeMs": 1786439232504.1794,
-      "updatedAt": "2026-08-11T09:11:45.245Z",
+      "updatedAt": "2026-08-11T09:59:55.046Z",
       "source": "scan"
     },
     "packages/shadcn/postcss.config.js": {
@@ -229,7 +1561,7 @@
       "hash": "e32657baf631d7c5",
       "size": 81,
       "mtimeMs": 1786438350595.0212,
-      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "updatedAt": "2026-08-11T09:59:55.046Z",
       "source": "scan"
     },
     "packages/shadcn/scripts/postbuild-use-client.mjs": {
@@ -238,7 +1570,7 @@
       "hash": "40766fce43fff27d",
       "size": 2250,
       "mtimeMs": 1786439169034.98,
-      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "updatedAt": "2026-08-11T09:59:55.047Z",
       "source": "scan",
       "symbols": [
         {
@@ -256,7 +1588,7 @@
       "hash": "d1c429644b03e4f8",
       "size": 544,
       "mtimeMs": 1786438764127.8188,
-      "updatedAt": "2026-08-11T09:11:45.246Z",
+      "updatedAt": "2026-08-11T09:59:55.047Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/admin/admin-layout.tsx": {
@@ -265,7 +1597,7 @@
       "hash": "75a4673aa91363b0",
       "size": 2327,
       "mtimeMs": 1786438741678.6128,
-      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "updatedAt": "2026-08-11T09:59:55.048Z",
       "source": "scan",
       "symbols": [
         {
@@ -311,7 +1643,7 @@
       "hash": "6d51a198b029f286",
       "size": 1345,
       "mtimeMs": 1786438749237.6821,
-      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "updatedAt": "2026-08-11T09:59:55.048Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/admin/data-table.tsx": {
@@ -320,7 +1652,7 @@
       "hash": "587bd8584ed099a6",
       "size": 8501,
       "mtimeMs": 1786439015635.1287,
-      "updatedAt": "2026-08-11T09:11:45.247Z",
+      "updatedAt": "2026-08-11T09:59:55.048Z",
       "source": "scan",
       "symbols": [
         {
@@ -373,7 +1705,7 @@
       "hash": "1d9b0f217da298c7",
       "size": 2383,
       "mtimeMs": 1786438775687.925,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.048Z",
       "source": "scan",
       "symbols": [
         {
@@ -433,7 +1765,7 @@
       "hash": "b5470587265cf22b",
       "size": 718,
       "mtimeMs": 1786438798715.1365,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.049Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/admin/states.tsx": {
@@ -442,7 +1774,7 @@
       "hash": "7445552224b431a8",
       "size": 2351,
       "mtimeMs": 1786438786080.0205,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.049Z",
       "source": "scan",
       "symbols": [
         {
@@ -481,7 +1813,7 @@
       "hash": "a2cb4c853b5175ab",
       "size": 651,
       "mtimeMs": 1786438791700.072,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.049Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/composed/confirm-dialog.tsx": {
@@ -490,7 +1822,7 @@
       "hash": "912cb98ab2e32be4",
       "size": 1345,
       "mtimeMs": 1786438727726.4846,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.049Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/composed/form-field.tsx": {
@@ -499,7 +1831,7 @@
       "hash": "3c8cee332b78e9fa",
       "size": 1572,
       "mtimeMs": 1786438720644.4197,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.050Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/composed/password-input.tsx": {
@@ -508,7 +1840,7 @@
       "hash": "a12816299c54b01d",
       "size": 1030,
       "mtimeMs": 1786438711636.337,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.050Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/composed/search-input.tsx": {
@@ -517,7 +1849,7 @@
       "hash": "515df9168db9a1d2",
       "size": 1378,
       "mtimeMs": 1786438705323.2788,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.050Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/avatar.tsx": {
@@ -526,7 +1858,7 @@
       "hash": "f77d67d9ddea8a27",
       "size": 947,
       "mtimeMs": 1786438578125.1108,
-      "updatedAt": "2026-08-11T09:11:45.248Z",
+      "updatedAt": "2026-08-11T09:59:55.050Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/badge.tsx": {
@@ -535,7 +1867,7 @@
       "hash": "d8649716fddb32fb",
       "size": 1324,
       "mtimeMs": 1786438540007.7607,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.050Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/button.tsx": {
@@ -544,7 +1876,7 @@
       "hash": "c7002435d68999e3",
       "size": 2233,
       "mtimeMs": 1786438507504.4622,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.051Z",
       "source": "scan",
       "symbols": [
         {
@@ -562,7 +1894,7 @@
       "hash": "c56e043350441519",
       "size": 1762,
       "mtimeMs": 1786438548926.8425,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.051Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/checkbox.tsx": {
@@ -571,7 +1903,7 @@
       "hash": "9266a41790edf1f9",
       "size": 1288,
       "mtimeMs": 1786438585639.1797,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.051Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/dialog.tsx": {
@@ -580,7 +1912,7 @@
       "hash": "4fea6643df893761",
       "size": 2810,
       "mtimeMs": 1786438665465.9128,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan",
       "symbols": [
         {
@@ -633,7 +1965,7 @@
       "hash": "3806a06515233fad",
       "size": 3331,
       "mtimeMs": 1786438690538.143,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan",
       "symbols": [
         {
@@ -672,7 +2004,7 @@
       "hash": "a548d2d05d111eb8",
       "size": 800,
       "mtimeMs": 1786438522896.6035,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/label.tsx": {
@@ -681,7 +2013,7 @@
       "hash": "6cd3338c15dcbb4d",
       "size": 743,
       "mtimeMs": 1786438533381.7,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/popover.tsx": {
@@ -690,7 +2022,7 @@
       "hash": "6d6db80409804998",
       "size": 1236,
       "mtimeMs": 1786438653772.8054,
-      "updatedAt": "2026-08-11T09:11:45.249Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/select.tsx": {
@@ -699,7 +2031,7 @@
       "hash": "60fda505795c2f6c",
       "size": 2604,
       "mtimeMs": 1786438676201.0115,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.052Z",
       "source": "scan",
       "symbols": [
         {
@@ -731,7 +2063,7 @@
       "hash": "21e7ac06b65d738f",
       "size": 783,
       "mtimeMs": 1786438562350.9658,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.053Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/skeleton.tsx": {
@@ -740,7 +2072,7 @@
       "hash": "30d0d8b48247f5be",
       "size": 252,
       "mtimeMs": 1786438571939.054,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.053Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/switch.tsx": {
@@ -749,7 +2081,7 @@
       "hash": "86b9b6e3b3a92ace",
       "size": 1239,
       "mtimeMs": 1786438593359.2507,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.053Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/tabs.tsx": {
@@ -758,7 +2090,7 @@
       "hash": "e82c4b66d24cf011",
       "size": 1629,
       "mtimeMs": 1786438618141.4783,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.053Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/textarea.tsx": {
@@ -767,7 +2099,7 @@
       "hash": "23d3ec7e08d28cd2",
       "size": 818,
       "mtimeMs": 1786438528117.6516,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.054Z",
       "source": "scan"
     },
     "packages/shadcn/src/components/ui/tooltip.tsx": {
@@ -776,7 +2108,7 @@
       "hash": "be3dfe13359c61b0",
       "size": 1125,
       "mtimeMs": 1786438646561.7393,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.054Z",
       "source": "scan"
     },
     "packages/shadcn/src/exports/data.ts": {
@@ -785,7 +2117,7 @@
       "hash": "11197713cf02a578",
       "size": 425,
       "mtimeMs": 1786439026146.0164,
-      "updatedAt": "2026-08-11T09:11:45.250Z",
+      "updatedAt": "2026-08-11T09:59:55.054Z",
       "source": "scan"
     },
     "packages/shadcn/src/exports/forms.ts": {
@@ -794,7 +2126,7 @@
       "hash": "ce6a4af49f04177e",
       "size": 729,
       "mtimeMs": 1786438845833.7852,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.054Z",
       "source": "scan"
     },
     "packages/shadcn/src/exports/layout.ts": {
@@ -803,7 +2135,7 @@
       "hash": "86f8450b8dd7a99f",
       "size": 542,
       "mtimeMs": 1786438854962.653,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.055Z",
       "source": "scan"
     },
     "packages/shadcn/src/index.ts": {
@@ -812,7 +2144,7 @@
       "hash": "75881a34b5cb4483",
       "size": 3030,
       "mtimeMs": 1786439021243.328,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.055Z",
       "source": "scan"
     },
     "packages/shadcn/src/lib/cn.ts": {
@@ -821,7 +2153,7 @@
       "hash": "4acbc7165a8d5473",
       "size": 169,
       "mtimeMs": 1786438477113.183,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.055Z",
       "source": "scan"
     },
     "packages/shadcn/src/styles/globals.css": {
@@ -830,7 +2162,7 @@
       "hash": "287546f6f3a24c18",
       "size": 2202,
       "mtimeMs": 1786438495170.1968,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.055Z",
       "source": "scan"
     },
     "packages/shadcn/src/theme/admin-provider.tsx": {
@@ -839,7 +2171,7 @@
       "hash": "f911cda5352f913e",
       "size": 2714,
       "mtimeMs": 1786438445135.8894,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.056Z",
       "source": "scan",
       "symbols": [
         {
@@ -892,7 +2224,7 @@
       "hash": "335ca379fea42413",
       "size": 509,
       "mtimeMs": 1786438473268.1477,
-      "updatedAt": "2026-08-11T09:11:45.251Z",
+      "updatedAt": "2026-08-11T09:59:55.056Z",
       "source": "scan"
     },
     "packages/shadcn/src/theme/presets.ts": {
@@ -901,7 +2233,7 @@
       "hash": "aec5dbccdd7750df",
       "size": 1226,
       "mtimeMs": 1786438423058.6868,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.056Z",
       "source": "scan"
     },
     "packages/shadcn/src/theme/resolve-theme.ts": {
@@ -910,7 +2242,7 @@
       "hash": "c5d638333ef95d39",
       "size": 1816,
       "mtimeMs": 1786438431612.7651,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.056Z",
       "source": "scan",
       "symbols": [
         {
@@ -935,7 +2267,7 @@
       "hash": "ceb57cb7c013e2b6",
       "size": 4249,
       "mtimeMs": 1786438459940.0254,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.056Z",
       "source": "scan",
       "symbols": [
         {
@@ -960,7 +2292,7 @@
       "hash": "5aa8e5d4c190bca7",
       "size": 3852,
       "mtimeMs": 1786438414452.6077,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.057Z",
       "source": "scan",
       "symbols": [
         {
@@ -999,7 +2331,7 @@
       "hash": "297b34aa940722f7",
       "size": 1702,
       "mtimeMs": 1786438395685.4353,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.057Z",
       "source": "scan"
     },
     "packages/shadcn/tailwind.config.ts": {
@@ -1008,7 +2340,7 @@
       "hash": "d53b5db39ccef30c",
       "size": 2907,
       "mtimeMs": 1786438364092.9753,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.057Z",
       "source": "scan"
     },
     "packages/shadcn/tsconfig.json": {
@@ -1017,7 +2349,7 @@
       "hash": "61cea246c3ed8f6a",
       "size": 470,
       "mtimeMs": 1786438331022.8416,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.057Z",
       "source": "scan"
     },
     "packages/shadcn/tsup.config.ts": {
@@ -1026,16 +2358,16 @@
       "hash": "77555922fbec9fd2",
       "size": 672,
       "mtimeMs": 1786439220210.0054,
-      "updatedAt": "2026-08-11T09:11:45.252Z",
+      "updatedAt": "2026-08-11T09:59:55.057Z",
       "source": "scan"
     },
     "pnpm-lock.yaml": {
       "description": "pnpm lock file",
-      "tokens": 32686,
-      "hash": "7914db22cfd5ce61",
-      "size": 114399,
-      "mtimeMs": 1786439059395.9448,
-      "updatedAt": "2026-08-11T09:11:45.253Z",
+      "tokens": 40506,
+      "hash": "d84e288fc6778a13",
+      "size": 141768,
+      "mtimeMs": 1786441795080.361,
+      "updatedAt": "2026-08-11T09:59:55.059Z",
       "source": "scan"
     },
     "pnpm-workspace.yaml": {
@@ -1044,7 +2376,7 @@
       "hash": "08d75840c97ab0e7",
       "size": 40,
       "mtimeMs": 1786438264266.1658,
-      "updatedAt": "2026-08-11T09:11:45.253Z",
+      "updatedAt": "2026-08-11T09:59:55.059Z",
       "source": "scan"
     },
     "README.md": {
@@ -1053,7 +2385,7 @@
       "hash": "511def32fd8ed1d1",
       "size": 4914,
       "mtimeMs": 1786439400332.0115,
-      "updatedAt": "2026-08-11T09:11:45.253Z",
+      "updatedAt": "2026-08-11T09:59:55.059Z",
       "source": "scan"
     }
   }

@@ -5,6 +5,7 @@ web_modules/
 dist/
 build/
 .next/
+*.tsbuildinfo
 .nuxt/
 out/
 .output/

@@ -1,0 +1,76 @@
+{
+  "name": "@novacore/frontend-next-mui",
+  "version": "0.1.0",
+  "description": "NovaCore Next.js client-facing UI implementation (MUI/Emotion based). Public API hides MUI entirely.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js"
+    },
+    "./layout": {
+      "types": "./dist/exports/layout.d.ts",
+      "import": "./dist/exports/layout.js"
+    },
+    "./forms": {
+      "types": "./dist/exports/forms.d.ts",
+      "import": "./dist/exports/forms.js"
+    },
+    "./product": {
+      "types": "./dist/exports/product.d.ts",
+      "import": "./dist/exports/product.js"
+    },
+    "./navigation": {
+      "types": "./dist/exports/navigation.d.ts",
+      "import": "./dist/exports/navigation.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/postbuild-use-client.mjs",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "novacore",
+    "nextjs",
+    "mui",
+    "ui"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0",
+    "next": "^14.0.0 || ^15.0.0"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.3.1",
+    "@mui/material": "^9.3.1",
+    "@mui/material-nextjs": "^9.3.0",
+    "@novacore/frontend-foundation": "file:../../../frontend-foundation",
+    "motion": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
+  }
+}

@@ -12,6 +12,30 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-08-11T00:00:00.000Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-08-12T00:00:00.000Z",
+      "error_message": "next build failed prerendering /mui: \"Error: Event handlers cannot be passed to Client Component props. {value: 4.5, ..., onChange: function onChange}\" — thrown from the Rating component nested inside ProductCard/ProductGrid on a Server Component page.",
+      "file": "packages/mui/src/components/data/rating.tsx",
+      "root_cause": "Rating.tsx (and, identically, TextField/Textarea/Select/Autocomplete/Checkbox/Switch/RadioGroup/DateField) unconditionally built an inline arrow-function onChange handler and passed it to the underlying MUI component on every render, even when the wrapper's own `onChange` prop was undefined (the common read-only/display case, e.g. `<Rating value={4.5} readOnly />` inside a product card on an otherwise-static Server Component page). A freshly-created closure is not serializable across the RSC boundary, so React throws as soon as a Server Component's render tree hands a Client Component a function prop — even an effectively-inert one.",
+      "fix": "Guard every wrapped onChange/onCheckedChange handler: only construct and pass the closure when the caller actually supplied a callback (`onChange ? (e) => onChange(...) : undefined`), otherwise pass `undefined` through. Left mandatory-callback components (SearchField, ProductQuantitySelector, FileUpload) unguarded since they're inherently interactive and always require a client boundary already established by the caller.",
+      "tags": ["rsc", "server-components", "mui", "event-handlers", "nextjs"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-12T00:00:00.000Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-08-12T00:00:00.000Z",
+      "error_message": "Browser console warning in dev: \"React does not recognize the `alignItems`/`justifyContent`/`flexWrap` prop on a DOM element\" when using the package's Stack component with `align`/`justify`/`wrap` props.",
+      "file": "packages/mui/src/components/layout/stack.tsx",
+      "root_cause": "Assumed MUI's Stack (@mui/material 9.3.1) forwards arbitrary CSS-named props like alignItems/justifyContent/flexWrap as system-style shorthand the way Box does. In this version Stack only intercepts direction/spacing/divider/useFlexGap as first-class props — everything else falls through `...other` straight onto the root DOM element.",
+      "fix": "Route align/justify/wrap through the `sx` prop instead of passing them as direct props to MuiStack.",
+      "tags": ["mui", "stack", "sx", "props"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-12T00:00:00.000Z"
     }
   ]
 }
