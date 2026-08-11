@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "meta": {
+    "lastScanned": "2026-08-11T08:44:11.462Z",
+    "fileCount": 9,
+    "hits": 0,
+    "misses": 0,
+    "renderedHash": "2ba03ca2cbd71a8432c1d37b89a8101cc916c9dee8e6b6e35107d1c65eac3261",
+    "storeUpdatedAt": "2026-08-11T08:44:11.463Z"
+  },
+  "files": {
+    ".claude/commands/reframe.md": {
+      "description": "Mode: migrate [framework]",
+      "tokens": 551,
+      "hash": "17a75695be5d4629",
+      "size": 2221,
+      "mtimeMs": 1786437851451.71,
+      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "source": "scan"
+    },
+    ".claude/commands/security-audit.md": {
+      "description": "Layer 1 — Dependencies",
+      "tokens": 510,
+      "hash": "e6f7e0b7337c9c86",
+      "size": 2060,
+      "mtimeMs": 1786437851451.6804,
+      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "source": "scan"
+    },
+    ".claude/rules/openwolf.md": {
+      "description": "",
+      "tokens": 328,
+      "hash": "6d735b2c1c54a916",
+      "size": 1323,
+      "mtimeMs": 1786437851444.4375,
+      "updatedAt": "2026-08-11T08:44:11.460Z",
+      "source": "scan"
+    },
+    ".claude/settings.json": {
+      "description": "",
+      "tokens": 514,
+      "hash": "f68759bb50af5ee4",
+      "size": 1799,
+      "mtimeMs": 1786437851443.4375,
+      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "source": "scan"
+    },
+    ".claude/settings.local.json": {
+      "description": "",
+      "tokens": 57,
+      "hash": "0225dd8212b2b110",
+      "size": 199,
+      "mtimeMs": 1786437756557.5662,
+      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "source": "scan"
+    },
+    ".codegraph/.gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 61,
+      "hash": "47c0dacebca9f56c",
+      "size": 229,
+      "mtimeMs": 1786437821274.5293,
+      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "source": "scan"
+    },
+    "CLAUDE.md": {
+      "description": "OpenWolf",
+      "tokens": 323,
+      "hash": "37c811f4697b18bb",
+      "size": 1294,
+      "mtimeMs": 1786437851444.583,
+      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "source": "scan"
+    },
+    "package.json": {
+      "description": "Node.js package manifest",
+      "tokens": 78,
+      "hash": "1b1c1f704f7e02f1",
+      "size": 271,
+      "mtimeMs": 1786436859508.324,
+      "updatedAt": "2026-08-11T08:44:11.461Z",
+      "source": "scan"
+    },
+    "README.md": {
+      "description": "Project documentation",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1786437692525.9783,
+      "updatedAt": "2026-08-11T08:44:11.462Z",
+      "source": "scan"
+    }
+  }
+}
