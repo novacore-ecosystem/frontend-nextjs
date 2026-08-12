@@ -11,6 +11,8 @@ out/
 .output/
 .docusaurus/
 target/
+.wolf/
+.codegraph/
 
 *.log
 npm-debug.log*
