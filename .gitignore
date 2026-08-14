@@ -11,6 +11,7 @@ out/
 .output/
 .docusaurus/
 target/
+.claude/
 .wolf/
 .codegraph/
 
@@ -62,6 +63,3 @@ coverage/
 *.rar
 *.tgz
 .bak
-.wolf/
-.codegraph/
-.claude/
