@@ -62,3 +62,6 @@ coverage/
 *.rar
 *.tgz
 .bak
+.wolf/
+.codegraph/
+.claude/
