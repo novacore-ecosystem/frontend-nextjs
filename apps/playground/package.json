@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mui/icons-material": "^9.3.1",
+    "@novacore/frontend-foundation": "file:../../../frontend-foundation",
     "@novacore/frontend-next-mui": "workspace:*",
     "@novacore/frontend-next-shadcn": "workspace:*",
     "lucide-react": "^0.475.0",

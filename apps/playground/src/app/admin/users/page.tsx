@@ -1,13 +1,14 @@
 "use client";
 
+import { Permissions } from "@novacore/frontend-foundation";
 import {
   AdminBreadcrumb,
   AdminPage,
-  Button,
   ConfirmDialog,
   DataTable,
   type DataTableColumn,
   PageHeader,
+  PermissionButton,
   StatusBadge,
 } from "@novacore/frontend-next-shadcn";
 import * as React from "react";
@@ -53,7 +54,7 @@ export default function UsersPage() {
     <AdminPage>
       <PageHeader
         title="Users"
-        description="Demonstrates DataTable: sorting, selection, pagination."
+        description="Demonstrates DataTable plus a permission-gated bulk action — the Viewer persona lacks users:manage, so Delete disappears."
         breadcrumb={<AdminBreadcrumb items={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Users" }]} />}
       />
       <DataTable
@@ -64,9 +65,9 @@ export default function UsersPage() {
         selectedRowIds={selectedIds}
         onSelectedRowIdsChange={setSelectedIds}
         bulkActions={
-          <Button variant="destructive" size="sm" onClick={() => setConfirmOpen(true)}>
+          <PermissionButton permission={Permissions.Users.Manage} variant="destructive" size="sm" onClick={() => setConfirmOpen(true)}>
             Delete selected
-          </Button>
+          </PermissionButton>
         }
         pagination={{ pageNumber, pageSize, totalRows: USERS.length }}
         onPaginationChange={(next) => setPageNumber(next.pageNumber)}

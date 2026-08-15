@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  AdminBreadcrumb,
-  AdminPage,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  PageHeader,
-  StatusBadge,
-} from "@novacore/frontend-next-shadcn";
+import { AdminPage, Breadcrumb, Button, Card, CardContent, PageHeader, Stat } from "@novacore/frontend-next-mui";
 import { useRouter } from "next/navigation";
 import { usePersona } from "../persona";
 
@@ -21,7 +10,7 @@ const stats = [
   { label: "Open tickets", value: "12" },
 ];
 
-export default function DashboardPage() {
+export default function MuiDashboardPage() {
   const router = useRouter();
   const { setPersona } = usePersona();
 
@@ -30,29 +19,26 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description="Overview of playground metrics."
-        status={<StatusBadge label="Live" tone="success" />}
-        breadcrumb={<AdminBreadcrumb items={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Dashboard" }]} />}
+        breadcrumb={<Breadcrumb items={[{ label: "Admin", href: "/mui/admin/dashboard" }, { label: "Dashboard" }]} />}
         actions={
           <Button
             variant="outline"
             size="sm"
             onClick={() => {
               setPersona("viewer");
-              router.push("/admin/settings");
+              router.push("/mui/admin/settings");
             }}
           >
             Preview Settings as Viewer
           </Button>
         }
       />
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
         {stats.map((stat) => (
           <Card key={stat.label}>
-            <CardHeader>
-              <CardDescription>{stat.label}</CardDescription>
-              <CardTitle className="text-2xl">{stat.value}</CardTitle>
-            </CardHeader>
-            <CardContent />
+            <CardContent>
+              <Stat label={stat.label} value={stat.value} />
+            </CardContent>
           </Card>
         ))}
       </div>

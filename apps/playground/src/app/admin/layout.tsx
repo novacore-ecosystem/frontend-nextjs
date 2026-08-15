@@ -1,19 +1,24 @@
 "use client";
 
+import { Permissions } from "@novacore/frontend-foundation";
 import {
   AdminHeader,
   AdminLayout,
   AdminSidebar,
   AdminSidebarCollapseToggle,
   ApplicationSwitcher,
+  Button,
   CommandPalette,
+  PermissionProvider,
   useAdminLayout,
   useCommandPalette,
   type ApplicationDefinition,
   type NavigationGroup,
 } from "@novacore/frontend-next-shadcn";
-import { LayoutDashboard, Search, Users2 } from "lucide-react";
+import { LayoutDashboard, Search, Settings, Users2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import type * as React from "react";
+import { PERSONAS, PersonaProvider, type PersonaId, usePersona } from "./persona";
 
 const NAV: NavigationGroup[] = [
   {
@@ -24,7 +29,10 @@ const NAV: NavigationGroup[] = [
   {
     id: "system",
     title: "System",
-    items: [{ id: "users", label: "Users", href: "/admin/users", icon: <Users2 className="h-4 w-4" /> }],
+    items: [
+      { id: "users", label: "Users", href: "/admin/users", icon: <Users2 className="h-4 w-4" />, permission: Permissions.Users.View },
+      { id: "settings", label: "Settings", href: "/admin/settings", icon: <Settings className="h-4 w-4" />, permission: Permissions.System.Full },
+    ],
   },
 ];
 
@@ -33,6 +41,19 @@ const APPLICATIONS: ApplicationDefinition[] = [
   { id: "oms", name: "Order Management", shortName: "OMS", description: "Orders, fulfillment, returns", href: "#", accent: "#16a34a" },
   { id: "cms", name: "Content Management", shortName: "CMS", description: "Catalog, pages, media", href: "#", accent: "#9333ea" },
 ];
+
+function PersonaSwitcher() {
+  const { persona, setPersona } = usePersona();
+  return (
+    <div className="flex items-center gap-1 rounded-md border border-input p-0.5">
+      {(Object.keys(PERSONAS) as PersonaId[]).map((id) => (
+        <Button key={id} size="sm" variant={persona === id ? "primary" : "ghost"} className="h-7 px-2.5 text-xs" onClick={() => setPersona(id)}>
+          {PERSONAS[id].label}
+        </Button>
+      ))}
+    </div>
+  );
+}
 
 function PlaygroundSidebar() {
   const { sidebarCollapsed } = useAdminLayout();
@@ -66,6 +87,7 @@ function PlaygroundTopbar() {
             <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">Ctrl K</kbd>
           </button>
         }
+        actions={<PersonaSwitcher />}
       >
         <AdminSidebarCollapseToggle />
       </AdminHeader>
@@ -81,10 +103,21 @@ function PlaygroundTopbar() {
   );
 }
 
+function PermissionedShell({ children }: { children: React.ReactNode }) {
+  const { persona } = usePersona();
+  return (
+    <PermissionProvider permissions={PERSONAS[persona].permissions}>
+      <AdminLayout sidebar={<PlaygroundSidebar />} topbar={<PlaygroundTopbar />}>
+        {children}
+      </AdminLayout>
+    </PermissionProvider>
+  );
+}
+
 export default function AdminAreaLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AdminLayout sidebar={<PlaygroundSidebar />} topbar={<PlaygroundTopbar />}>
-      {children}
-    </AdminLayout>
+    <PersonaProvider>
+      <PermissionedShell>{children}</PermissionedShell>
+    </PersonaProvider>
   );
 }

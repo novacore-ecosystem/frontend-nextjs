@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { label: "Shop", href: "/mui", active: true },
   { label: "Components", href: "/mui/components" },
   { label: "Theme", href: "/mui/theme" },
+  { label: "Admin", href: "/mui/admin/dashboard" },
 ];
 
 const PRODUCTS: ProductCardViewModel[] = [
