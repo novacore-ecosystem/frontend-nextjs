@@ -107,3 +107,17 @@ export {
   type CommandPaletteProps,
   type CommandPaletteAction,
 } from "./components/admin/command-palette";
+export {
+  AdminPage,
+  PageContainer,
+  PageSection,
+  PageHeader,
+  Toolbar,
+  ContentPanel,
+  type AdminPageProps,
+  type PageContainerProps,
+  type PageSectionProps,
+  type PageHeaderProps,
+  type ToolbarProps,
+  type ContentPanelProps,
+} from "./components/admin/page";
