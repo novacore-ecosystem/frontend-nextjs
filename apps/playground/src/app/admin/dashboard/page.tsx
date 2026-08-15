@@ -1,4 +1,5 @@
 import {
+  AdminBreadcrumb,
   AdminPage,
   Card,
   CardContent,
@@ -6,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
   PageHeader,
+  StatusBadge,
 } from "@novacore/frontend-next-shadcn";
 
 const stats = [
@@ -17,7 +19,12 @@ const stats = [
 export default function DashboardPage() {
   return (
     <AdminPage>
-      <PageHeader title="Dashboard" description="Overview of playground metrics." />
+      <PageHeader
+        title="Dashboard"
+        description="Overview of playground metrics."
+        status={<StatusBadge label="Live" tone="success" />}
+        breadcrumb={<AdminBreadcrumb items={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Dashboard" }]} />}
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
           <Card key={stat.label}>

@@ -104,7 +104,14 @@ export type {
   NavigationItemRenderProps,
   ApplicationDefinition,
 } from "./components/admin/nav-types";
-export { AdminHeader } from "./components/admin/admin-header";
+export { AdminHeader, type AdminHeaderProps } from "./components/admin/admin-header";
+export { ApplicationSwitcher, type ApplicationSwitcherProps } from "./components/admin/application-switcher";
+export {
+  CommandPalette,
+  useCommandPalette,
+  type CommandPaletteProps,
+  type CommandPaletteAction,
+} from "./components/admin/command-palette";
 export {
   AdminPage,
   PageContainer,
@@ -114,6 +121,7 @@ export {
   ContentPanel,
   type PageHeaderProps,
 } from "./components/admin/page";
+export { AdminBreadcrumb, type AdminBreadcrumbItem, type AdminBreadcrumbProps } from "./components/admin/breadcrumb";
 export { EmptyState, LoadingState, ErrorState, SkeletonList } from "./components/admin/states";
 export { StatusBadge, type StatusBadgeProps, type StatusTone } from "./components/admin/status-badge";
 export { PermissionGate, type PermissionGateProps } from "./components/admin/permission-gate";

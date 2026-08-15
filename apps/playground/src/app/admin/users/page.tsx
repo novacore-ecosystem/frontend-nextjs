@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AdminBreadcrumb,
   AdminPage,
   Button,
   ConfirmDialog,
@@ -50,7 +51,11 @@ export default function UsersPage() {
 
   return (
     <AdminPage>
-      <PageHeader title="Users" description="Demonstrates DataTable: sorting, selection, pagination." />
+      <PageHeader
+        title="Users"
+        description="Demonstrates DataTable: sorting, selection, pagination."
+        breadcrumb={<AdminBreadcrumb items={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Users" }]} />}
+      />
       <DataTable
         data={pageRows}
         columns={columns}
