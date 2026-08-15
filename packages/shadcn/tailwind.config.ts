@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 // This config only scans this package's own source. The compiled CSS is
 // shipped in dist/styles.css — consuming apps never need their own Tailwind
@@ -54,6 +55,15 @@ export default {
           DEFAULT: "hsl(var(--nc-info) / <alpha-value>)",
           foreground: "hsl(var(--nc-info-foreground) / <alpha-value>)",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--nc-sidebar) / <alpha-value>)",
+          foreground: "hsl(var(--nc-sidebar-foreground) / <alpha-value>)",
+          border: "hsl(var(--nc-sidebar-border) / <alpha-value>)",
+          accent: "hsl(var(--nc-sidebar-accent) / <alpha-value>)",
+          "accent-foreground": "hsl(var(--nc-sidebar-accent-foreground) / <alpha-value>)",
+          primary: "hsl(var(--nc-sidebar-primary) / <alpha-value>)",
+          "primary-foreground": "hsl(var(--nc-sidebar-primary-foreground) / <alpha-value>)",
+        },
       },
       borderRadius: {
         lg: "var(--nc-radius)",
@@ -70,5 +80,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [animate],
 } satisfies Config;

@@ -1,12 +1,16 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, PanelLeft, X } from "lucide-react";
 import * as React from "react";
 import { cn } from "../../lib/cn";
+import { Sheet, SheetContent, SheetTitle } from "../ui/sheet";
 
 interface AdminLayoutContextValue {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  /** Desktop icon-only rail mode. The `sidebar` slot must read this itself (e.g. pass it to `<AdminSidebar collapsed>`) — the layout only owns the state and the rail width. */
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 const AdminLayoutContext = React.createContext<AdminLayoutContextValue | null>(null);
@@ -18,38 +22,54 @@ export function useAdminLayout(): AdminLayoutContextValue {
 }
 
 export interface AdminLayoutProps {
+  /** Rendered inside the desktop rail and the mobile drawer. Typically `<AdminSidebar>` — read `sidebarCollapsed` via `useAdminLayout()` to switch it to icon-only mode. */
   sidebar: React.ReactNode;
-  header?: React.ReactNode;
+  /** Rendered as the sticky topbar. Typically `<AdminHeader>`. */
+  topbar?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  defaultCollapsed?: boolean;
+  sidebarWidth?: number;
+  collapsedWidth?: number;
 }
 
-/** Generic admin shell: responsive sidebar + header + content. No domain assumptions. */
-export function AdminLayout({ sidebar, header, children, className }: AdminLayoutProps) {
+/** Generic admin shell: responsive sidebar rail/drawer + topbar + content. No domain assumptions. */
+export function AdminLayout({
+  sidebar,
+  topbar,
+  children,
+  className,
+  defaultCollapsed = false,
+  sidebarWidth = 264,
+  collapsedWidth = 68,
+}: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(defaultCollapsed);
+
+  const contextValue = React.useMemo<AdminLayoutContextValue>(
+    () => ({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed }),
+    [sidebarOpen, sidebarCollapsed],
+  );
 
   return (
-    <AdminLayoutContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
+    <AdminLayoutContext.Provider value={contextValue}>
       <div className={cn("flex min-h-screen bg-background text-foreground", className)}>
         <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-border bg-card transition-transform md:static md:translate-x-0",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full",
-          )}
+          className="hidden shrink-0 overflow-hidden border-r border-sidebar-border transition-[width] duration-200 ease-in-out md:block"
+          style={{ width: sidebarCollapsed ? collapsedWidth : sidebarWidth }}
         >
           {sidebar}
         </aside>
 
-        {sidebarOpen ? (
-          <button
-            aria-label="Close sidebar"
-            className="fixed inset-0 z-30 bg-black/50 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        ) : null}
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-72 p-0">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            {sidebar}
+          </SheetContent>
+        </Sheet>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {header}
+          {topbar}
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </div>
       </div>
@@ -62,11 +82,32 @@ export function AdminSidebarToggle({ className }: { className?: string }) {
   return (
     <button
       type="button"
-      aria-label="Toggle sidebar"
+      aria-label="Toggle navigation"
       onClick={() => setSidebarOpen(!sidebarOpen)}
-      className={cn("inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent md:hidden", className)}
+      className={cn(
+        "inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:hidden",
+        className,
+      )}
     >
       {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+    </button>
+  );
+}
+
+export function AdminSidebarCollapseToggle({ className }: { className?: string }) {
+  const { sidebarCollapsed, setSidebarCollapsed } = useAdminLayout();
+  return (
+    <button
+      type="button"
+      aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      aria-pressed={sidebarCollapsed}
+      onClick={() => setSidebarCollapsed((prev) => !prev)}
+      className={cn(
+        "hidden h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:inline-flex",
+        className,
+      )}
+    >
+      <PanelLeft className="h-4 w-4" />
     </button>
   );
 }

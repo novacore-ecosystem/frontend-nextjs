@@ -20,6 +20,11 @@ function buildBaseTokens(hue: number, sat: number): { light: Partial<ThemeTokens
       "accent-foreground": `${h} ${s * 1.5}% 10%`,
       border: `${h} ${s}% 90%`,
       input: `${h} ${s}% 90%`,
+      sidebar: `${h} ${s * 1.4}% 96.5%`,
+      "sidebar-foreground": `${h} ${s * 2.5}% 3.9%`,
+      "sidebar-border": `${h} ${s}% 87%`,
+      "sidebar-accent": `${h} ${s}% 92%`,
+      "sidebar-accent-foreground": `${h} ${s * 1.5}% 10%`,
     },
     dark: {
       background: `${h} ${s * 2.5}% 3.9%`,
@@ -36,6 +41,11 @@ function buildBaseTokens(hue: number, sat: number): { light: Partial<ThemeTokens
       "accent-foreground": `0 0% 98%`,
       border: `${h} ${s * 0.8}% 15.9%`,
       input: `${h} ${s * 0.8}% 15.9%`,
+      sidebar: `${h} ${s * 2.5}% 2.5%`,
+      "sidebar-foreground": `0 0% 98%`,
+      "sidebar-border": `${h} ${s * 0.8}% 13%`,
+      "sidebar-accent": `${h} ${s * 0.8}% 13%`,
+      "sidebar-accent-foreground": `0 0% 98%`,
     },
   };
 }
@@ -83,11 +93,15 @@ export function resolveAccentTokens(color: ThemeColor) {
       primary: accent.light,
       "primary-foreground": accent.foregroundLight ?? "0 0% 98%",
       ring: accent.light,
+      "sidebar-primary": accent.light,
+      "sidebar-primary-foreground": accent.foregroundLight ?? "0 0% 98%",
     },
     dark: {
       primary: accent.dark,
       "primary-foreground": accent.foregroundDark ?? "0 0% 98%",
       ring: accent.dark,
+      "sidebar-primary": accent.dark,
+      "sidebar-primary-foreground": accent.foregroundDark ?? "0 0% 98%",
     },
   };
 }

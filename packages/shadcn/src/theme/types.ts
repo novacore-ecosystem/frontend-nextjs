@@ -44,6 +44,15 @@ export interface ThemeTokens {
   input: string;
   ring: string;
   radius: string;
+  /** Distinct sidebar surface — deliberately separate from `card`/`background` so navigation reads as a stronger, branded region. */
+  sidebar: string;
+  "sidebar-foreground": string;
+  "sidebar-border": string;
+  "sidebar-accent": string;
+  "sidebar-accent-foreground": string;
+  /** Active nav item — tied to the resolved accent color, not the neutral base. */
+  "sidebar-primary": string;
+  "sidebar-primary-foreground": string;
 }
 
 export interface ThemeConfig {

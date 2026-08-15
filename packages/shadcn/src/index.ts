@@ -44,6 +44,43 @@ export {
   DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "./components/ui/dropdown-menu";
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+  type SheetProps,
+  type SheetContentProps,
+  type SheetSide,
+} from "./components/ui/sheet";
+export { ScrollArea, type ScrollAreaProps } from "./components/ui/scroll-area";
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./components/ui/collapsible";
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+  type CommandDialogProps,
+} from "./components/ui/command";
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+  type BreadcrumbLinkProps,
+} from "./components/ui/breadcrumb";
 
 // Composed
 export { SearchInput, type SearchInputProps } from "./components/composed/search-input";
@@ -52,8 +89,21 @@ export { FormField, FormSection, FormActions, type FormFieldProps } from "./comp
 export { ConfirmDialog, type ConfirmDialogProps } from "./components/composed/confirm-dialog";
 
 // Admin
-export { AdminLayout, AdminSidebarToggle, useAdminLayout, type AdminLayoutProps } from "./components/admin/admin-layout";
-export { AdminSidebar, AdminSidebarSection, AdminSidebarItem } from "./components/admin/admin-sidebar";
+export {
+  AdminLayout,
+  AdminSidebarToggle,
+  AdminSidebarCollapseToggle,
+  useAdminLayout,
+  type AdminLayoutProps,
+} from "./components/admin/admin-layout";
+export { AdminSidebar, type AdminSidebarProps } from "./components/admin/admin-sidebar";
+export type {
+  NavigationItem,
+  NavigationGroup,
+  NavigationItemRenderer,
+  NavigationItemRenderProps,
+  ApplicationDefinition,
+} from "./components/admin/nav-types";
 export { AdminHeader } from "./components/admin/admin-header";
 export {
   AdminPage,

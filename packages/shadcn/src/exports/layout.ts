@@ -1,5 +1,18 @@
-export { AdminLayout, AdminSidebarToggle, useAdminLayout, type AdminLayoutProps } from "../components/admin/admin-layout";
-export { AdminSidebar, AdminSidebarSection, AdminSidebarItem } from "../components/admin/admin-sidebar";
+export {
+  AdminLayout,
+  AdminSidebarToggle,
+  AdminSidebarCollapseToggle,
+  useAdminLayout,
+  type AdminLayoutProps,
+} from "../components/admin/admin-layout";
+export { AdminSidebar, type AdminSidebarProps } from "../components/admin/admin-sidebar";
+export type {
+  NavigationItem,
+  NavigationGroup,
+  NavigationItemRenderer,
+  NavigationItemRenderProps,
+  ApplicationDefinition,
+} from "../components/admin/nav-types";
 export { AdminHeader } from "../components/admin/admin-header";
 export {
   AdminPage,

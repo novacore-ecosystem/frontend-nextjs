@@ -1,28 +1,52 @@
+"use client";
+
 import {
   AdminHeader,
   AdminLayout,
   AdminSidebar,
-  AdminSidebarItem,
-  AdminSidebarSection,
+  AdminSidebarCollapseToggle,
+  useAdminLayout,
+  type NavigationGroup,
 } from "@novacore/frontend-next-shadcn";
-import Link from "next/link";
+import { LayoutDashboard, Users2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+const NAV: NavigationGroup[] = [
+  {
+    id: "overview",
+    title: "Overview",
+    items: [{ id: "dashboard", label: "Dashboard", href: "/admin/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> }],
+  },
+  {
+    id: "system",
+    title: "System",
+    items: [{ id: "users", label: "Users", href: "/admin/users", icon: <Users2 className="h-4 w-4" /> }],
+  },
+];
+
+function PlaygroundSidebar() {
+  const { sidebarCollapsed } = useAdminLayout();
+  const pathname = usePathname();
+  return (
+    <AdminSidebar
+      groups={NAV}
+      activeHref={pathname}
+      collapsed={sidebarCollapsed}
+      header={<span className="text-sm font-semibold tracking-tight">{sidebarCollapsed ? "NC" : "NovaCore"}</span>}
+    />
+  );
+}
 
 export default function AdminAreaLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminLayout
-      sidebar={
-        <AdminSidebar>
-          <AdminSidebarSection title="Playground">
-            <Link href="/admin/dashboard">
-              <AdminSidebarItem>Dashboard</AdminSidebarItem>
-            </Link>
-            <Link href="/admin/users">
-              <AdminSidebarItem>Users</AdminSidebarItem>
-            </Link>
-          </AdminSidebarSection>
-        </AdminSidebar>
+      sidebar={<PlaygroundSidebar />}
+      topbar={
+        <AdminHeader>
+          <AdminSidebarCollapseToggle />
+          <span className="text-sm font-medium">Admin Playground</span>
+        </AdminHeader>
       }
-      header={<AdminHeader>Admin Playground</AdminHeader>}
     >
       {children}
     </AdminLayout>
