@@ -33,6 +33,15 @@ export interface ThemeTokens {
   info: string;
   border: string;
   divider: string;
+  /** Distinct sidebar surface — deliberately separate from `surface`/`background` so navigation reads as a stronger, branded region. */
+  sidebar: string;
+  sidebarForeground: string;
+  sidebarBorder: string;
+  sidebarAccent: string;
+  sidebarAccentForeground: string;
+  /** Active nav item — tied to the resolved preset's primary color. */
+  sidebarPrimary: string;
+  sidebarPrimaryForeground: string;
 }
 
 export interface ThemeConfig {
