@@ -21,6 +21,7 @@ import type {
   AdminNavigationItemRenderer,
   AdminNavigationItemRenderProps,
 } from "./nav-types";
+import { usePermissionContext } from "./permission-provider";
 
 function isItemVisible(item: AdminNavigationItem, permissions: readonly string[] | undefined): boolean {
   if (!item.permission || !permissions) return true;
@@ -35,7 +36,7 @@ function isHrefActive(href: string | undefined, activeHref: string | undefined):
 
 export interface AdminSidebarProps {
   groups: AdminNavigationGroup[];
-  /** Owned permissions used to filter `permission`-tagged items. Omit to render every item ungated. */
+  /** Owned permissions used to filter `permission`-tagged items. Falls back to the nearest `<PermissionProvider>` when omitted; if neither is present, every item renders ungated. */
   permissions?: readonly string[];
   /** Current location, e.g. from `usePathname()` — used to compute each item's `active` state. The sidebar has no router awareness of its own. */
   activeHref?: string;
@@ -52,7 +53,7 @@ export interface AdminSidebarProps {
 /** Grouped, permission-aware admin navigation. Renders inside `<AdminLayout sidebar={...}>`. */
 export function AdminSidebar({
   groups,
-  permissions,
+  permissions: permissionsProp,
   activeHref,
   renderItem,
   header,
@@ -61,6 +62,7 @@ export function AdminSidebar({
   className,
   sx,
 }: AdminSidebarProps) {
+  const permissions = permissionsProp ?? usePermissionContext()?.permissions;
   const { resolved, effectiveMode } = useClientTheme();
   const tokens = effectiveMode === "dark" ? resolved.dark : resolved.light;
 

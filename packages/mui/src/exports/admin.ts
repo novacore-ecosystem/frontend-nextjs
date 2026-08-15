@@ -35,3 +35,13 @@ export {
   type ToolbarProps,
   type ContentPanelProps,
 } from "../components/admin/page";
+export {
+  PermissionProvider,
+  usePermissionContext,
+  type PermissionProviderProps,
+} from "../components/admin/permission-provider";
+export { usePermission, type UsePermissionResult } from "../components/admin/use-permission";
+export { PermissionGate, type PermissionGateProps } from "../components/admin/permission-gate";
+export { PermissionBoundary, type PermissionBoundaryProps } from "../components/admin/permission-boundary";
+export { PermissionButton, type PermissionButtonProps } from "../components/admin/permission-button";
+export { AccessDenied, type AccessDeniedProps } from "../components/admin/access-denied";
