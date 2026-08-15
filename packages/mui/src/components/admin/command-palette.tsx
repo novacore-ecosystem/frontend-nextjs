@@ -1,5 +1,6 @@
 "use client";
 
+import { hasAllPermissions, hasAnyPermission } from "@novacore/frontend-foundation";
 import SearchIcon from "@mui/icons-material/Search";
 import MuiBox from "@mui/material/Box";
 import MuiDialog from "@mui/material/Dialog";
@@ -12,6 +13,13 @@ import MuiListSubheader from "@mui/material/ListSubheader";
 import MuiTypography from "@mui/material/Typography";
 import * as React from "react";
 import type { ApplicationDefinition, AdminNavigationGroup, AdminNavigationItem } from "./nav-types";
+import { usePermissionContext } from "./permission-provider";
+
+function isItemVisible(item: AdminNavigationItem, permissions: readonly string[] | undefined): boolean {
+  if (!item.permission || !permissions) return true;
+  const required = Array.isArray(item.permission) ? item.permission : [item.permission];
+  return item.permissionMode === "all" ? hasAllPermissions(permissions, required) : hasAnyPermission(permissions, required);
+}
 
 export interface CommandPaletteAction {
   id: string;
@@ -24,8 +32,10 @@ export interface CommandPaletteAction {
 export interface CommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Same groups passed to `<AdminSidebar>` — flattened and searched by label. */
+  /** Same groups passed to `<AdminSidebar>` — flattened, permission-filtered the same way, and searched by label. */
   navigationGroups?: AdminNavigationGroup[];
+  /** Owned permissions used to filter `permission`-tagged items. Falls back to the nearest `<PermissionProvider>` when omitted; if neither is present, every item is searchable. */
+  permissions?: readonly string[];
   onNavigate?: (item: AdminNavigationItem) => void;
   applications?: ApplicationDefinition[];
   onSelectApplication?: (application: ApplicationDefinition) => void;
@@ -33,9 +43,10 @@ export interface CommandPaletteProps {
   placeholder?: string;
 }
 
-function flattenAdminNavigationItems(groups: AdminNavigationGroup[]): AdminNavigationItem[] {
+function flattenAdminNavigationItems(groups: AdminNavigationGroup[], permissions: readonly string[] | undefined): AdminNavigationItem[] {
   const result: AdminNavigationItem[] = [];
   const visit = (item: AdminNavigationItem) => {
+    if (!isItemVisible(item, permissions)) return;
     if (item.href) result.push(item);
     item.children?.forEach(visit);
   };
@@ -58,6 +69,7 @@ export function CommandPalette({
   open,
   onOpenChange,
   navigationGroups = [],
+  permissions: permissionsProp,
   onNavigate,
   applications = [],
   onSelectApplication,
@@ -65,7 +77,8 @@ export function CommandPalette({
   placeholder = "Search pages, actions, applications…",
 }: CommandPaletteProps) {
   const [query, setQuery] = React.useState("");
-  const navItems = React.useMemo(() => flattenAdminNavigationItems(navigationGroups), [navigationGroups]);
+  const permissions = permissionsProp ?? usePermissionContext()?.permissions;
+  const navItems = React.useMemo(() => flattenAdminNavigationItems(navigationGroups, permissions), [navigationGroups, permissions]);
 
   React.useEffect(() => {
     if (open) setQuery("");

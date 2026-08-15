@@ -1,5 +1,6 @@
 "use client";
 
+import { hasAllPermissions, hasAnyPermission } from "@novacore/frontend-foundation";
 import * as React from "react";
 import {
   CommandDialog,
@@ -12,6 +13,13 @@ import {
   CommandShortcut,
 } from "../ui/command";
 import type { ApplicationDefinition, NavigationGroup, NavigationItem } from "./nav-types";
+import { usePermissionContext } from "./permission-provider";
+
+function isItemVisible(item: NavigationItem, permissions: readonly string[] | undefined): boolean {
+  if (!item.permission || !permissions) return true;
+  const required = Array.isArray(item.permission) ? item.permission : [item.permission];
+  return item.permissionMode === "all" ? hasAllPermissions(permissions, required) : hasAnyPermission(permissions, required);
+}
 
 export interface CommandPaletteAction {
   id: string;
@@ -24,8 +32,10 @@ export interface CommandPaletteAction {
 export interface CommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Same groups passed to `<AdminSidebar>` — flattened and searched by label. */
+  /** Same groups passed to `<AdminSidebar>` — flattened, permission-filtered the same way, and searched by label. */
   navigationGroups?: NavigationGroup[];
+  /** Owned permissions used to filter `permission`-tagged items. Falls back to the nearest `<PermissionProvider>` when omitted; if neither is present, every item is searchable. */
+  permissions?: readonly string[];
   onNavigate?: (item: NavigationItem) => void;
   applications?: ApplicationDefinition[];
   onSelectApplication?: (application: ApplicationDefinition) => void;
@@ -33,9 +43,10 @@ export interface CommandPaletteProps {
   placeholder?: string;
 }
 
-function flattenNavigationItems(groups: NavigationGroup[]): NavigationItem[] {
+function flattenNavigationItems(groups: NavigationGroup[], permissions: readonly string[] | undefined): NavigationItem[] {
   const result: NavigationItem[] = [];
   const visit = (item: NavigationItem) => {
+    if (!isItemVisible(item, permissions)) return;
     if (item.href) result.push(item);
     item.children?.forEach(visit);
   };
@@ -50,13 +61,15 @@ export function CommandPalette({
   open,
   onOpenChange,
   navigationGroups = [],
+  permissions: permissionsProp,
   onNavigate,
   applications = [],
   onSelectApplication,
   actions = [],
   placeholder = "Search pages, actions, applications…",
 }: CommandPaletteProps) {
-  const navItems = React.useMemo(() => flattenNavigationItems(navigationGroups), [navigationGroups]);
+  const permissions = permissionsProp ?? usePermissionContext()?.permissions;
+  const navItems = React.useMemo(() => flattenNavigationItems(navigationGroups, permissions), [navigationGroups, permissions]);
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>

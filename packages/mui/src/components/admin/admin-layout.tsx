@@ -2,7 +2,7 @@
 
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import ViewSidebarIcon from "@mui/icons-material/ViewSidebar";
+import ViewSidebarIcon from "@mui/icons-material/ViewSidebarOutlined";
 import MuiBox from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiIconButton from "@mui/material/IconButton";
