@@ -29,6 +29,10 @@
       "types": "./dist/exports/navigation.d.ts",
       "import": "./dist/exports/navigation.js"
     },
+    "./admin": {
+      "types": "./dist/exports/admin.d.ts",
+      "import": "./dist/exports/admin.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
