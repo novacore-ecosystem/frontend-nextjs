@@ -50,6 +50,13 @@ export function AdminLayout({
     () => ({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed }),
     [sidebarOpen, sidebarCollapsed],
   );
+  // The `sidebar` node is mounted twice (desktop rail + mobile drawer). Forcing
+  // `sidebarCollapsed: false` for the mobile copy keeps icon-only rail mode a
+  // desktop-only concept — a full-width mobile sheet has no reason to collapse.
+  const mobileContextValue = React.useMemo<AdminLayoutContextValue>(
+    () => ({ ...contextValue, sidebarCollapsed: false }),
+    [contextValue],
+  );
 
   return (
     <AdminLayoutContext.Provider value={contextValue}>
@@ -64,7 +71,7 @@ export function AdminLayout({
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
           <SheetContent side="left" className="w-72 p-0">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            {sidebar}
+            <AdminLayoutContext.Provider value={mobileContextValue}>{sidebar}</AdminLayoutContext.Provider>
           </SheetContent>
         </Sheet>
 
