@@ -69,8 +69,58 @@ import { AdminPage, PageHeader, DataTable } from "@novacore/frontend-next-shadcn
 - `@novacore/frontend-next-shadcn/theme` — AdminProvider, useAdminTheme, ThemeCustomizer, resolveTheme, presets, tokens
 - `@novacore/frontend-next-shadcn/forms` — Input, Textarea, Select, Checkbox, Switch, SearchInput, PasswordInput, FormField
 - `@novacore/frontend-next-shadcn/data` — DataTable, fromPaginatedResult, EmptyState, LoadingState, ErrorState, StatusBadge
-- `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, AdminPage, PageHeader, PermissionGate
+- `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, AdminBreadcrumb, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
 - `@novacore/frontend-next-shadcn/styles.css` — precompiled CSS (Tailwind is an implementation detail; consumers do not install or configure Tailwind)
+
+### Admin shell
+
+```tsx
+// app/admin/layout.tsx
+"use client";
+import { AdminLayout, AdminSidebar, AdminHeader, useAdminLayout, type NavigationGroup } from "@novacore/frontend-next-shadcn";
+
+const NAV: NavigationGroup[] = [
+  { id: "catalog", title: "Catalog", items: [{ id: "products", label: "Products", href: "/admin/products", permission: "product.read" }] },
+];
+
+function Sidebar() {
+  const { sidebarCollapsed } = useAdminLayout();
+  return <AdminSidebar groups={NAV} collapsed={sidebarCollapsed} />;
+}
+
+export default function AdminAreaLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminLayout sidebar={<Sidebar />} topbar={<AdminHeader />}>
+      {children}
+    </AdminLayout>
+  );
+}
+```
+
+`AdminLayout` renders `sidebar` in both a collapsible desktop rail and a mobile `Sheet` drawer (the drawer's copy always stays expanded regardless of desktop collapse state). `AdminSidebar` takes grouped `NavigationItem`/`NavigationGroup` data with optional icons/badges/nested children, a `renderItem` render-prop for full custom rendering, and permission-aware filtering (see below). `AdminHeader` is slot-based (`applicationSwitcher`, `breadcrumb`, `search`, `notifications`, `localeSwitcher`, `themeToggle`, `actions`, `userMenu`) — populate only what the app needs. `ApplicationSwitcher` and `CommandPalette` (+ `useCommandPalette()` for the Cmd/Ctrl+K shortcut) round out cross-application navigation.
+
+### Permission system
+
+Framework-agnostic evaluation lives in `@novacore/frontend-foundation` (`hasPermission`/`hasAnyPermission`/`hasAllPermissions`); this package only adds the React layer:
+
+```tsx
+import { PermissionProvider, PermissionGate, PermissionBoundary } from "@novacore/frontend-next-shadcn";
+
+// wrap once with the current actor's owned permissions
+<PermissionProvider permissions={currentUser.permissions}>{children}</PermissionProvider>;
+
+// hide UI
+<PermissionGate permission="product.update" fallback={null}>
+  <EditButton />
+</PermissionGate>;
+
+// guard an entire page/route — falls back to <AccessDenied> by default
+<PermissionBoundary permission="system:full">
+  <SettingsPage />
+</PermissionBoundary>;
+```
+
+With no `<PermissionProvider>` mounted, every check is permissive (nothing is hidden) — the system is fully optional. `AdminSidebar` and `CommandPalette` both auto-source permissions from the nearest provider so you don't have to thread them through manually. **This is a UX layer only** — it hides unavailable actions and confusing navigation, it does not replace server-side authorization, which every backend endpoint must still enforce independently.
 
 ### Theme system
 
@@ -96,18 +146,21 @@ sourcemap as a safety net.
 `@novacore/frontend-foundation`'s `PaginatedResult` — the canonical shape every NovaCore
 backend list endpoint returns. Use `fromPaginatedResult()` to adapt an API response directly.
 
-## Known limitations (phase 1)
+## Known limitations
 
 - Theme `style` variants (`modern`/`soft`/`compact`/`minimal`/`sharp`) are recorded on
   `resolveTheme()`'s output and exposed as a `data-nc-style` attribute, but only a couple of
   presets currently vary visual weight by style — most components don't yet branch on it.
-- No automated tests, Storybook, or CI — explicitly out of scope for this phase.
-- Command palette, Calendar, Accordion, DatePicker/DateRangePicker/NumberInput/CurrencyInput/
-  FileUpload/ImageUpload, EntitySelect/EntityCombobox, ActivityTimeline/MetadataPanel, and
-  schema-driven `AdminForm` are not implemented yet.
+- No automated tests, Storybook, or CI — explicitly out of scope so far.
+- Calendar, Accordion, DatePicker/DateRangePicker/NumberInput/CurrencyInput/FileUpload/
+  ImageUpload, EntitySelect/EntityCombobox, ActivityTimeline/MetadataPanel, and schema-driven
+  `AdminForm` are not implemented yet. (Command palette shipped in phase 2.)
 - No no-flash SSR theme script — the resolved theme applies client-side on mount, so there is a
   brief flash of the default (`zinc-blue`/medium/light) fallback theme baked into `globals.css`
   before `<AdminProvider>` hydrates.
+- `AccessDenied`'s copy is plain props with English defaults, not wired into
+  `@novacore/frontend-foundation`'s i18n system — pass translated strings via props if your app
+  needs localization.
 
 ## `@novacore/frontend-next-mui`
 
@@ -156,6 +209,11 @@ than forcing a Tailwind/CSS-variable pattern onto it.
 - `@novacore/frontend-next-mui/layout` — Container, Section, Stack, Grid, HeroSection, FeatureGrid, CTASection, StatsSection, TestimonialSection
 - `@novacore/frontend-next-mui/navigation` — Header, NavigationMenu, Breadcrumb, Footer
 - `@novacore/frontend-next-mui/forms` — Form, FormField, TextField, Select, Autocomplete, Checkbox/Switch/RadioGroup, PasswordField, SearchField, DateField, FileUpload
+- `@novacore/frontend-next-mui/admin` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
+
+### Admin shell + permission system
+
+Phase 2 added a full admin shell to this package too (`packages/mui/src/components/admin/`) — same API shape as the shadcn package's (grouped `AdminNavigationItem`/`AdminNavigationGroup` nav, slot-based `AdminHeader`, `ApplicationSwitcher`, `CommandPalette`, and a `PermissionProvider`/`usePermission`/`PermissionGate`/`PermissionBoundary`/`PermissionButton`/`AccessDenied` permission layer built on the same `@novacore/frontend-foundation` engine), built from MUI's own `Drawer`/`List`/`Collapse`/`Menu`/`Dialog` primitives instead of shadcn's Radix ones. Nav/application types are prefixed `AdminNavigationItem`/`AdminNavigationGroup`/etc. (vs. shadcn's unprefixed names) to avoid colliding with this package's pre-existing marketing `NavigationItem` type. See the shadcn package's Admin shell / Permission system sections above — the usage patterns are identical, just imported from `@novacore/frontend-next-mui`.
 
 ### Theme system
 
@@ -183,14 +241,17 @@ Component (see buglog bug-002).
 locale/CLDR-correct fraction digits and symbols) — the same "consume the foundation" pattern as
 the shadcn package's `fromPaginatedResult`.
 
-## Known limitations — `@novacore/frontend-next-mui` (phase 1)
+## Known limitations — `@novacore/frontend-next-mui`
 
 - `DateField`/`DateRangeField` wrap the native `<input type="date">` rather than
   `@mui/x-date-pickers` — lighter dependency footprint for phase 1, upgradeable later.
 - No no-flash SSR theme script — mode resolves to `"light"` on first paint and corrects to the
   system preference after mount (same tradeoff as the shadcn package).
-- No admin-style `DataTable` in this package by design — this package is explicitly client-facing;
-  admin density belongs in `packages/shadcn`.
+- Still no admin-style `DataTable` in this package by design — phase 2 added a full admin
+  *shell* (layout/sidebar/topbar/permissions) to this package, but dense tabular data display
+  remains `packages/shadcn`'s job; mui's admin pages use `Card`/list-based layouts instead.
 - Motion wrappers (`FadeIn`/`SlideIn`/`ScaleIn`) use `whileInView`, so headless/automated
   screenshot tools that capture before the IntersectionObserver fires may show elements as still
   hidden — real browsers trigger it on mount for above-the-fold content.
+- `AccessDenied`'s copy is plain props with English defaults, same tradeoff as the shadcn
+  package's version — see its Known limitations entry above.
