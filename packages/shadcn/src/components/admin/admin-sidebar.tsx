@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 import { ScrollArea } from "../ui/scroll-area";
 import { Tooltip } from "../ui/tooltip";
 import type { NavigationGroup, NavigationItem, NavigationItemRenderer, NavigationItemRenderProps } from "./nav-types";
+import { usePermissionContext } from "./permission-provider";
 
 function isItemVisible(item: NavigationItem, permissions: readonly string[] | undefined): boolean {
   if (!item.permission || !permissions) return true;
@@ -23,7 +24,7 @@ function isHrefActive(href: string | undefined, activeHref: string | undefined):
 
 export interface AdminSidebarProps {
   groups: NavigationGroup[];
-  /** Owned permissions used to filter `permission`-tagged items. Omit to render every item ungated. */
+  /** Owned permissions used to filter `permission`-tagged items. Falls back to the nearest `<PermissionProvider>` when omitted; if neither is present, every item renders ungated. */
   permissions?: readonly string[];
   /** Current location, e.g. from `usePathname()` — used to compute each item's `active` state. The sidebar has no router awareness of its own. */
   activeHref?: string;
@@ -39,7 +40,7 @@ export interface AdminSidebarProps {
 /** Grouped, permission-aware admin navigation. Renders inside `<AdminLayout sidebar={...}>`. */
 export function AdminSidebar({
   groups,
-  permissions,
+  permissions: permissionsProp,
   activeHref,
   renderItem,
   header,
@@ -47,6 +48,8 @@ export function AdminSidebar({
   collapsed = false,
   className,
 }: AdminSidebarProps) {
+  const permissions = permissionsProp ?? usePermissionContext()?.permissions;
+
   return (
     <div className={cn("flex h-full flex-col bg-sidebar text-sidebar-foreground", className)}>
       {header ? (
