@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "../../lib/cn";
 import { Separator } from "../ui/separator";
-import { AdminSidebarToggle } from "./admin-layout";
+import { AdminSidebarCollapseToggle, AdminSidebarToggle } from "./admin-layout";
 
 export interface AdminHeaderProps {
   /** Freeform leading content — rendered after the app switcher/breadcrumb, before the trailing slots. Kept for simple/legacy usage; prefer the named slots below for a consistent layout. */
@@ -17,7 +17,7 @@ export interface AdminHeaderProps {
   className?: string;
 }
 
-/** Admin topbar: sidebar toggle + app switcher + breadcrumb on the left, search/notifications/locale/theme/actions/user menu on the right. Every slot is optional — pass only what the app needs. */
+/** Admin topbar: sidebar toggle (mobile drawer + desktop collapse) + app switcher + breadcrumb on the left, search/notifications/locale/theme/actions/user menu on the right. Every slot is optional — pass only what the app needs. */
 export function AdminHeader({
   children,
   applicationSwitcher,
@@ -40,6 +40,7 @@ export function AdminHeader({
       )}
     >
       <AdminSidebarToggle />
+      <AdminSidebarCollapseToggle />
       {applicationSwitcher}
       {breadcrumb}
       <div className="flex min-w-0 flex-1 items-center gap-3">{children}</div>

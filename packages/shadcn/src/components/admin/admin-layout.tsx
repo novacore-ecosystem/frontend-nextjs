@@ -31,6 +31,9 @@ export interface AdminLayoutProps {
   defaultCollapsed?: boolean;
   sidebarWidth?: number;
   collapsedWidth?: number;
+  /** Controlled collapsed state — pass alongside `onCollapsedChange` to own the value externally (e.g. to persist it). Omit both to keep the default uncontrolled behavior. */
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
 }
 
 /** Generic admin shell: responsive sidebar rail/drawer + topbar + content. No domain assumptions. */
@@ -42,13 +45,29 @@ export function AdminLayout({
   defaultCollapsed = false,
   sidebarWidth = 264,
   collapsedWidth = 68,
+  collapsed: collapsedProp,
+  onCollapsedChange,
 }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(defaultCollapsed);
+  const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed);
+  const isControlled = collapsedProp !== undefined;
+  const sidebarCollapsed = isControlled ? collapsedProp : internalCollapsed;
+
+  const setSidebarCollapsed = React.useCallback(
+    (value: boolean | ((prev: boolean) => boolean)) => {
+      if (isControlled) {
+        const next = typeof value === "function" ? (value as (prev: boolean) => boolean)(collapsedProp) : value;
+        onCollapsedChange?.(next);
+      } else {
+        setInternalCollapsed(value);
+      }
+    },
+    [isControlled, collapsedProp, onCollapsedChange],
+  );
 
   const contextValue = React.useMemo<AdminLayoutContextValue>(
     () => ({ sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed }),
-    [sidebarOpen, sidebarCollapsed],
+    [sidebarOpen, sidebarCollapsed, setSidebarCollapsed],
   );
   // The `sidebar` node is mounted twice (desktop rail + mobile drawer). Forcing
   // `sidebarCollapsed: false` for the mobile copy keeps icon-only rail mode a
