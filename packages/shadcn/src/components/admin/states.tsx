@@ -1,12 +1,15 @@
+"use client";
+
 import { AlertTriangle, Inbox, Loader2 } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export function EmptyState({
   icon,
-  title = "Nothing here yet",
+  title,
   description,
   action,
   className,
@@ -17,11 +20,12 @@ export function EmptyState({
   action?: React.ReactNode;
   className?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={cn("flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border p-10 text-center", className)}>
       <div className="text-muted-foreground">{icon ?? <Inbox className="h-8 w-8" />}</div>
       <div className="space-y-1">
-        <p className="text-sm font-medium">{title}</p>
+        <p className="text-sm font-medium">{title ?? t("states.emptyTitle")}</p>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {action}
@@ -29,17 +33,18 @@ export function EmptyState({
   );
 }
 
-export function LoadingState({ label = "Loading…", className }: { label?: string; className?: string }) {
+export function LoadingState({ label, className }: { label?: string; className?: string }) {
+  const { t } = useTranslation();
   return (
     <div className={cn("flex flex-col items-center justify-center gap-2 p-10 text-muted-foreground", className)}>
       <Loader2 className="h-6 w-6 animate-spin" />
-      <p className="text-sm">{label}</p>
+      <p className="text-sm">{label ?? t("states.loading")}</p>
     </div>
   );
 }
 
 export function ErrorState({
-  title = "Something went wrong",
+  title,
   description,
   onRetry,
   className,
@@ -49,16 +54,17 @@ export function ErrorState({
   onRetry?: () => void;
   className?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={cn("flex flex-col items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-10 text-center", className)}>
       <AlertTriangle className="h-8 w-8 text-destructive" />
       <div className="space-y-1">
-        <p className="text-sm font-medium">{title}</p>
+        <p className="text-sm font-medium">{title ?? t("states.errorTitle")}</p>
         {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {onRetry ? (
         <Button variant="outline" size="sm" onClick={onRetry}>
-          Try again
+          {t("states.retry")}
         </Button>
       ) : null}
     </div>

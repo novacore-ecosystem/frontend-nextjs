@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import type { CriteriaSort } from "@novacore/frontend-foundation";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { Select } from "../ui/select";
@@ -31,7 +32,8 @@ export interface AdvancedSortProps {
  * (`sortable`/`onSortingChange`) — this is the "advanced" mechanism that can include fields
  * with no visible column at all.
  */
-export function AdvancedSort({ fields, value, onApply, triggerLabel = "Sort", className }: AdvancedSortProps) {
+export function AdvancedSort({ fields, value, onApply, triggerLabel, className }: AdvancedSortProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<CriteriaSort[]>(value);
 
@@ -62,7 +64,7 @@ export function AdvancedSort({ fields, value, onApply, triggerLabel = "Sort", cl
   return (
     <>
       <Button variant="outline" size="sm" className={cn("gap-1.5", className)} onClick={() => setOpen(true)}>
-        {triggerLabel}
+        {triggerLabel ?? t("sort.trigger")}
         {value.length > 0 ? (
           <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
             {value.length}
@@ -72,12 +74,12 @@ export function AdvancedSort({ fields, value, onApply, triggerLabel = "Sort", cl
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Sort by</DialogTitle>
-            <DialogDescription>Sort by multiple fields, including ones not shown as table columns.</DialogDescription>
+            <DialogTitle>{t("sort.title")}</DialogTitle>
+            <DialogDescription>{t("sort.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-3">
-            {draft.length === 0 ? <p className="text-sm text-muted-foreground">No sort fields yet.</p> : null}
+            {draft.length === 0 ? <p className="text-sm text-muted-foreground">{t("sort.noSorts")}</p> : null}
             {draft.map((row, index) => (
               <div key={index} className="flex items-center gap-2">
                 <span className="w-5 shrink-0 text-sm text-muted-foreground">{index + 1}.</span>
@@ -94,7 +96,7 @@ export function AdvancedSort({ fields, value, onApply, triggerLabel = "Sort", cl
                   onClick={() => updateRow(index, { direction: row.direction === "asc" ? "desc" : "asc" })}
                 >
                   {row.direction === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
-                  {row.direction === "asc" ? "Asc" : "Desc"}
+                  {row.direction === "asc" ? t("sort.ascending") : t("sort.descending")}
                 </Button>
                 <Button variant="ghost" size="icon" onClick={() => removeRow(index)}>
                   <Trash2 className="h-4 w-4" />
@@ -109,15 +111,15 @@ export function AdvancedSort({ fields, value, onApply, triggerLabel = "Sort", cl
               disabled={draft.length >= fields.length}
             >
               <Plus className="h-4 w-4" />
-              Add sort
+              {t("sort.addSort")}
             </Button>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t("common.actions.cancel")}
             </Button>
-            <Button onClick={apply}>Apply</Button>
+            <Button onClick={apply}>{t("common.actions.apply")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -2,6 +2,7 @@
 
 import { Columns3 } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -33,9 +34,10 @@ export function ColumnVisibility({
   hidden,
   onHiddenChange,
   onClear,
-  triggerLabel = "Columns",
+  triggerLabel,
   className,
 }: ColumnVisibilityProps) {
+  const { t } = useTranslation();
   function toggle(id: string, visible: boolean) {
     onHiddenChange(visible ? hidden.filter((hiddenId) => hiddenId !== id) : [...hidden, id]);
   }
@@ -46,7 +48,7 @@ export function ColumnVisibility({
       trigger={
         <Button variant="outline" size="sm" className={cn("gap-1.5", className)}>
           <Columns3 className="h-4 w-4" />
-          {triggerLabel}
+          {triggerLabel ?? t("columns.trigger")}
           {hidden.length > 0 ? (
             <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
               {hidden.length}
@@ -56,7 +58,7 @@ export function ColumnVisibility({
       }
     >
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium">Visible columns</p>
+        <p className="text-sm font-medium">{t("columns.title")}</p>
         <div className="flex flex-col gap-2">
           {columns.map((column) => {
             const visible = !hidden.includes(column.id);
@@ -70,7 +72,7 @@ export function ColumnVisibility({
           })}
         </div>
         <Button variant="ghost" size="sm" className="w-fit" onClick={onClear} disabled={hidden.length === 0}>
-          Clear
+          {t("columns.clear")}
         </Button>
       </div>
     </Popover>

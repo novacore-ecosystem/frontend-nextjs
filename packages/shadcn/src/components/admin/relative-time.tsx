@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { formatDateTime, parseDateInput, relativeTime, type DateInput } from "@novacore/frontend-foundation";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { useRelativeTimeTick } from "../../lib/relative-time-clock";
 import { Tooltip } from "../ui/tooltip";
@@ -13,7 +14,7 @@ export interface RelativeTimeProps {
   date: DateInput | null | undefined;
   /** Which representation leads; the other is revealed in a tooltip on hover/focus. Defaults to `"relative"`. */
   mode?: RelativeTimeMode;
-  /** BCP 47 locale tag forwarded to `Intl`. Pass the app's active locale to keep this reactive to a language switch — omitting it falls back to the runtime default, which does NOT follow an in-app locale switcher. */
+  /** BCP 47 locale tag forwarded to `Intl`. Omit to auto-follow the nearest `<I18nProvider>`'s active locale (reactive to `LocaleSwitcher`/`setLocale`) — pass this only to pin a specific locale regardless of the app's language switcher. */
   locale?: string;
   /** Reveals the alternate representation in a tooltip on hover/focus. Defaults to `true`. */
   showTooltip?: boolean;
@@ -54,6 +55,8 @@ export function RelativeTime({
   fallback = "—",
   className,
 }: RelativeTimeProps) {
+  const { locale: contextLocale } = useTranslation();
+  const effectiveLocale = locale ?? contextLocale;
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
   useRelativeTimeTick(mounted && updateInterval === "auto");
@@ -64,8 +67,8 @@ export function RelativeTime({
   }
 
   const isoInstant = parsed.toISOString();
-  const absoluteText = formatDateTime(parsed, { locale });
-  const relativeText = mounted ? relativeTime(parsed, { locale }) : absoluteText;
+  const absoluteText = formatDateTime(parsed, { locale: effectiveLocale });
+  const relativeText = mounted ? relativeTime(parsed, { locale: effectiveLocale }) : absoluteText;
   const primaryText = mode === "relative" ? relativeText : absoluteText;
   const alternateText = mode === "relative" ? absoluteText : relativeText;
 

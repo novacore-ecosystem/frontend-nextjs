@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Plus, Trash2 } from "lucide-react";
-import type { CriteriaFilter, CriteriaFilterValue, CriteriaOperator } from "@novacore/frontend-foundation";
+import type { CriteriaFilter, CriteriaFilterValue, CriteriaOperator, Translator } from "@novacore/frontend-foundation";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -30,22 +31,9 @@ export interface AdvancedFilterProps {
   className?: string;
 }
 
-const OPERATOR_LABELS: Record<CriteriaOperator, string> = {
-  eq: "equals",
-  ne: "not equals",
-  gt: "greater than",
-  gte: "greater than or equal",
-  lt: "less than",
-  lte: "less than or equal",
-  c: "contains",
-  sw: "starts with",
-  ew: "ends with",
-  in: "in",
-  nin: "not in",
-  between: "between",
-  null: "is empty",
-  notnull: "is not empty",
-};
+function operatorLabel(operator: CriteriaOperator, t: Translator): string {
+  return t(`filter.operators.${operator}`);
+}
 
 function defaultFilterForField(config: FilterFieldConfig): CriteriaFilter {
   const operator = config.operators[0] ?? "eq";
@@ -58,7 +46,8 @@ function defaultFilterForField(config: FilterFieldConfig): CriteriaFilter {
  * backend contract doesn't support it, so this doesn't invent one). Trigger shows the
  * active condition count; the dialog is a local draft that only commits on Apply.
  */
-export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter", className }: AdvancedFilterProps) {
+export function AdvancedFilter({ fields, value, onApply, triggerLabel, className }: AdvancedFilterProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<CriteriaFilter[]>(value);
 
@@ -88,7 +77,7 @@ export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter"
   return (
     <>
       <Button variant="outline" size="sm" className={cn("gap-1.5", className)} onClick={() => setOpen(true)}>
-        {triggerLabel}
+        {triggerLabel ?? t("filter.trigger")}
         {value.length > 0 ? (
           <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
             {value.length}
@@ -98,13 +87,13 @@ export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter"
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Advanced filters</DialogTitle>
-            <DialogDescription>Combine conditions to narrow the results.</DialogDescription>
+            <DialogTitle>{t("filter.title")}</DialogTitle>
+            <DialogDescription>{t("filter.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-3">
             {draft.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No conditions yet.</p>
+              <p className="text-sm text-muted-foreground">{t("filter.noConditions")}</p>
             ) : null}
             {draft.map((row, index) => {
               const config = fields.find((candidate) => candidate.field === row.field) ?? fields[0];
@@ -123,9 +112,9 @@ export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter"
                     className="w-44 shrink-0"
                     value={row.operator}
                     onValueChange={(operator) => updateRow(index, { operator: operator as CriteriaOperator })}
-                    options={(config?.operators ?? []).map((op) => ({ value: op, label: OPERATOR_LABELS[op] }))}
+                    options={(config?.operators ?? []).map((op) => ({ value: op, label: operatorLabel(op, t) }))}
                   />
-                  <FilterValueEditor config={config} row={row} onChange={(nextValue) => updateRow(index, { value: nextValue })} />
+                  <FilterValueEditor config={config} row={row} t={t} onChange={(nextValue) => updateRow(index, { value: nextValue })} />
                   <Button variant="ghost" size="icon" onClick={() => removeRow(index)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -134,15 +123,15 @@ export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter"
             })}
             <Button variant="outline" size="sm" className="w-fit gap-1.5" onClick={addRow}>
               <Plus className="h-4 w-4" />
-              Add condition
+              {t("filter.addCondition")}
             </Button>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t("common.actions.cancel")}
             </Button>
-            <Button onClick={apply}>Apply</Button>
+            <Button onClick={apply}>{t("common.actions.apply")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -153,10 +142,12 @@ export function AdvancedFilter({ fields, value, onApply, triggerLabel = "Filter"
 function FilterValueEditor({
   config,
   row,
+  t,
   onChange,
 }: {
   config?: FilterFieldConfig;
   row: CriteriaFilter;
+  t: Translator;
   onChange: (value: CriteriaFilterValue) => void;
 }) {
   if (row.operator === "null" || row.operator === "notnull") {
@@ -170,8 +161,8 @@ function FilterValueEditor({
         value={String(row.value ?? true)}
         onValueChange={(next) => onChange(next === "true")}
         options={[
-          { value: "true", label: "True" },
-          { value: "false", label: "False" },
+          { value: "true", label: t("filter.booleanTrue") },
+          { value: "false", label: t("filter.booleanFalse") },
         ]}
       />
     );

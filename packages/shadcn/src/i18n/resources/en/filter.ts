@@ -1,0 +1,26 @@
+/** `AdvancedFilter`'s own UI text. English baseline — `vi`/`zh-CN` are shape-checked against this file. */
+export const filter = {
+  trigger: "Filter",
+  title: "Advanced filters",
+  description: "Combine conditions to narrow the results.",
+  noConditions: "No conditions yet.",
+  addCondition: "Add condition",
+  booleanTrue: "True",
+  booleanFalse: "False",
+  operators: {
+    eq: "equals",
+    ne: "not equals",
+    gt: "greater than",
+    gte: "greater than or equal",
+    lt: "less than",
+    lte: "less than or equal",
+    c: "contains",
+    sw: "starts with",
+    ew: "ends with",
+    in: "in",
+    nin: "not in",
+    between: "between",
+    null: "is empty",
+    notnull: "is not empty",
+  },
+};

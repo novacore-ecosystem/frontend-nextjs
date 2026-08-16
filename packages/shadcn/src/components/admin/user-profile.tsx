@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { ChevronsUpDown, LogOut } from "lucide-react";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Avatar } from "../ui/avatar";
 import {
@@ -58,12 +59,14 @@ export function UserProfile({
   user,
   items = [],
   onLogout,
-  logoutLabel = "Log out",
+  logoutLabel,
   loading,
   variant = "full",
   align = "end",
   className,
 }: UserProfileProps) {
+  const { t } = useTranslation();
+  const resolvedLogoutLabel = logoutLabel ?? t("userProfile.logout");
   const triggerClassName =
     variant === "full"
       ? "flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-sidebar-accent disabled:pointer-events-none disabled:opacity-50"
@@ -104,7 +107,7 @@ export function UserProfile({
               <span className="mr-2 flex h-4 w-4 items-center justify-center">
                 <LogOut className="h-4 w-4" />
               </span>
-              {logoutLabel}
+              {resolvedLogoutLabel}
             </DropdownMenuItem>
           </>
         ) : null}

@@ -9,6 +9,7 @@ import {
   ApplicationSwitcher,
   Button,
   CommandPalette,
+  LocaleSwitcher,
   PermissionProvider,
   useAdminLayout,
   useCommandPalette,
@@ -87,6 +88,7 @@ function PlaygroundTopbar() {
             <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">Ctrl K</kbd>
           </button>
         }
+        localeSwitcher={<LocaleSwitcher />}
         actions={<PersonaSwitcher />}
       >
         <AdminSidebarCollapseToggle />

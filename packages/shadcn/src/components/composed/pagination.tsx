@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { Select } from "../ui/select";
@@ -52,6 +53,7 @@ export function Pagination({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   className,
 }: PaginationProps) {
+  const { t } = useTranslation();
   const pageCount = Math.max(1, Math.ceil(totalRows / pageSize));
   const pages = getPageWindow(pageNumber, pageCount);
   const startRow = totalRows === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
@@ -59,12 +61,10 @@ export function Pagination({
 
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground", className)}>
-      <span>
-        Showing {startRow}–{endRow} of {totalRows}
-      </span>
+      <span>{t("pagination.showing", { from: startRow, to: endRow, total: totalRows })}</span>
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="whitespace-nowrap">Rows per page</span>
+          <span className="whitespace-nowrap">{t("pagination.rowsPerPage")}</span>
           <Select
             className="h-8 w-[76px]"
             value={String(pageSize)}
@@ -76,6 +76,7 @@ export function Pagination({
           <Button
             variant="outline"
             size="icon"
+            aria-label={t("pagination.previous")}
             disabled={pageNumber <= 1}
             onClick={() => onPaginationChange({ pageNumber: pageNumber - 1, pageSize, totalRows })}
           >
@@ -100,6 +101,7 @@ export function Pagination({
           <Button
             variant="outline"
             size="icon"
+            aria-label={t("pagination.next")}
             disabled={pageNumber >= pageCount}
             onClick={() => onPaginationChange({ pageNumber: pageNumber + 1, pageSize, totalRows })}
           >

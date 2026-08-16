@@ -1,6 +1,17 @@
 // Theme
 export * from "./theme";
 
+// i18n
+export {
+  I18nProvider,
+  useI18nContext,
+  useTranslation,
+  BUILTIN_TRANSLATIONS,
+  type I18nProviderProps,
+  type I18nContextValue,
+  type BuiltinTranslationKey,
+} from "./i18n";
+
 // Hooks
 export { usePersistentState } from "./hooks/use-persistent-state";
 export { useDebouncedValue } from "./hooks/use-debounced-value";

@@ -1,14 +1,17 @@
+"use client";
+
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
+import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 
 export interface AccessDeniedProps {
+  /** Defaults resolve via the shared translation system (`accessDenied.*`) — pass these only for an intentional override. */
   title?: string;
   description?: string;
   icon?: React.ReactNode;
-  /** Strings are not localized here — pass translated copy from your own i18n setup via these props. */
   backLabel?: string;
   homeLabel?: string;
   backHref?: string;
@@ -22,11 +25,11 @@ export interface AccessDeniedProps {
 
 /** Reusable full-region access-denied state for `PermissionBoundary`'s default fallback or standalone route guards. UX only — the backend must still reject the underlying request. */
 export function AccessDenied({
-  title = "Access denied",
-  description = "You do not have permission to access this page.",
+  title,
+  description,
   icon,
-  backLabel = "Go back",
-  homeLabel = "Go to dashboard",
+  backLabel,
+  homeLabel,
   backHref,
   homeHref,
   onBack,
@@ -34,6 +37,11 @@ export function AccessDenied({
   children,
   className,
 }: AccessDeniedProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("accessDenied.title");
+  const resolvedDescription = description ?? t("accessDenied.description");
+  const resolvedBackLabel = backLabel ?? t("accessDenied.backLabel");
+  const resolvedHomeLabel = homeLabel ?? t("accessDenied.homeLabel");
   const showBack = Boolean(onBack || backHref);
   const showHome = Boolean(onHome || homeHref);
 
@@ -43,8 +51,8 @@ export function AccessDenied({
         {icon ?? <ShieldAlert className="h-7 w-7" />}
       </div>
       <div className="flex flex-col gap-1">
-        <h1 className="text-lg font-semibold">{title}</h1>
-        <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
+        <h1 className="text-lg font-semibold">{resolvedTitle}</h1>
+        <p className="max-w-sm text-sm text-muted-foreground">{resolvedDescription}</p>
       </div>
       {children}
       {showBack || showHome ? (
@@ -52,22 +60,22 @@ export function AccessDenied({
           {showBack ? (
             onBack ? (
               <Button variant="outline" size="sm" onClick={onBack}>
-                {backLabel}
+                {resolvedBackLabel}
               </Button>
             ) : (
               <Button variant="outline" size="sm" asChild>
-                <Link href={backHref!}>{backLabel}</Link>
+                <Link href={backHref!}>{resolvedBackLabel}</Link>
               </Button>
             )
           ) : null}
           {showHome ? (
             onHome ? (
               <Button size="sm" onClick={onHome}>
-                {homeLabel}
+                {resolvedHomeLabel}
               </Button>
             ) : (
               <Button size="sm" asChild>
-                <Link href={homeHref!}>{homeLabel}</Link>
+                <Link href={homeHref!}>{resolvedHomeLabel}</Link>
               </Button>
             )
           ) : null}
