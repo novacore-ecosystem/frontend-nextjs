@@ -27,6 +27,10 @@
       "types": "./dist/exports/layout.d.ts",
       "import": "./dist/exports/layout.js"
     },
+    "./hooks": {
+      "types": "./dist/exports/hooks.d.ts",
+      "import": "./dist/exports/hooks.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
