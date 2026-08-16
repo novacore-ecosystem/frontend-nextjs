@@ -68,7 +68,7 @@ import { AdminPage, PageHeader, DataTable } from "@novacore/frontend-next-shadcn
 - `@novacore/frontend-next-shadcn` — everything
 - `@novacore/frontend-next-shadcn/theme` — AdminProvider, useAdminTheme, ThemeCustomizer, resolveTheme, presets, tokens, NOVACORE_ADMIN_THEME, NOVACORE_CHROME_OVERRIDES
 - `@novacore/frontend-next-shadcn/forms` — Input, Textarea, Select, Checkbox, Switch, SearchInput, PasswordInput, FormField
-- `@novacore/frontend-next-shadcn/data` — DataTable, fromPaginatedResult, EmptyState, LoadingState, ErrorState, StatusBadge
+- `@novacore/frontend-next-shadcn/data` — DataTable, fromPaginatedResult, EmptyState, LoadingState, ErrorState, StatusBadge, StatCard, StatCardRow, DataFreshness, useDataFreshness
 - `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, AdminBreadcrumb, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
 - `@novacore/frontend-next-shadcn/styles.css` — precompiled CSS (Tailwind is an implementation detail; consumers do not install or configure Tailwind)
 
@@ -150,6 +150,27 @@ this theme and override only `color` (and optionally `radius`) for its own ident
 Full rationale and the rest of the NovaCore Admin design baseline (KPI/freshness pattern,
 list-page composition, business-identity-via-icon convention):
 `nova-console/docs/reference/design-system.md`.
+
+### KPI cards and data freshness
+
+`StatCard`/`StatCardRow` (`./data`) render icon + value + optional trend + optional
+freshness. Pass `freshness` whenever the value is approximate or cached — never let a KPI
+imply real-time precision it doesn't have:
+
+```tsx
+<StatCard
+  label="Total tenants"
+  value={totalTenants}
+  icon={<Building2 />}
+  tone="brand"
+  freshness={{ updatedAt: query.dataUpdatedAt, isFetching: query.isFetching }}
+/>
+```
+
+`DataFreshness`/`useDataFreshness` (same export) render "Updated 2m ago" / "Cached ·
+refresh in 42s" and accept `updatedAt`/`nextRefreshAt`/`ttlSeconds`/`isFetching` — shaped so
+a real backend `refreshedAt`/`cacheTtl` contract can plug in later without changing the
+component. They compose into `StatCard.freshness` or stand alone.
 
 ### RSC / client boundaries
 
