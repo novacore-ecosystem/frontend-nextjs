@@ -66,7 +66,7 @@ import { AdminPage, PageHeader, DataTable } from "@novacore/frontend-next-shadcn
 ### Exports
 
 - `@novacore/frontend-next-shadcn` — everything
-- `@novacore/frontend-next-shadcn/theme` — AdminProvider, useAdminTheme, ThemeCustomizer, resolveTheme, presets, tokens
+- `@novacore/frontend-next-shadcn/theme` — AdminProvider, useAdminTheme, ThemeCustomizer, resolveTheme, presets, tokens, NOVACORE_ADMIN_THEME, NOVACORE_CHROME_OVERRIDES
 - `@novacore/frontend-next-shadcn/forms` — Input, Textarea, Select, Checkbox, Switch, SearchInput, PasswordInput, FormField
 - `@novacore/frontend-next-shadcn/data` — DataTable, fromPaginatedResult, EmptyState, LoadingState, ErrorState, StatusBadge
 - `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, AdminBreadcrumb, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
@@ -130,6 +130,26 @@ CSS custom properties (`--nc-*`) on `<html>` by `<AdminProvider>`. Supports `lig
 `system`. Named presets (`zinc-blue`, `slate-violet`, `gray-green`, `neutral-orange`,
 `stone-rose`, `zinc-teal`, `slate-red`) compose 5 base palettes × 8 accent colors — see
 `packages/shadcn/src/theme/`.
+
+`overrides` applies identically to both the resolved light and dark token sets
+(`resolve-theme.ts`) — a mode-independent surface (e.g. chrome that stays dark regardless
+of the app's light/dark mode) needs no engine change, just fixed override values for that
+surface's tokens.
+
+**`NOVACORE_ADMIN_THEME`** (`./theme` export, `src/theme/novacore.ts`) is the NovaCore
+Admin brand baseline: `zinc` base, `violet` accent, `large` radius, plus
+`NOVACORE_CHROME_OVERRIDES` — five `sidebar-*` keys fixed to a dark navy/indigo,
+independent of light/dark mode, while `sidebar-primary` keeps tracking `color` so the
+active-nav highlight stays theme-aware. Every NovaCore admin product should start from
+this theme and override only `color` (and optionally `radius`) for its own identity:
+
+```tsx
+<AdminProvider theme={{ ...NOVACORE_ADMIN_THEME, color: "blue" }}>
+```
+
+Full rationale and the rest of the NovaCore Admin design baseline (KPI/freshness pattern,
+list-page composition, business-identity-via-icon convention):
+`nova-console/docs/reference/design-system.md`.
 
 ### RSC / client boundaries
 

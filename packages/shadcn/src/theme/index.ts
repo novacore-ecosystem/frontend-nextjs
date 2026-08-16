@@ -3,6 +3,7 @@ export { ThemeCustomizer } from "./theme-customizer";
 export { resolveTheme, tokensToCssVars } from "./resolve-theme";
 export { THEME_PRESETS, DEFAULT_PRESET, resolvePreset } from "./presets";
 export { BASE_PALETTES, ACCENT_COLORS } from "./tokens";
+export { NOVACORE_ADMIN_THEME, NOVACORE_CHROME_OVERRIDES } from "./novacore";
 export type {
   ThemeMode,
   ThemeBase,
