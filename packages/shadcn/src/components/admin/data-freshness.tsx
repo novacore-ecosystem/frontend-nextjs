@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
 import { relativeTime, type DateInput } from "@novacore/frontend-foundation";
 import { cn } from "../../lib/cn";
-
-const TICK_INTERVAL_MS = 30_000;
+import { useRelativeTimeTick } from "../../lib/relative-time-clock";
+import { RelativeTime } from "./relative-time";
 
 export interface DataFreshnessProps {
   /** When the displayed data was last fetched/computed. */
@@ -15,22 +14,14 @@ export interface DataFreshnessProps {
   ttlSeconds?: number;
   /** True while a refetch is in flight — shown as "Refreshing…" instead of the age. */
   isFetching?: boolean;
+  /** BCP 47 locale tag forwarded to the relative-time formatting. Pass the app's active locale to keep it reactive to a language switch. */
+  locale?: string;
   className?: string;
 }
 
 export interface DataFreshnessState {
   label: string;
   isStale: boolean;
-}
-
-/** Re-renders on a fixed interval so relative-time labels stay live without new data arriving. */
-function useClockTick(intervalMs: number): number {
-  const [tick, setTick] = React.useState(0);
-  React.useEffect(() => {
-    const id = setInterval(() => setTick((n) => n + 1), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
-  return tick;
 }
 
 function resolveRefreshDueAt(updatedAt: DateInput, nextRefreshAt?: DateInput, ttlSeconds?: number): Date | null {
@@ -51,15 +42,16 @@ export function useDataFreshness({
   nextRefreshAt,
   ttlSeconds,
   isFetching,
+  locale,
 }: Omit<DataFreshnessProps, "className">): DataFreshnessState {
-  useClockTick(TICK_INTERVAL_MS);
+  useRelativeTimeTick(!isFetching);
 
   if (isFetching) {
     return { label: "Refreshing…", isStale: false };
   }
 
   const refreshDueAt = resolveRefreshDueAt(updatedAt, nextRefreshAt, ttlSeconds);
-  const updatedLabel = `Updated ${relativeTime(updatedAt)}`;
+  const updatedLabel = `Updated ${relativeTime(updatedAt, { locale })}`;
 
   if (!refreshDueAt) {
     return { label: updatedLabel, isStale: false };
@@ -77,6 +69,20 @@ export function useDataFreshness({
 
 /** Small, muted freshness indicator — pairs with `StatCard` or stands alone next to any cached summary. */
 export function DataFreshness(props: DataFreshnessProps) {
+  const { updatedAt, nextRefreshAt, ttlSeconds, isFetching, locale, className } = props;
   const { label } = useDataFreshness(props);
-  return <span className={cn("text-xs text-muted-foreground", props.className)}>{label}</span>;
+
+  // The plain "just updated" case (no TTL/cache countdown, not mid-refetch) is the one
+  // genuinely fixed-instant timestamp here — render it via `RelativeTime` for the
+  // hover/tooltip exact-time affordance. "Refreshing…" and "Cached · refresh in Ns" are
+  // status/countdown text, not a point in time, so they stay plain strings.
+  if (!isFetching && nextRefreshAt === undefined && ttlSeconds === undefined) {
+    return (
+      <span className={cn("text-xs text-muted-foreground", className)}>
+        Updated <RelativeTime date={updatedAt} locale={locale} />
+      </span>
+    );
+  }
+
+  return <span className={cn("text-xs text-muted-foreground", className)}>{label}</span>;
 }

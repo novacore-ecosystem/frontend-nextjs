@@ -166,6 +166,7 @@ export {
   type DataFreshnessProps,
   type DataFreshnessState,
 } from "./components/admin/data-freshness";
+export { RelativeTime, type RelativeTimeProps, type RelativeTimeMode } from "./components/admin/relative-time";
 export {
   PermissionProvider,
   usePermissionContext,
