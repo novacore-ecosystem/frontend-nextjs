@@ -106,6 +106,8 @@ export {
   type ColumnVisibilityProps,
   type ColumnVisibilityColumn,
 } from "./components/composed/column-visibility";
+export { AboutDialog, type AboutDialogProps, type AboutDialogLink } from "./components/composed/about-dialog";
+export { LocaleSwitcher, type LocaleSwitcherProps, type LocaleOption } from "./components/composed/locale-switcher";
 
 // Admin
 export {
@@ -141,6 +143,13 @@ export {
   type PageHeaderProps,
 } from "./components/admin/page";
 export { AdminBreadcrumb, type AdminBreadcrumbItem, type AdminBreadcrumbProps } from "./components/admin/breadcrumb";
+export { HowTo, type HowToProps } from "./components/admin/how-to";
+export {
+  UserProfile,
+  type UserProfileProps,
+  type UserProfileUser,
+  type UserProfileMenuItem,
+} from "./components/admin/user-profile";
 export { EmptyState, LoadingState, ErrorState, SkeletonList } from "./components/admin/states";
 export { StatusBadge, type StatusBadgeProps, type StatusTone } from "./components/admin/status-badge";
 export {

@@ -32,6 +32,7 @@ export {
 } from "../components/admin/page";
 export { AdminBreadcrumb, type AdminBreadcrumbItem, type AdminBreadcrumbProps } from "../components/admin/breadcrumb";
 export { FilterToolbar, type FilterToolbarProps } from "../components/composed/filter-toolbar";
+export { HowTo, type HowToProps } from "../components/admin/how-to";
 export {
   AdvancedFilter,
   type AdvancedFilterProps,
@@ -39,6 +40,14 @@ export {
   type FilterFieldType,
 } from "../components/composed/advanced-filter";
 export { AdvancedSort, type AdvancedSortProps, type SortFieldConfig } from "../components/composed/advanced-sort";
+export { AboutDialog, type AboutDialogProps, type AboutDialogLink } from "../components/composed/about-dialog";
+export { LocaleSwitcher, type LocaleSwitcherProps, type LocaleOption } from "../components/composed/locale-switcher";
+export {
+  UserProfile,
+  type UserProfileProps,
+  type UserProfileUser,
+  type UserProfileMenuItem,
+} from "../components/admin/user-profile";
 export {
   PermissionProvider,
   usePermissionContext,
