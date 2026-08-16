@@ -24,3 +24,8 @@ export {
   type DataFreshnessState,
 } from "../components/admin/data-freshness";
 export { Pagination, type PaginationProps, type PaginationState } from "../components/composed/pagination";
+export {
+  ColumnVisibility,
+  type ColumnVisibilityProps,
+  type ColumnVisibilityColumn,
+} from "../components/composed/column-visibility";

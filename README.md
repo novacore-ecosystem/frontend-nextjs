@@ -69,7 +69,7 @@ import { AdminPage, PageHeader, DataTable } from "@novacore/frontend-next-shadcn
 - `@novacore/frontend-next-shadcn/theme` — AdminProvider, useAdminTheme, ThemeCustomizer, resolveTheme, presets, tokens, NOVACORE_ADMIN_THEME, NOVACORE_CHROME_OVERRIDES
 - `@novacore/frontend-next-shadcn/forms` — Input, Textarea, Select, Checkbox, Switch, SearchInput, PasswordInput, FormField
 - `@novacore/frontend-next-shadcn/data` — DataTable, fromPaginatedResult, EmptyState, LoadingState, ErrorState, StatusBadge, StatCard, StatCardRow, DataFreshness, useDataFreshness
-- `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, AdminBreadcrumb, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
+- `@novacore/frontend-next-shadcn/layout` — AdminLayout, AdminSidebar, AdminHeader, ApplicationSwitcher, CommandPalette, AdminPage, PageHeader, AdminBreadcrumb, FilterToolbar, PermissionProvider, usePermission, PermissionGate, PermissionBoundary, PermissionButton, AccessDenied
 - `@novacore/frontend-next-shadcn/styles.css` — precompiled CSS (Tailwind is an implementation detail; consumers do not install or configure Tailwind)
 
 ### Admin shell
@@ -171,6 +171,12 @@ imply real-time precision it doesn't have:
 refresh in 42s" and accept `updatedAt`/`nextRefreshAt`/`ttlSeconds`/`isFetching` — shaped so
 a real backend `refreshedAt`/`cacheTtl` contract can plug in later without changing the
 component. They compose into `StatCard.freshness` or stand alone.
+
+### List-page filtering
+
+`FilterToolbar` (`./layout`) composes a search slot, filter-control slot, conditional
+"clear filters" action, and trailing actions in one row — prop-driven, owns no state
+itself.
 
 ### RSC / client boundaries
 
