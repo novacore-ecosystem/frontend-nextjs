@@ -23,3 +23,4 @@ export {
   type DataFreshnessProps,
   type DataFreshnessState,
 } from "../components/admin/data-freshness";
+export { Pagination, type PaginationProps, type PaginationState } from "../components/composed/pagination";

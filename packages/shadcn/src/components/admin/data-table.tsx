@@ -1,11 +1,11 @@
 "use client";
 
 import type { PaginatedResult } from "@novacore/frontend-foundation";
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import * as React from "react";
 import { cn } from "../../lib/cn";
-import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import { Pagination, type PaginationState } from "../composed/pagination";
 import { EmptyState, ErrorState, SkeletonList } from "./states";
 
 export interface DataTableColumn<T> {
@@ -24,17 +24,8 @@ export interface DataTableSortState {
   direction: DataTableSortDirection;
 }
 
-/**
- * One-based to match `@novacore/frontend-foundation`'s `PaginatedResult` /
- * `PAGINATION_DEFAULTS` convention (the canonical shape every NovaCore
- * backend list endpoint returns) — avoids an off-by-one translation layer
- * between API responses and table state at every call site.
- */
-export interface DataTablePaginationState {
-  pageNumber: number;
-  pageSize: number;
-  totalRows: number;
-}
+/** Same shape as `Pagination`'s `PaginationState` (`../composed/pagination`) — kept as its own exported name since it predates that component. */
+export type DataTablePaginationState = PaginationState;
 
 /** Adapts a backend `PaginatedResult<T>` response directly into DataTable props. */
 export function fromPaginatedResult<T>(result: PaginatedResult<T>): {
@@ -59,6 +50,7 @@ export interface DataTableProps<T> {
   onSortingChange?: (sort: DataTableSortState | undefined) => void;
   pagination?: DataTablePaginationState;
   onPaginationChange?: (pagination: DataTablePaginationState) => void;
+  pageSizeOptions?: number[];
   selectable?: boolean;
   selectedRowIds?: string[];
   onSelectedRowIdsChange?: (ids: string[]) => void;
@@ -79,6 +71,7 @@ export function DataTable<T>({
   onSortingChange,
   pagination,
   onPaginationChange,
+  pageSizeOptions,
   selectable,
   selectedRowIds = [],
   onSelectedRowIdsChange,
@@ -111,8 +104,6 @@ export function DataTable<T>({
       selectedRowIds.includes(id) ? selectedRowIds.filter((rowId) => rowId !== id) : [...selectedRowIds, id],
     );
   }
-
-  const pageCount = pagination ? Math.max(1, Math.ceil(pagination.totalRows / pagination.pageSize)) : 1;
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -211,29 +202,13 @@ export function DataTable<T>({
       </div>
 
       {pagination && onPaginationChange ? (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>
-            Page {pagination.pageNumber} of {pageCount} · {pagination.totalRows} total
-          </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={pagination.pageNumber <= 1}
-              onClick={() => onPaginationChange({ ...pagination, pageNumber: pagination.pageNumber - 1 })}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={pagination.pageNumber >= pageCount}
-              onClick={() => onPaginationChange({ ...pagination, pageNumber: pagination.pageNumber + 1 })}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          pageNumber={pagination.pageNumber}
+          pageSize={pagination.pageSize}
+          totalRows={pagination.totalRows}
+          onPaginationChange={onPaginationChange}
+          pageSizeOptions={pageSizeOptions}
+        />
       ) : null}
     </div>
   );

@@ -92,6 +92,7 @@ export { SearchInput, type SearchInputProps } from "./components/composed/search
 export { PasswordInput, type PasswordInputProps } from "./components/composed/password-input";
 export { FormField, FormSection, FormActions, type FormFieldProps } from "./components/composed/form-field";
 export { ConfirmDialog, type ConfirmDialogProps } from "./components/composed/confirm-dialog";
+export { Pagination, type PaginationProps, type PaginationState } from "./components/composed/pagination";
 
 // Admin
 export {
