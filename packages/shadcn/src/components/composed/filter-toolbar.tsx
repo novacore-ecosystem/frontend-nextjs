@@ -28,14 +28,18 @@ export function FilterToolbar({
 }: FilterToolbarProps) {
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-2", className)}>
-      <div className="flex flex-wrap items-center gap-2">
-        {search}
-        {filters}
-        {hasActiveFilters && onClearFilters ? (
-          <Button variant="ghost" size="sm" onClick={onClearFilters}>
-            {clearFiltersLabel}
-          </Button>
-        ) : null}
+      <div className="flex flex-wrap justify-between items-center gap-2">
+        <div className="flex items-center justify-start">
+          {search}
+        </div>
+        <div className="flex items-center justify-end">
+          {filters}
+          {hasActiveFilters && onClearFilters ? (
+            <Button variant="ghost" size="sm" onClick={onClearFilters}>
+              {clearFiltersLabel}
+            </Button>
+          ) : null}
+        </div>
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </div>

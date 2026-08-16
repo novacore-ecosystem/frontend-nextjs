@@ -78,7 +78,7 @@ export function DataFreshness(props: DataFreshnessProps) {
   // status/countdown text, not a point in time, so they stay plain strings.
   if (!isFetching && nextRefreshAt === undefined && ttlSeconds === undefined) {
     return (
-      <span className={cn("text-xs text-muted-foreground", className)}>
+      <span className={cn("text-xs text-muted-foreground text-right", className)}>
         Updated <RelativeTime date={updatedAt} locale={locale} />
       </span>
     );
