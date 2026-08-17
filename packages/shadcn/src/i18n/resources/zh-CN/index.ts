@@ -1,6 +1,6 @@
 import { zhCN as foundationZhCN } from "@novacore/frontend-foundation";
 import type { en } from "../en";
-import { accessControlNavigation, assignment, permissions, positions, roles } from "./access-control";
+import { accessControlNavigation, assignment, permissions, positions, roles, userPermissions } from "./access-control";
 import { accessDenied } from "./access-denied";
 import { columns } from "./columns";
 import { filter } from "./filter";
@@ -24,4 +24,5 @@ export const zhCN = {
   roles,
   positions,
   assignment,
+  userPermissions,
 } as const satisfies typeof en;

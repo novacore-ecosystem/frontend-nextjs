@@ -54,6 +54,11 @@ export { PermissionManagement, type PermissionManagementProps } from "../compone
 export { RoleManagement, type RoleManagementProps } from "../components/access-control/role-management";
 export { PositionManagement, type PositionManagementProps } from "../components/access-control/position-management";
 export {
+  UserPermissionAssignment,
+  type UserPermissionAssignmentProps,
+  type UserPermissionAssignmentFilterRenderProps,
+} from "../components/access-control/user-permission-assignment";
+export {
   createAccessControlNavigation,
   useAccessControlNavigation,
   type AccessControlNavigationOptions,

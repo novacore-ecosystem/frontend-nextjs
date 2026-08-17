@@ -7,9 +7,9 @@ import { AccessControlPermissions } from "./access-control-permissions";
 export interface AccessControlNavigationOptions {
   /** Overrides the group's own title. Defaults to a plain "Access Control" label — pass a translated string, or use `useAccessControlNavigation` for an auto-translated default. */
   title?: string;
-  labels?: { permissions?: string; roles?: string; positions?: string };
-  /** Hide specific entries, e.g. `{ permissions: true }` for an app that doesn't expose permission-translation editing. */
-  hidden?: { permissions?: boolean; roles?: boolean; positions?: boolean };
+  labels?: { permissions?: string; roles?: string; positions?: string; userPermissions?: string };
+  /** Hide specific entries, e.g. `{ userPermissions: true }` for an app that doesn't mount `UserPermissionAssignment`. */
+  hidden?: { permissions?: boolean; roles?: boolean; positions?: boolean; userPermissions?: boolean };
 }
 
 /**
@@ -25,7 +25,13 @@ export function createAccessControlNavigation(
   options: AccessControlNavigationOptions = {},
 ): NavigationGroup {
   const prefix = basePath.replace(/\/$/, "");
-  const labels = { permissions: "Permissions", roles: "Roles", positions: "Positions", ...options.labels };
+  const labels = {
+    permissions: "Permissions",
+    roles: "Roles",
+    positions: "Positions",
+    userPermissions: "User Permissions",
+    ...options.labels,
+  };
   const hidden = options.hidden ?? {};
 
   return {
@@ -62,6 +68,16 @@ export function createAccessControlNavigation(
               permission: AccessControlPermissions.position.view,
             },
           ]),
+      ...(hidden.userPermissions
+        ? []
+        : [
+            {
+              id: "access-control-user-permissions",
+              label: labels.userPermissions,
+              href: `${prefix}/user-permissions`,
+              permission: AccessControlPermissions.permission.manage,
+            },
+          ]),
     ],
   };
 }
@@ -76,6 +92,7 @@ export function useAccessControlNavigation(basePath: string, options: AccessCont
       permissions: t("permissions.title"),
       roles: t("roles.title"),
       positions: t("positions.title"),
+      userPermissions: t("userPermissions.title"),
       ...options.labels,
     },
   });

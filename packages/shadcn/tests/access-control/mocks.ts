@@ -4,6 +4,8 @@ import type {
   PermissionGroup,
   PositionRecord,
   RoleRecord,
+  SubjectOption,
+  SubjectSearchProvider,
 } from "../../src/components/access-control/types";
 import { buildPositionTree } from "../../src/components/access-control/position-hierarchy";
 
@@ -40,6 +42,26 @@ export const MOCK_PERMISSIONS: PermissionDefinition[] = [
   { id: "inventory:view", translationKey: "View inventory", group: "inventory", groupTranslationKey: "Inventory" },
   { id: "inventory:adjust", translationKey: "Adjust inventory", group: "inventory", groupTranslationKey: "Inventory" },
 ];
+
+/** A minimal in-memory `SubjectSearchProvider` for `UserPermissionAssignment` tests — filters by keyword only, matching real `CriteriaRequest` pagination. */
+export function createMockSubjectProvider(seed: SubjectOption[]): SubjectSearchProvider {
+  return {
+    async search({ keyword, page = 1, pageSize = 20 }) {
+      const all = keyword ? seed.filter((s) => s.displayName.toLowerCase().includes(keyword.toLowerCase())) : seed;
+      const start = (page - 1) * pageSize;
+      const items = all.slice(start, start + pageSize);
+      return {
+        items,
+        pageNumber: page,
+        pageSize,
+        totalCount: all.length,
+        hasNextPage: start + pageSize < all.length,
+        hasPreviousPage: page > 1,
+        totalPages: Math.max(1, Math.ceil(all.length / pageSize)),
+      };
+    },
+  };
+}
 
 /**
  * An in-memory `AccessControlServices` implementation for tests — exercises the real

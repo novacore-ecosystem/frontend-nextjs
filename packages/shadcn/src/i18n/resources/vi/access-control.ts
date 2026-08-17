@@ -4,6 +4,7 @@ import type {
   permissions as enPermissions,
   positions as enPositions,
   roles as enRoles,
+  userPermissions as enUserPermissions,
 } from "../en/access-control";
 
 /** Vietnamese translation of `resources/en/access-control.ts`. Kept shape-complete via `satisfies typeof en*`. */
@@ -147,3 +148,34 @@ export const assignment = {
     user: "người dùng",
   },
 } as const satisfies typeof enAssignment;
+
+export const userPermissions = {
+  title: "Quyền người dùng",
+  description: "Tìm kiếm người dùng và cấp quyền trực tiếp cho họ.",
+  searchPlaceholder: "Tìm kiếm người dùng…",
+  columns: {
+    name: "Tên",
+    secondary: "",
+  },
+  selectedCount: "Đã chọn {{count}}",
+  clearSelection: "Bỏ chọn",
+  noneSelected: "Chọn một hoặc nhiều người dùng ở trên để gán quyền.",
+  empty: "Không có người dùng nào khớp với tìm kiếm của bạn.",
+  bulk: {
+    title: "Cấp quyền cho {{count}} người dùng",
+    description: "Quyền hiện có của mỗi người dùng được chọn vẫn giữ nguyên — thao tác này chỉ thêm các quyền được chọn bên dưới.",
+    confirmTitle: "Cấp quyền?",
+    confirmDescription: "Thao tác này sẽ cấp {{permissionCount}} quyền cho {{subjectCount}} người dùng. Các quyền hiện có không bị ảnh hưởng.",
+    confirmButton: "Cấp quyền",
+    grant: "Cấp quyền",
+    granted: "Đã cấp quyền.",
+  },
+  howTo: {
+    title: "Về quyền người dùng",
+    whatIs: "Cấp quyền trực tiếp cho một hoặc nhiều người dùng, bên cạnh những quyền họ có được qua Vai trò và Vị trí.",
+    singleVsBulk:
+      "Chọn một người dùng sẽ hiển thị đầy đủ quyền hiện tại của họ, có thể chỉnh sửa như gán quyền cho Vai trò/Vị trí. Chọn nhiều người dùng sẽ chuyển sang cấp một tập hợp quyền đã chọn cho tất cả cùng lúc — không có quyền nào hiện có bị gỡ bỏ.",
+    notUserManagement:
+      "Trang này chỉ gán quyền — việc tạo người dùng, các bộ lọc tìm kiếm ngoài từ khóa, và thông tin hồ sơ thuộc về hệ thống quản lý người dùng riêng của ứng dụng, không phải ở đây.",
+  },
+} as const satisfies typeof enUserPermissions;

@@ -140,3 +140,33 @@ export const assignment = {
     user: "user",
   },
 };
+
+export const userPermissions = {
+  title: "User Permissions",
+  description: "Search for users and grant them permissions directly.",
+  searchPlaceholder: "Search users…",
+  columns: {
+    name: "Name",
+    secondary: "",
+  },
+  selectedCount: "{{count}} selected",
+  clearSelection: "Clear selection",
+  noneSelected: "Select one or more users above to assign permissions.",
+  empty: "No users match your search.",
+  bulk: {
+    title: "Grant permissions to {{count}} users",
+    description: "Existing permissions for each selected user are kept — this only adds the permissions checked below.",
+    confirmTitle: "Grant permissions?",
+    confirmDescription: "This grants {{permissionCount}} permission(s) to {{subjectCount}} user(s). Existing permissions aren't affected.",
+    confirmButton: "Grant permissions",
+    grant: "Grant permissions",
+    granted: "Permissions granted.",
+  },
+  howTo: {
+    title: "About user permissions",
+    whatIs: "Grant permissions directly to one or more users, in addition to whatever they hold via Roles and Positions.",
+    singleVsBulk:
+      "Selecting one user shows their full current permissions, editable like Role/Position assignment. Selecting several users switches to granting a chosen set of permissions to all of them at once — nothing already held is removed.",
+    notUserManagement: "This page only assigns permissions — user creation, search filters beyond keyword, and profile details live in this application's own user management, not here.",
+  },
+};

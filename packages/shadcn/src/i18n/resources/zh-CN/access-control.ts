@@ -4,6 +4,7 @@ import type {
   permissions as enPermissions,
   positions as enPositions,
   roles as enRoles,
+  userPermissions as enUserPermissions,
 } from "../en/access-control";
 
 /** Simplified Chinese translation of `resources/en/access-control.ts`. Kept shape-complete via `satisfies typeof en*`. */
@@ -142,3 +143,32 @@ export const assignment = {
     user: "用户",
   },
 } as const satisfies typeof enAssignment;
+
+export const userPermissions = {
+  title: "用户权限",
+  description: "搜索用户并直接为其授予权限。",
+  searchPlaceholder: "搜索用户…",
+  columns: {
+    name: "姓名",
+    secondary: "",
+  },
+  selectedCount: "已选择 {{count}} 项",
+  clearSelection: "清除选择",
+  noneSelected: "请在上方选择一个或多个用户以分配权限。",
+  empty: "没有符合搜索条件的用户。",
+  bulk: {
+    title: "为 {{count}} 位用户授予权限",
+    description: "每位所选用户现有的权限保持不变——此操作仅添加下方勾选的权限。",
+    confirmTitle: "授予权限？",
+    confirmDescription: "此操作将为 {{subjectCount}} 位用户授予 {{permissionCount}} 项权限。现有权限不受影响。",
+    confirmButton: "授予权限",
+    grant: "授予权限",
+    granted: "权限已授予。",
+  },
+  howTo: {
+    title: "关于用户权限",
+    whatIs: "直接为一个或多个用户授予权限，作为其通过角色和职位获得的权限之外的补充。",
+    singleVsBulk: "选择单个用户会显示其当前的完整权限，可像角色/职位分配一样编辑。选择多个用户则会切换为一次性为所有人授予一组选定的权限——不会移除任何已有权限。",
+    notUserManagement: "此页面仅用于分配权限——用户创建、关键字之外的搜索筛选以及资料信息属于此应用程序自己的用户管理，不在此处。",
+  },
+} as const satisfies typeof enUserPermissions;

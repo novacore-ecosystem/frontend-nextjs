@@ -8,6 +8,7 @@ app; compose them.
 <PermissionManagement permissions={myAppPermissions} />
 <RoleManagement permissions={myAppPermissions} />
 <PositionManagement permissions={myAppPermissions} />
+<UserPermissionAssignment permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
 ```
 
 Each renders a full page: breadcrumb slot, header, toolbar, table/tree, dialogs, validation,
@@ -21,9 +22,9 @@ Part of `@novacore/frontend-next-shadcn`, importable from the package root or th
 subpath (identical exports — the subpath exists for consumers who prefer narrower imports):
 
 ```ts
-import { PermissionManagement, RoleManagement, PositionManagement, AccessControlProvider } from "@novacore/frontend-next-shadcn";
+import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, AccessControlProvider } from "@novacore/frontend-next-shadcn";
 // or
-import { PermissionManagement, RoleManagement, PositionManagement, AccessControlProvider } from "@novacore/frontend-next-shadcn/access-control";
+import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, AccessControlProvider } from "@novacore/frontend-next-shadcn/access-control";
 ```
 
 ## Permission catalog
@@ -82,6 +83,79 @@ a service (see above), and subject/user search for `UserPermissionAssignment` is
 `subjectProvider` prop, not part of this provider either (too application-specific to standardize
 — see "User Permission Assignment" below).
 
+## User Permission Assignment
+
+`UserPermissionAssignment` grants permissions directly to users/members — a capability the
+platform was missing entirely (Role/Position assignment existed, but nothing let an admin grant
+a permission to one specific person without wrapping them in a Role first). It's deliberately a
+**separate module from any User Management page** — assigning permissions is an access-control
+concern, not a user-CRUD concern, and folding it into a user list would make that page responsible
+for user search *and* filtering *and* permission UI *and* selection state *and* role management,
+all at once.
+
+```tsx
+<UserPermissionAssignment permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
+```
+
+### Subject search is application-provided
+
+There's no universal "user" entity across NovaCore apps — it might be a User, Member, Account,
+Employee, or Operator, and every application's identity system is different. Rather than baking
+a concrete entity into this module, it depends on a generic adapter:
+
+```ts
+export interface SubjectOption {
+  id: string;
+  displayName: string;
+  secondaryText?: string;
+}
+
+export interface SubjectSearchProvider {
+  search(request: CriteriaRequest): Promise<PaginatedResult<SubjectOption>>;
+}
+```
+
+`SubjectSearchProvider` reuses the platform's canonical `CriteriaRequest`/`PaginatedResult` search
+contract — the same one `RoleService.getList`/`PositionService.getList` already use — so an app
+backed by a real search endpoint (Users included, per `CriteriaRequest`'s own doc comment) can
+implement this with one `httpClient` call. `subjectProvider` is **not** part of `AccessControlServices`
+— pass it directly as a prop, since (unlike Role/Position/assignment data) it's too
+application-specific to standardize into the shared provider.
+
+The component never loads an entire user list — every keystroke/page/filter change re-queries
+`subjectProvider.search()` server-side, so it scales to large installations the same way
+Role/Position's paginated lists do.
+
+### Filters
+
+Only a search box ships built in. For application-specific filters (department, status, tenant,
+...), supply `renderFilters` — the component owns the resulting `CriteriaFilter[]` state and
+threads it into every search call; you only supply the controls:
+
+```tsx
+<UserPermissionAssignment
+  permissions={myAppPermissions}
+  subjectProvider={myAppSubjectProvider}
+  renderFilters={({ filters, onFiltersChange }) => (
+    <DepartmentFilter value={filters} onChange={onFiltersChange} />
+  )}
+/>
+```
+
+### Selection and assignment semantics
+
+- **One user selected** — the full `PermissionAssignment` editor (identical to Role/Position):
+  loads their current permissions, lets you check/uncheck freely, Save replaces their permission
+  set with exactly what's checked.
+- **Multiple users selected** — a fresh, unchecked `PermissionTree` (the same selector Role/Position
+  use) plus a confirmation dialog summarizing "grants N permissions to M users." Confirming is an
+  **additive grant**: each selected user's *existing* permissions (fetched individually first) are
+  preserved, and the checked permissions are added on top — a bulk action never silently revokes
+  a permission a user already held for an unrelated reason.
+
+The running selection (`Map<id, SubjectOption>`) survives searches/pagination, and the toolbar
+shows a live "N selected" count with a "Clear selection" action.
+
 ### Position has no existing backend contract
 
 `Position` doesn't exist anywhere in `@novacore/frontend-foundation` today — no permission keys,
@@ -103,11 +177,12 @@ const navigationGroups = [
 ];
 ```
 
-Returns a ready-to-render `NavigationGroup` (Permissions / Roles / Positions), each entry already
-permission-gated via `AccessControlPermissions`. Inside a component, prefer `useAccessControlNavigation`
-for labels that follow the active `I18nProvider` locale automatically. Your app still owns whether
-the group is shown, where it sits in the sidebar, and route prefix — this just saves re-typing the
-three entries.
+Returns a ready-to-render `NavigationGroup` (Permissions / Roles / Positions / User Permissions),
+each entry already permission-gated via `AccessControlPermissions`. Inside a component, prefer
+`useAccessControlNavigation` for labels that follow the active `I18nProvider` locale automatically.
+Your app still owns whether the group is shown, where it sits in the sidebar, and route prefix —
+this just saves re-typing the four entries. Pass `hidden: { userPermissions: true }` if your app
+doesn't mount `UserPermissionAssignment`.
 
 ## Routing
 
@@ -137,10 +212,11 @@ package's permission system.
 ## Customization
 
 **Can override:** the service adapter (all data access), `breadcrumb`, `readOnly`, navigation
-labels (`createAccessControlNavigation`'s `labels`/`hidden` options), and — since it flows through
-the same `I18nProvider`/`translations` mechanism as the rest of the package — any individual UI
-string, by supplying an override at the `accessControl`-relevant top-level keys (`permissions`,
-`roles`, `positions`, `assignment`, `accessControlNavigation`) in your `I18nProvider`'s
+labels (`createAccessControlNavigation`'s `labels`/`hidden` options), `UserPermissionAssignment`'s
+`renderFilters`, and — since it flows through the same `I18nProvider`/`translations` mechanism as
+the rest of the package — any individual UI string, by supplying an override at the
+`accessControl`-relevant top-level keys (`permissions`, `roles`, `positions`, `assignment`,
+`userPermissions`, `accessControlNavigation`) in your `I18nProvider`'s
 `translations`/`tenantTranslations` prop.
 
 **Should NOT override:** page layout/structure, table columns, dialog flow, validation behavior,
@@ -163,6 +239,8 @@ Reusable outside the three page components, if you're composing your own screen:
 - `PositionHierarchy` — presentational superior/subordinate tree (expand/collapse, `renderActions`
   escape hatch).
 - `PositionSelector` — indented, cycle-safe single-select for choosing a superior position.
+- `DataTable`'s `selectable`/`selectedRowIds`/`onSelectedRowIdsChange` — what `UserPermissionAssignment`
+  is built on for paginated multi-select; reuse it directly if composing a custom subject picker.
 
 ## Example: minimal new Admin application
 
@@ -176,6 +254,7 @@ export const accessControlServices: AccessControlServices = {
   positions: myPositionApiAdapter,
   assignments: myAssignmentApiAdapter,
 };
+export const myAppSubjectProvider: SubjectSearchProvider = myUserSearchApiAdapter;
 
 // app/admin/layout.tsx
 <PermissionProvider permissions={currentUser.permissions}>
@@ -194,8 +273,10 @@ export default () => <PermissionManagement permissions={myAppPermissions} />;
 export default () => <RoleManagement permissions={myAppPermissions} />;
 // app/admin/access-control/positions/page.tsx
 export default () => <PositionManagement permissions={myAppPermissions} />;
+// app/admin/access-control/user-permissions/page.tsx
+export default () => <UserPermissionAssignment permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />;
 ```
 
-Three route files, one permission catalog, one service adapter module, zero access-control UI
+Four route files, one permission catalog, one service adapter module, zero access-control UI
 code. `myAppTranslations` is where `myAppPermissions`' `translationKey`/`groupTranslationKey`
 values actually resolve — see "Permission catalog" above.

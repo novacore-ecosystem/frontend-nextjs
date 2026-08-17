@@ -1,5 +1,5 @@
 import { en as foundationEn } from "@novacore/frontend-foundation";
-import { accessControlNavigation, assignment, permissions, positions, roles } from "./access-control";
+import { accessControlNavigation, assignment, permissions, positions, roles, userPermissions } from "./access-control";
 import { accessDenied } from "./access-denied";
 import { columns } from "./columns";
 import { filter } from "./filter";
@@ -33,4 +33,5 @@ export const en = {
   roles,
   positions,
   assignment,
+  userPermissions,
 };
