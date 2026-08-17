@@ -35,6 +35,10 @@
       "types": "./dist/exports/i18n.d.ts",
       "import": "./dist/exports/i18n.js"
     },
+    "./access-control": {
+      "types": "./dist/exports/access-control.d.ts",
+      "import": "./dist/exports/access-control.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
