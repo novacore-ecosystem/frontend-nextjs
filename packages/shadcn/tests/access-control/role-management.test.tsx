@@ -5,7 +5,7 @@ import { AccessControlProvider } from "../../src/components/access-control/acces
 import { PermissionProvider } from "../../src/components/admin/permission-provider";
 import { RoleManagement } from "../../src/components/access-control/role-management";
 import { AccessControlPermissions } from "../../src/components/access-control/access-control-permissions";
-import { createMockServices } from "./mocks";
+import { createMockServices, MOCK_PERMISSIONS } from "./mocks";
 import type { RoleRecord } from "../../src/components/access-control/types";
 
 const SEED_ROLES: RoleRecord[] = [
@@ -19,7 +19,7 @@ function renderRoleManagement({ manage = true }: { manage?: boolean } = {}) {
   render(
     <PermissionProvider permissions={permissions}>
       <AccessControlProvider services={services}>
-        <RoleManagement />
+        <RoleManagement permissions={MOCK_PERMISSIONS} />
       </AccessControlProvider>
     </PermissionProvider>,
   );

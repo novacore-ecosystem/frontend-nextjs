@@ -6,7 +6,7 @@ export const accessControlNavigation = {
 
 export const permissions = {
   title: "Permissions",
-  description: "Browse the platform's permission catalog and its display copy.",
+  description: "Browse the permissions this application uses.",
   searchPlaceholder: "Search permissions…",
   columns: {
     identifier: "Identifier",
@@ -15,22 +15,13 @@ export const permissions = {
     description: "Description",
   },
   empty: "No permissions match your search.",
-  edit: {
-    trigger: "Edit",
-    title: "Edit permission",
-    description: "Update the display name and description shown to administrators, per language.",
-    nameLabel: "Display name",
-    descriptionLabel: "Description",
-    save: "Save changes",
-    saved: "Permission updated.",
-  },
   howTo: {
     title: "About permissions",
     whatIs:
-      "A permission is a fixed capability defined by the backend (e.g. \"order:view\"). Administrators can't create or delete permissions here — only edit how each one is displayed.",
+      "A permission is a fixed capability defined by the backend (e.g. \"order:view\"). This list shows only the permissions this application uses; their names and descriptions are defined by the application and can't be edited here.",
     naming: "Identifiers follow a module:action format and are grouped by module in the list above.",
     assignment:
-      "Permissions are granted to Roles and Positions, never directly here — use Role or Position management to change who holds a permission.",
+      "Permissions are granted to Roles, Positions, and Users, never directly here — use Role, Position, or User Permissions to change who holds a permission.",
   },
 };
 

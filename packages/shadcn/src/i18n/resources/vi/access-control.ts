@@ -14,7 +14,7 @@ export const accessControlNavigation = {
 
 export const permissions = {
   title: "Quyền hạn",
-  description: "Xem danh mục quyền hạn của hệ thống và nội dung hiển thị của từng quyền.",
+  description: "Xem các quyền hạn mà ứng dụng này sử dụng.",
   searchPlaceholder: "Tìm kiếm quyền hạn…",
   columns: {
     identifier: "Mã định danh",
@@ -23,22 +23,13 @@ export const permissions = {
     description: "Mô tả",
   },
   empty: "Không có quyền hạn nào khớp với tìm kiếm của bạn.",
-  edit: {
-    trigger: "Sửa",
-    title: "Sửa quyền hạn",
-    description: "Cập nhật tên hiển thị và mô tả cho quản trị viên, theo từng ngôn ngữ.",
-    nameLabel: "Tên hiển thị",
-    descriptionLabel: "Mô tả",
-    save: "Lưu thay đổi",
-    saved: "Đã cập nhật quyền hạn.",
-  },
   howTo: {
     title: "Về quyền hạn",
     whatIs:
-      "Quyền hạn là một năng lực cố định do backend định nghĩa (ví dụ \"order:view\"). Quản trị viên không thể tạo hoặc xóa quyền hạn tại đây — chỉ có thể chỉnh sửa cách hiển thị của từng quyền.",
+      "Quyền hạn là một năng lực cố định do backend định nghĩa (ví dụ \"order:view\"). Danh sách này chỉ hiển thị các quyền mà ứng dụng này sử dụng; tên và mô tả do ứng dụng định nghĩa và không thể chỉnh sửa tại đây.",
     naming: "Mã định danh có dạng module:action và được nhóm theo module trong danh sách ở trên.",
     assignment:
-      "Quyền hạn được cấp cho Vai trò và Vị trí, không cấp trực tiếp tại đây — dùng Quản lý vai trò hoặc Quản lý vị trí để thay đổi ai đang nắm giữ một quyền.",
+      "Quyền hạn được cấp cho Vai trò, Vị trí và Người dùng, không cấp trực tiếp tại đây — dùng Quản lý vai trò, Quản lý vị trí, hoặc Quyền người dùng để thay đổi ai đang nắm giữ một quyền.",
   },
 } as const satisfies typeof enPermissions;
 

@@ -1,5 +1,6 @@
 import type {
   AccessControlServices,
+  PermissionDefinition,
   PermissionGroup,
   PositionRecord,
   RoleRecord,
@@ -26,6 +27,21 @@ export const MOCK_PERMISSION_GROUPS: PermissionGroup[] = [
 ];
 
 /**
+ * The `PermissionDefinition[]` equivalent of `MOCK_PERMISSION_GROUPS`, for components that now
+ * take a `permissions` prop (`PermissionManagement`/`PermissionAssignment`/`RoleManagement`/
+ * `PositionManagement`). `translationKey`/`groupTranslationKey` are set to the literal label text
+ * on purpose — no `I18nProvider` is mounted in these tests, so the translator's `onMissingKey:
+ * "key"` default returns the key verbatim, reproducing the same rendered text as the old
+ * pre-resolved `MOCK_PERMISSION_GROUPS` with no test-file assertion changes required.
+ */
+export const MOCK_PERMISSIONS: PermissionDefinition[] = [
+  { id: "order:view", translationKey: "View orders", group: "order", groupTranslationKey: "Orders" },
+  { id: "order:manage", translationKey: "Manage orders", group: "order", groupTranslationKey: "Orders" },
+  { id: "inventory:view", translationKey: "View inventory", group: "inventory", groupTranslationKey: "Inventory" },
+  { id: "inventory:adjust", translationKey: "Adjust inventory", group: "inventory", groupTranslationKey: "Inventory" },
+];
+
+/**
  * An in-memory `AccessControlServices` implementation for tests — exercises the real
  * `AccessControlProvider` -> component -> service round trip instead of mocking at the
  * component boundary, so tests catch contract mismatches too.
@@ -42,20 +58,6 @@ export function createMockServices(seed?: {
   let positionSeq = 0;
 
   return {
-    permissions: {
-      async getGroups() {
-        return MOCK_PERMISSION_GROUPS;
-      },
-      async getById(id) {
-        return MOCK_PERMISSION_GROUPS.flatMap((group) => group.permissions).find((record) => record.id === id) ?? null;
-      },
-      async updateTranslations(id, translations) {
-        const record = MOCK_PERMISSION_GROUPS.flatMap((group) => group.permissions).find((r) => r.id === id);
-        if (!record) throw new Error(`Unknown permission: ${id}`);
-        const [translation] = translations;
-        return { ...record, displayName: translation.displayName, description: translation.description };
-      },
-    },
     roles: {
       async getList({ keyword, page = 1, pageSize = 20 }) {
         const all = [...roles.values()].filter(

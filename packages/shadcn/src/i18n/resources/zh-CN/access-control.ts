@@ -14,7 +14,7 @@ export const accessControlNavigation = {
 
 export const permissions = {
   title: "权限",
-  description: "浏览平台的权限目录及其显示内容。",
+  description: "浏览此应用程序使用的权限。",
   searchPlaceholder: "搜索权限…",
   columns: {
     identifier: "标识符",
@@ -23,20 +23,11 @@ export const permissions = {
     description: "描述",
   },
   empty: "没有符合搜索条件的权限。",
-  edit: {
-    trigger: "编辑",
-    title: "编辑权限",
-    description: "按语言更新向管理员显示的名称和描述。",
-    nameLabel: "显示名称",
-    descriptionLabel: "描述",
-    save: "保存更改",
-    saved: "权限已更新。",
-  },
   howTo: {
     title: "关于权限",
-    whatIs: "权限是由后端定义的固定能力（例如 \"order:view\"）。管理员无法在此创建或删除权限，只能编辑其显示方式。",
+    whatIs: "权限是由后端定义的固定能力（例如 \"order:view\"）。此列表仅显示此应用程序使用的权限；其名称和描述由应用程序定义，无法在此编辑。",
     naming: "标识符遵循 模块:操作 的格式，并在上方列表中按模块分组。",
-    assignment: "权限被授予给角色和职位，而不是直接在此授予——请使用角色管理或职位管理来更改谁持有某项权限。",
+    assignment: "权限被授予给角色、职位和用户，而不是直接在此授予——请使用角色管理、职位管理或用户权限来更改谁持有某项权限。",
   },
 } as const satisfies typeof enPermissions;
 

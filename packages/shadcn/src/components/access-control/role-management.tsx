@@ -20,11 +20,13 @@ import { Textarea } from "../ui/textarea";
 import { AccessControlPermissions } from "./access-control-permissions";
 import { useAccessControlServices } from "./access-control-provider";
 import { RolePermissionAssignment } from "./role-permission-assignment";
-import type { RoleRecord } from "./types";
+import type { PermissionDefinition, RoleRecord } from "./types";
 
 const PAGE_SIZE = 10;
 
 export interface RoleManagementProps {
+  /** The application's permission catalog — forwarded to the Permissions tab's `RolePermissionAssignment`. */
+  permissions: PermissionDefinition[];
   /** e.g. `<AdminBreadcrumb items={[...]} />` — routing/navigation stays the consuming app's responsibility. */
   breadcrumb?: React.ReactNode;
   /** Forces view-only: hides Create/Edit/Delete regardless of the current actor's permissions. */
@@ -33,7 +35,7 @@ export interface RoleManagementProps {
 }
 
 /** The complete Role Management page (section 6): search, create, edit (details + permission assignment), delete. */
-export function RoleManagement({ breadcrumb, readOnly, className }: RoleManagementProps) {
+export function RoleManagement({ permissions, breadcrumb, readOnly, className }: RoleManagementProps) {
   const { t } = useTranslation();
   const services = useAccessControlServices();
   const { can } = usePermission();
@@ -173,6 +175,7 @@ export function RoleManagement({ breadcrumb, readOnly, className }: RoleManageme
       {editingRole ? (
         <RoleEditSheet
           role={editingRole}
+          permissions={permissions}
           canManage={canManage}
           onOpenChange={(open) => {
             if (!open) setEditingRole(null);
@@ -284,11 +287,13 @@ function RoleCreateDialog({
 
 function RoleEditSheet({
   role,
+  permissions,
   canManage,
   onOpenChange,
   onUpdated,
 }: {
   role: RoleRecord;
+  permissions: PermissionDefinition[];
   canManage: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: (role: RoleRecord) => void;
@@ -372,7 +377,7 @@ function RoleEditSheet({
             ) : null}
           </TabsContent>
           <TabsContent value="permissions" className="flex-1 overflow-y-auto">
-            <RolePermissionAssignment roleId={role.id} readOnly={!canManage} />
+            <RolePermissionAssignment permissions={permissions} roleId={role.id} readOnly={!canManage} />
           </TabsContent>
         </Tabs>
       </SheetContent>

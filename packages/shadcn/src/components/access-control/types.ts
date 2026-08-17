@@ -1,23 +1,36 @@
-import type { CriteriaRequest, Locale, PaginatedResult } from "@novacore/frontend-foundation";
+import type { CriteriaRequest, PaginatedResult } from "@novacore/frontend-foundation";
 
 /**
- * A permission entry as surfaced to the UI. `id` is the raw permission key (e.g.
- * `"order:view"`) — see `@novacore/frontend-foundation`'s `Permission` type for the real
- * platform catalog. `category` groups permissions in `PermissionTree`/`PermissionManagement`;
- * an adapter backed by the real Auth service should derive it the same way the backend's
- * `PermissionGroupTranslation` does, but a simple `id.split(":")[0]` is a reasonable default
- * (see `derivePermissionCategory` in `permission-utils.ts`).
+ * One permission as declared by the **consuming application** — not fetched from a backend.
+ * Permission identifiers are a fixed, code-first platform catalog (mirrored from the backend's
+ * `Permissions.cs`); a given admin application only ever cares about a subset of them, and that
+ * subset — plus its localized presentation — is the application's own configuration, not runtime
+ * data. See `docs/access-control.md`'s "Permission catalog" section.
+ *
+ * `translationKey`/`groupTranslationKey` are resolved through the active `I18nProvider` (the
+ * same mechanism every other string in this package uses) — the application supplies the actual
+ * `en`/`vi`/`zh-CN` copy via `I18nProvider`'s `translations` prop, this module never stores or
+ * edits display copy itself.
  */
+export interface PermissionDefinition {
+  /** The canonical permission identifier, e.g. `"order:view"`. */
+  id: string;
+  /** Translation key resolved via the active `I18nProvider`'s translator, e.g. `"myApp.permissions.order.view"`. */
+  translationKey: string;
+  /** Optional translation key for read-only descriptive copy, e.g. shown as a table column/tooltip. Never editable through this module. */
+  descriptionTranslationKey?: string;
+  /** Groups this permission in `PermissionTree`/`PermissionManagement`. Defaults to `derivePermissionCategory(id)` when omitted. */
+  group?: string;
+  /** Translation key for `group`'s label. Falls back to the raw `group` string when omitted or unresolved. */
+  groupTranslationKey?: string;
+  /** Sort order within its group; ties broken by `id`. Omitted definitions sort after ordered ones. */
+  order?: number;
+}
+
+/** A permission resolved for rendering — `PermissionTree`/`PermissionManagement`'s internal shape, produced from a `PermissionDefinition[]` by `resolvePermissionCatalog`. Not application-authored. */
 export interface PermissionRecord {
   id: string;
   category: string;
-  displayName: string;
-  description?: string;
-}
-
-/** One locale's editable display copy for a single permission — mirrors the backend's `PermissionDefinitionTranslation` (one row per permission per language). */
-export interface PermissionTranslationInput {
-  locale: Locale;
   displayName: string;
   description?: string;
 }
@@ -26,6 +39,24 @@ export interface PermissionGroup {
   category: string;
   categoryLabel: string;
   permissions: PermissionRecord[];
+}
+
+/** An authorization subject selectable in `UserPermissionAssignment` — deliberately generic since a "user" may be a Member/Account/Employee/Operator depending on the consuming application's domain (see `docs/access-control.md`). */
+export interface SubjectOption {
+  id: string;
+  displayName: string;
+  secondaryText?: string;
+}
+
+/**
+ * The consuming application's user/member search adapter for `UserPermissionAssignment`. Reuses
+ * the platform's canonical `CriteriaRequest`/`PaginatedResult` search contract — the same one
+ * `RoleService.getList`/`PositionService.getList` already use — rather than a bespoke search
+ * type, so an app backed by a real `POST /users/search`-style endpoint (per `CriteriaRequest`'s
+ * own doc comment) can implement this with a single `httpClient` call.
+ */
+export interface SubjectSearchProvider {
+  search(request: CriteriaRequest): Promise<PaginatedResult<SubjectOption>>;
 }
 
 export interface RoleRecord {
@@ -74,22 +105,8 @@ export interface AssignedPermissions {
   readOnlyPermissionIds?: string[];
 }
 
-/** What kind of entity a `PermissionAssignment` is editing. `"user"` is reserved for a future per-member assignment screen (section 5) — not built yet, but the contract already accommodates it. */
+/** What kind of entity a `PermissionAssignment` is editing. `"user"` covers `UserPermissionAssignment`'s single-subject path. */
 export type AccessControlSubjectType = "role" | "position" | "user";
-
-/**
- * Fetches/edits the platform's permission catalog. Deliberately **no create/delete** —
- * `@novacore/frontend-foundation`'s `Permissions` catalog is a fixed, code-first set mirrored
- * from the backend's `Permissions.cs`; only per-locale display copy is admin-editable there
- * (`PermissionDefinitionTranslation`). An adapter for a platform where permissions genuinely
- * are dynamic can still implement this interface — it just also exposes its own
- * creation/deletion UI outside `PermissionManagement`, which intentionally doesn't assume one.
- */
-export interface PermissionService {
-  getGroups(): Promise<PermissionGroup[]>;
-  getById(id: string): Promise<PermissionRecord | null>;
-  updateTranslations(id: string, translations: PermissionTranslationInput[]): Promise<PermissionRecord>;
-}
 
 export interface RoleService {
   getList(request: CriteriaRequest): Promise<PaginatedResult<RoleRecord>>;
@@ -114,9 +131,15 @@ export interface PermissionAssignmentService {
   assignPermissions(subjectType: AccessControlSubjectType, subjectId: string, permissionIds: string[]): Promise<void>;
 }
 
-/** The full adapter surface a consuming application provides to `<AccessControlProvider>`. */
+/**
+ * The full adapter surface a consuming application provides to `<AccessControlProvider>`.
+ * Deliberately excludes the permission catalog — unlike roles/positions/assignments, the
+ * catalog is static application configuration, not runtime data fetched from a service; it
+ * flows into components as a `permissions: PermissionDefinition[]` prop instead (see
+ * `docs/access-control.md`). Also excludes subject/user search — too application-specific to
+ * standardize here, passed directly to `UserPermissionAssignment` as a `subjectProvider` prop.
+ */
 export interface AccessControlServices {
-  permissions: PermissionService;
   roles: RoleService;
   positions: PositionService;
   assignments: PermissionAssignmentService;

@@ -5,7 +5,7 @@ import { AccessControlProvider } from "../../src/components/access-control/acces
 import { PermissionProvider } from "../../src/components/admin/permission-provider";
 import { PositionManagement } from "../../src/components/access-control/position-management";
 import { AccessControlPermissions } from "../../src/components/access-control/access-control-permissions";
-import { createMockServices } from "./mocks";
+import { createMockServices, MOCK_PERMISSIONS } from "./mocks";
 import type { PositionRecord } from "../../src/components/access-control/types";
 
 const SEED_POSITIONS: PositionRecord[] = [
@@ -19,7 +19,7 @@ function renderPositionManagement() {
   render(
     <PermissionProvider permissions={[AccessControlPermissions.position.view, AccessControlPermissions.position.manage]}>
       <AccessControlProvider services={services}>
-        <PositionManagement />
+        <PositionManagement permissions={MOCK_PERMISSIONS} />
       </AccessControlProvider>
     </PermissionProvider>,
   );

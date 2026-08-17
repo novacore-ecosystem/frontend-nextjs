@@ -9,10 +9,9 @@ export type {
   AccessControlSubjectType,
   AssignedPermissions,
   PermissionAssignmentService,
+  PermissionDefinition,
   PermissionGroup,
   PermissionRecord,
-  PermissionService,
-  PermissionTranslationInput,
   PositionInput,
   PositionRecord,
   PositionService,
@@ -20,12 +19,13 @@ export type {
   RoleInput,
   RoleRecord,
   RoleService,
+  SubjectOption,
+  SubjectSearchProvider,
 } from "../components/access-control/types";
 export {
   derivePermissionCategory,
-  groupPermissions,
   matchesPermissionSearch,
-  translateCategoryLabel,
+  resolvePermissionCatalog,
 } from "../components/access-control/permission-utils";
 export {
   PermissionTree,

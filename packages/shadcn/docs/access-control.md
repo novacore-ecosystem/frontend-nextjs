@@ -5,14 +5,15 @@ This is a platform module, not an app feature — do not reimplement these pages
 app; compose them.
 
 ```tsx
-<PermissionManagement />
-<RoleManagement />
-<PositionManagement />
+<PermissionManagement permissions={myAppPermissions} />
+<RoleManagement permissions={myAppPermissions} />
+<PositionManagement permissions={myAppPermissions} />
 ```
 
 Each renders a full page: breadcrumb slot, header, toolbar, table/tree, dialogs, validation,
 loading/error/empty states, and a How-To section — with built-in English/Vietnamese/Simplified
-Chinese translations. No required props.
+Chinese translations. The only required prop is `permissions` — the application's own permission
+catalog (see "Permission catalog" below).
 
 ## Installation
 
@@ -25,30 +26,61 @@ import { PermissionManagement, RoleManagement, PositionManagement, AccessControl
 import { PermissionManagement, RoleManagement, PositionManagement, AccessControlProvider } from "@novacore/frontend-next-shadcn/access-control";
 ```
 
+## Permission catalog
+
+Unlike Role/Position/assignment data, the permission catalog is **not fetched from a service** —
+it's static application configuration, passed as a `permissions: PermissionDefinition[]` prop:
+
+```ts
+import type { PermissionDefinition } from "@novacore/frontend-next-shadcn";
+
+export const myAppPermissions: PermissionDefinition[] = [
+  { id: "order:view", translationKey: "myApp.permissions.order.view", group: "order", groupTranslationKey: "myApp.groups.order" },
+  { id: "order:manage", translationKey: "myApp.permissions.order.manage", group: "order", groupTranslationKey: "myApp.groups.order" },
+];
+```
+
+- **`id`** is the canonical backend permission key (see `@novacore/frontend-foundation`'s
+  `Permissions` catalog for the real platform-wide set). The backend's catalog may be far larger
+  than any one application needs — this list is the application's own *subset*, not a mirror of
+  everything the backend supports. Don't pad it with permissions your app doesn't actually use.
+- **`translationKey`/`groupTranslationKey`** are resolved via the active `I18nProvider`'s
+  translator (`t(key)`) — supply the real `en`/`vi`/`zh-CN` copy through `I18nProvider`'s
+  `translations` prop, the same mechanism every other string in this package uses. If a key is
+  missing, the translator's default `onMissingKey: "key"` behavior returns the key itself
+  (visible but non-fatal) for permissions, and falls back to the raw `group` string for
+  `groupTranslationKey`.
+- **`group`** defaults to `derivePermissionCategory(id)` (the text before the first `:`) when
+  omitted.
+
+`resolvePermissionCatalog(permissions, t)` (exported alongside the components) is what every
+access-control component calls internally to turn this into render-ready groups — you won't
+normally call it yourself unless you're composing a custom screen with `PermissionTree` directly.
+
+**Why there's no create/edit/delete for permissions:** `@novacore/frontend-foundation`'s
+`Permissions` catalog is a fixed, code-first set mirrored from the backend's `Permissions.cs` —
+permission keys aren't a CRUD resource, and their display copy is application configuration, not
+admin-editable runtime data (permissions are system-defined capabilities, not business content).
+`PermissionManagement` reflects that: browse + search only, on whatever catalog you pass it.
+
 ## Provider setup
 
-The module depends on an abstraction, not a concrete HTTP client — implement `PermissionService`/
-`RoleService`/`PositionService`/`PermissionAssignmentService` (see `src/components/access-control/types.ts`)
+Role/Position/assignment data still flows through service adapters — implement `RoleService`/
+`PositionService`/`PermissionAssignmentService` (see `src/components/access-control/types.ts`)
 against your app's real API, then mount `AccessControlProvider` once:
 
 ```tsx
-<AccessControlProvider services={{ permissions, roles, positions, assignments }}>
-  {/* PermissionManagement / RoleManagement / PositionManagement anywhere below */}
+<AccessControlProvider services={{ roles, positions, assignments }}>
+  {/* PermissionManagement / RoleManagement / PositionManagement / UserPermissionAssignment anywhere below */}
 </AccessControlProvider>
 ```
 
 Unlike `PermissionProvider`/`I18nProvider`, there is **no permissive default** — every access-control
 component throws a clear error if rendered without a provider, since there's no sane fallback for
-missing data.
-
-### Why `PermissionService` has no create/delete
-
-`@novacore/frontend-foundation`'s `Permissions` catalog is a fixed, code-first set mirrored from
-the backend's `Permissions.cs` — permission *keys* aren't a CRUD resource on the real NovaCore
-backend, only their per-locale display copy is (`PermissionDefinitionTranslation`). `PermissionManagement`
-reflects that: browse + search + edit display name/description, no create/delete flow. If your
-backend's permission catalog genuinely is dynamic, that's a different module to build — don't
-force it through this one.
+missing data. Note `AccessControlServices` has no `permissions` key — the catalog is a prop, not
+a service (see above), and subject/user search for `UserPermissionAssignment` is a separate
+`subjectProvider` prop, not part of this provider either (too application-specific to standardize
+— see "User Permission Assignment" below).
 
 ### Position has no existing backend contract
 
@@ -84,7 +116,12 @@ The module owns page content, never a route. Mount each page under whatever path
 ```tsx
 // app/admin/access-control/permissions/page.tsx
 export default function Page() {
-  return <PermissionManagement breadcrumb={<AdminBreadcrumb items={[{ label: "Access Control" }, { label: "Permissions" }]} />} />;
+  return (
+    <PermissionManagement
+      permissions={myAppPermissions}
+      breadcrumb={<AdminBreadcrumb items={[{ label: "Access Control" }, { label: "Permissions" }]} />}
+    />
+  );
 }
 ```
 
@@ -116,10 +153,13 @@ module (new prop, discussed as a real requirement), not to fork it in one app.
 Reusable outside the three page components, if you're composing your own screen:
 
 - `PermissionTree` — grouped, searchable permission checkbox tree (select all/deselect all,
-  inherited/read-only locked indicators).
+  inherited/read-only locked indicators). Takes already-resolved `PermissionGroup[]` — pass it
+  `resolvePermissionCatalog(permissions, t)`'s result if composing a custom screen.
+- `resolvePermissionCatalog(permissions, t)` — turns a `PermissionDefinition[]` into the
+  `PermissionGroup[]` shape `PermissionTree` renders.
 - `PermissionAssignment` — owns loading/save/dirty-state for one subject's permissions:
-  `<PermissionAssignment subjectType="role" subjectId={id} />`. `RolePermissionAssignment`/
-  `PositionPermissionAssignment` are `subjectType`-preset sugar over it.
+  `<PermissionAssignment permissions={myAppPermissions} subjectType="role" subjectId={id} />`.
+  `RolePermissionAssignment`/`PositionPermissionAssignment` are `subjectType`-preset sugar over it.
 - `PositionHierarchy` — presentational superior/subordinate tree (expand/collapse, `renderActions`
   escape hatch).
 - `PositionSelector` — indented, cycle-safe single-select for choosing a superior position.
@@ -127,9 +167,11 @@ Reusable outside the three page components, if you're composing your own screen:
 ## Example: minimal new Admin application
 
 ```tsx
-// access-control-services.ts — the only app-specific code this module requires
+// access-control-permissions.ts — the application's own permission catalog
+export const myAppPermissions: PermissionDefinition[] = [ /* ... */ ];
+
+// access-control-services.ts — the app-specific service adapters this module requires
 export const accessControlServices: AccessControlServices = {
-  permissions: myPermissionApiAdapter,
   roles: myRoleApiAdapter,
   positions: myPositionApiAdapter,
   assignments: myAssignmentApiAdapter,
@@ -137,19 +179,23 @@ export const accessControlServices: AccessControlServices = {
 
 // app/admin/layout.tsx
 <PermissionProvider permissions={currentUser.permissions}>
-  <AccessControlProvider services={accessControlServices}>
-    <AdminLayout sidebar={<AdminSidebar navigationGroups={[...appNav, createAccessControlNavigation("/admin/access-control")]} />}>
-      {children}
-    </AdminLayout>
-  </AccessControlProvider>
+  <I18nProvider locale={locale} onLocaleChange={setLocale} translations={myAppTranslations}>
+    <AccessControlProvider services={accessControlServices}>
+      <AdminLayout sidebar={<AdminSidebar navigationGroups={[...appNav, createAccessControlNavigation("/admin/access-control")]} />}>
+        {children}
+      </AdminLayout>
+    </AccessControlProvider>
+  </I18nProvider>
 </PermissionProvider>
 
 // app/admin/access-control/permissions/page.tsx
-export default () => <PermissionManagement />;
+export default () => <PermissionManagement permissions={myAppPermissions} />;
 // app/admin/access-control/roles/page.tsx
-export default () => <RoleManagement />;
+export default () => <RoleManagement permissions={myAppPermissions} />;
 // app/admin/access-control/positions/page.tsx
-export default () => <PositionManagement />;
+export default () => <PositionManagement permissions={myAppPermissions} />;
 ```
 
-Three route files, one service adapter module, zero access-control UI code.
+Three route files, one permission catalog, one service adapter module, zero access-control UI
+code. `myAppTranslations` is where `myAppPermissions`' `translationKey`/`groupTranslationKey`
+values actually resolve — see "Permission catalog" above.

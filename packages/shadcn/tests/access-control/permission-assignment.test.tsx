@@ -3,14 +3,14 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { AccessControlProvider } from "../../src/components/access-control/access-control-provider";
 import { PermissionAssignment } from "../../src/components/access-control/permission-assignment";
-import { createMockServices } from "./mocks";
+import { createMockServices, MOCK_PERMISSIONS } from "./mocks";
 
 function renderAssignment(services = createMockServices({ assignments: { "role:role-1": ["order:view"] } })) {
   return {
     services,
     ...render(
       <AccessControlProvider services={services}>
-        <PermissionAssignment subjectType="role" subjectId="role-1" />
+        <PermissionAssignment permissions={MOCK_PERMISSIONS} subjectType="role" subjectId="role-1" />
       </AccessControlProvider>,
     ),
   };
@@ -67,7 +67,7 @@ describe("PermissionAssignment", () => {
     const services = createMockServices({ assignments: { "role:role-1": ["order:view"] } });
     render(
       <AccessControlProvider services={services}>
-        <PermissionAssignment subjectType="role" subjectId="role-1" readOnly />
+        <PermissionAssignment permissions={MOCK_PERMISSIONS} subjectType="role" subjectId="role-1" readOnly />
       </AccessControlProvider>,
     );
 

@@ -23,9 +23,11 @@ import { useAccessControlServices } from "./access-control-provider";
 import { PositionHierarchy } from "./position-hierarchy";
 import { PositionPermissionAssignment } from "./position-permission-assignment";
 import { PositionSelector } from "./position-selector";
-import type { PositionRecord, PositionTreeNode } from "./types";
+import type { PermissionDefinition, PositionRecord, PositionTreeNode } from "./types";
 
 export interface PositionManagementProps {
+  /** The application's permission catalog — forwarded to the Permissions tab's `PositionPermissionAssignment`. */
+  permissions: PermissionDefinition[];
   /** e.g. `<AdminBreadcrumb items={[...]} />` — routing/navigation stays the consuming app's responsibility. */
   breadcrumb?: React.ReactNode;
   /** Forces view-only: hides Create/Edit/Delete regardless of the current actor's permissions. */
@@ -66,7 +68,7 @@ function findNode(nodes: PositionTreeNode[], id: string): PositionTreeNode | nul
 }
 
 /** The complete Position Management page (section 8/9): tree + flat views, create/edit/delete, superior selection, and permission assignment. Position is organizational hierarchy, not a permission bundle — see `HowTo` at the bottom for the Role/Position distinction. */
-export function PositionManagement({ breadcrumb, readOnly, className }: PositionManagementProps) {
+export function PositionManagement({ permissions, breadcrumb, readOnly, className }: PositionManagementProps) {
   const { t } = useTranslation();
   const services = useAccessControlServices();
   const { can } = usePermission();
@@ -264,6 +266,7 @@ export function PositionManagement({ breadcrumb, readOnly, className }: Position
         <PositionEditSheet
           tree={tree ?? []}
           position={editingNode}
+          permissions={permissions}
           canManage={canManage}
           onOpenChange={(open) => {
             if (!open) setEditingId(null);
@@ -394,12 +397,14 @@ function PositionCreateDialog({
 function PositionEditSheet({
   tree,
   position,
+  permissions,
   canManage,
   onOpenChange,
   onUpdated,
 }: {
   tree: PositionTreeNode[];
   position: PositionTreeNode;
+  permissions: PermissionDefinition[];
   canManage: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: (record: PositionRecord) => void;
@@ -508,7 +513,7 @@ function PositionEditSheet({
             ) : null}
           </TabsContent>
           <TabsContent value="permissions" className="flex-1 overflow-y-auto">
-            <PositionPermissionAssignment positionId={position.id} readOnly={!canManage} />
+            <PositionPermissionAssignment permissions={permissions} positionId={position.id} readOnly={!canManage} />
           </TabsContent>
         </Tabs>
       </SheetContent>

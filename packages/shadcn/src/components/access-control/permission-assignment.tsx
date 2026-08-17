@@ -7,10 +7,13 @@ import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { FormActions } from "../composed/form-field";
 import { Button } from "../ui/button";
 import { useAccessControlServices } from "./access-control-provider";
+import { resolvePermissionCatalog } from "./permission-utils";
 import { PermissionTree } from "./permission-tree";
-import type { AccessControlSubjectType, AssignedPermissions, PermissionGroup } from "./types";
+import type { AccessControlSubjectType, AssignedPermissions, PermissionDefinition } from "./types";
 
 export interface PermissionAssignmentProps {
+  /** The application's permission catalog — the same one passed to `PermissionManagement`/`RoleManagement`/`PositionManagement`. */
+  permissions: PermissionDefinition[];
   subjectType: AccessControlSubjectType;
   subjectId: string;
   /** Locks every checkbox and hides Save/Cancel — for a view-only audit surface. */
@@ -22,16 +25,23 @@ export interface PermissionAssignmentProps {
 
 /**
  * The one reusable permission-assignment surface behind `RolePermissionAssignment`/
- * `PositionPermissionAssignment` (section 7) — owns permission loading, grouping (via
- * `PermissionService.getGroups()`), selection state, inherited/read-only overlays, dirty-state
- * tracking, and save/cancel. Not coupled to Role specifically: `subjectType`/`subjectId` is the
- * entire API surface.
+ * `PositionPermissionAssignment`/`UserPermissionAssignment`'s single-subject path — owns
+ * assignment loading, catalog resolution (via `resolvePermissionCatalog`), selection state,
+ * inherited/read-only overlays, dirty-state tracking, and save/cancel. Not coupled to Role
+ * specifically: `subjectType`/`subjectId` is the entire per-subject API surface.
  */
-export function PermissionAssignment({ subjectType, subjectId, readOnly, onSaved, className }: PermissionAssignmentProps) {
+export function PermissionAssignment({
+  permissions,
+  subjectType,
+  subjectId,
+  readOnly,
+  onSaved,
+  className,
+}: PermissionAssignmentProps) {
   const { t } = useTranslation();
   const services = useAccessControlServices();
 
-  const [groups, setGroups] = React.useState<PermissionGroup[] | null>(null);
+  const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
   const [assigned, setAssigned] = React.useState<AssignedPermissions | null>(null);
   const [draftIds, setDraftIds] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -43,11 +53,7 @@ export function PermissionAssignment({ subjectType, subjectId, readOnly, onSaved
     setLoading(true);
     setError(null);
     try {
-      const [permissionGroups, assignedPermissions] = await Promise.all([
-        services.permissions.getGroups(),
-        services.assignments.getAssignedPermissions(subjectType, subjectId),
-      ]);
-      setGroups(permissionGroups);
+      const assignedPermissions = await services.assignments.getAssignedPermissions(subjectType, subjectId);
       setAssigned(assignedPermissions);
       setDraftIds(assignedPermissions.permissionIds);
     } catch (err) {
@@ -91,7 +97,7 @@ export function PermissionAssignment({ subjectType, subjectId, readOnly, onSaved
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState description={error} onRetry={() => void load()} />;
-  if (!groups || groups.length === 0) return <EmptyState description={t("assignment.empty")} />;
+  if (groups.length === 0) return <EmptyState description={t("assignment.empty")} />;
 
   const subjectLabel = t(`assignment.subjectLabels.${subjectType}`);
 
