@@ -20,12 +20,15 @@ export interface SelectProps {
   disabled?: boolean;
   className?: string;
   name?: string;
+  /** Forwarded to the trigger button — pairs with `FormField`'s `htmlFor` for a properly associated label. */
+  id?: string;
 }
 
-export function Select({ options, value, defaultValue, onValueChange, placeholder, disabled, className, name }: SelectProps) {
+export function Select({ options, value, defaultValue, onValueChange, placeholder, disabled, className, name, id }: SelectProps) {
   return (
     <SelectPrimitive.Root value={value} defaultValue={defaultValue} onValueChange={onValueChange} disabled={disabled} name={name}>
       <SelectPrimitive.Trigger
+        id={id}
         className={cn(
           "flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
           className,
