@@ -3,7 +3,9 @@ import type {
   assignment as enAssignment,
   permissions as enPermissions,
   positions as enPositions,
+  roleAssignment as enRoleAssignment,
   roles as enRoles,
+  userAuthorizationDetail as enUserAuthorizationDetail,
   userPermissions as enUserPermissions,
 } from "../en/access-control";
 
@@ -107,7 +109,8 @@ export const positions = {
     noParent: "无上级（最高级职位）",
   },
   tabs: {
-    details: "详情",
+    details: "概览",
+    roles: "角色",
     permissions: "权限",
   },
   columns: {
@@ -126,7 +129,7 @@ export const positions = {
 
 export const assignment = {
   title: "权限分配",
-  description: "选择此{{subject}}授予哪些权限。",
+  description: "选择直接分配给此{{subject}}的权限，与通过角色获得的权限相区分。",
   searchPlaceholder: "搜索权限…",
   selectAll: "全选",
   deselectAll: "取消全选",
@@ -137,6 +140,7 @@ export const assignment = {
   cancel: "取消",
   saved: "权限已更新。",
   empty: "没有符合搜索条件的权限。",
+  selectedCount: "已选择 {{selected}} / {{total}} 项权限",
   subjectLabels: {
     role: "角色",
     position: "职位",
@@ -144,9 +148,26 @@ export const assignment = {
   },
 } as const satisfies typeof enAssignment;
 
+export const roleAssignment = {
+  title: "角色分配",
+  description: "选择此{{subject}}所持有的角色。",
+  searchPlaceholder: "搜索角色…",
+  columns: {
+    name: "名称",
+    description: "描述",
+    permissionCount: "权限数",
+  },
+  unsavedChanges: "您有未保存的更改。",
+  save: "保存更改",
+  cancel: "取消",
+  saved: "角色已更新。",
+  empty: "没有符合搜索条件的角色。",
+  selectedCount: "已选择 {{selected}} / {{total}} 个角色",
+} as const satisfies typeof enRoleAssignment;
+
 export const userPermissions = {
   title: "用户权限",
-  description: "搜索用户并直接为其授予权限。",
+  description: "搜索用户并直接为其授予角色或权限。",
   searchPlaceholder: "搜索用户…",
   columns: {
     name: "姓名",
@@ -154,21 +175,47 @@ export const userPermissions = {
   },
   selectedCount: "已选择 {{count}} 项",
   clearSelection: "清除选择",
-  noneSelected: "请在上方选择一个或多个用户以分配权限。",
+  noneSelected: "请在上方选择一个或多个用户以管理其权限。",
   empty: "没有符合搜索条件的用户。",
+  viewDetail: "打开完整权限详情",
+  tabs: {
+    roles: "角色",
+    directPermissions: "直接权限",
+  },
   bulk: {
-    title: "为 {{count}} 位用户授予权限",
-    description: "每位所选用户现有的权限保持不变——此操作仅添加下方勾选的权限。",
-    confirmTitle: "授予权限？",
-    confirmDescription: "此操作将为 {{subjectCount}} 位用户授予 {{permissionCount}} 项权限。现有权限不受影响。",
-    confirmButton: "授予权限",
-    grant: "授予权限",
-    granted: "权限已授予。",
+    title: "为 {{count}} 位用户更新权限",
+    description: "每位所选用户现有的角色和权限保持不变——此操作仅添加下方勾选的内容。",
+    confirmTitle: "应用更改？",
+    confirmDescription: "此操作将为 {{subjectCount}} 位用户授予 {{permissionCount}} 项权限和 {{roleCount}} 个角色。现有角色和权限不受影响。",
+    confirmButton: "应用",
+    assign: "应用",
+    assigned: "角色和权限已更新。",
   },
   howTo: {
     title: "关于用户权限",
-    whatIs: "直接为一个或多个用户授予权限，作为其通过角色和职位获得的权限之外的补充。",
-    singleVsBulk: "选择单个用户会显示其当前的完整权限，可像角色/职位分配一样编辑。选择多个用户则会切换为一次性为所有人授予一组选定的权限——不会移除任何已有权限。",
-    notUserManagement: "此页面仅用于分配权限——用户创建、关键字之外的搜索筛选以及资料信息属于此应用程序自己的用户管理，不在此处。",
+    whatIs: "一次性为一个或多个用户授予角色或直接权限。角色是可复用的权限组合；直接权限用于处理例外情况。",
+    singleVsBulk: "选择单个用户会显示其当前完整的角色和直接权限，可立即编辑，并附有指向完整权限详情页的链接。选择多个用户则会切换为一次性为所有人授予一组选定的角色/权限——不会移除任何已有内容。",
+    notUserManagement: "此页面仅用于管理权限——用户创建、关键字之外的搜索筛选以及资料信息属于此应用程序自己的用户管理，不在此处。",
   },
 } as const satisfies typeof enUserPermissions;
+
+export const userAuthorizationDetail = {
+  title: "用户权限详情",
+  backLink: "返回用户权限",
+  notFound: "未找到该用户。",
+  tabs: {
+    overview: "概览",
+    roles: "角色",
+    directPermissions: "直接权限",
+    effectivePermissions: "生效权限",
+  },
+  overview: {
+    empty: "暂无更多资料信息。",
+  },
+  effectivePermissions: {
+    description: "该用户当前持有的所有权限，及各自的来源。",
+    empty: "该用户暂无生效权限。",
+    sourceDirect: "直接授予",
+    sourceRole: "角色 — {{name}}",
+  },
+} as const satisfies typeof enUserAuthorizationDetail;

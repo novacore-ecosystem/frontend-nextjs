@@ -330,7 +330,7 @@ function RoleEditSheet({
 
   return (
     <Sheet open onOpenChange={onOpenChange}>
-      <SheetContent className="flex w-full max-w-md flex-col sm:max-w-md">
+      <SheetContent size="wide" className="flex flex-col">
         <SheetHeader>
           <SheetTitle>{role.name}</SheetTitle>
           <SheetDescription>{t("roles.edit.title")}</SheetDescription>

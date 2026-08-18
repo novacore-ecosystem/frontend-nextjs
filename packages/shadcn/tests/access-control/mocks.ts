@@ -4,7 +4,7 @@ import type {
   PermissionGroup,
   PositionRecord,
   RoleRecord,
-  SubjectOption,
+  SubjectDetail,
   SubjectSearchProvider,
 } from "../../src/components/access-control/types";
 import { buildPositionTree } from "../../src/components/access-control/position-hierarchy";
@@ -43,8 +43,8 @@ export const MOCK_PERMISSIONS: PermissionDefinition[] = [
   { id: "inventory:adjust", translationKey: "Adjust inventory", group: "inventory", groupTranslationKey: "Inventory" },
 ];
 
-/** A minimal in-memory `SubjectSearchProvider` for `UserPermissionAssignment` tests — filters by keyword only, matching real `CriteriaRequest` pagination. */
-export function createMockSubjectProvider(seed: SubjectOption[]): SubjectSearchProvider {
+/** A minimal in-memory `SubjectSearchProvider` for `UserPermissionAssignment`/`UserAuthorizationDetail` tests — filters by keyword only, matching real `CriteriaRequest` pagination. */
+export function createMockSubjectProvider(seed: SubjectDetail[]): SubjectSearchProvider {
   return {
     async search({ keyword, page = 1, pageSize = 20 }) {
       const all = keyword ? seed.filter((s) => s.displayName.toLowerCase().includes(keyword.toLowerCase())) : seed;
@@ -60,6 +60,9 @@ export function createMockSubjectProvider(seed: SubjectOption[]): SubjectSearchP
         totalPages: Math.max(1, Math.ceil(all.length / pageSize)),
       };
     },
+    async getById(id) {
+      return seed.find((s) => s.id === id) ?? null;
+    },
   };
 }
 
@@ -72,10 +75,12 @@ export function createMockServices(seed?: {
   roles?: RoleRecord[];
   positions?: PositionRecord[];
   assignments?: Record<string, string[]>;
+  roleAssignments?: Record<string, string[]>;
 }): AccessControlServices {
   const roles = new Map<string, RoleRecord>((seed?.roles ?? []).map((role) => [role.id, role]));
   const positions = new Map<string, PositionRecord>((seed?.positions ?? []).map((position) => [position.id, position]));
   const assignments = new Map<string, string[]>(Object.entries(seed?.assignments ?? {}));
+  const roleAssignments = new Map<string, string[]>(Object.entries(seed?.roleAssignments ?? {}));
   let roleSeq = 0;
   let positionSeq = 0;
 
@@ -167,6 +172,14 @@ export function createMockServices(seed?: {
       },
       async assignPermissions(subjectType, subjectId, permissionIds) {
         assignments.set(`${subjectType}:${subjectId}`, permissionIds);
+      },
+    },
+    roleAssignments: {
+      async getAssignedRoleIds(subjectType, subjectId) {
+        return roleAssignments.get(`${subjectType}:${subjectId}`) ?? [];
+      },
+      async assignRoles(subjectType, subjectId, roleIds) {
+        roleAssignments.set(`${subjectType}:${subjectId}`, roleIds);
       },
     },
   };

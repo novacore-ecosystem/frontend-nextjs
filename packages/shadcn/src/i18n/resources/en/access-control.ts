@@ -101,7 +101,8 @@ export const positions = {
     noParent: "No superior (top-level position)",
   },
   tabs: {
-    details: "Details",
+    details: "Overview",
+    roles: "Roles",
     permissions: "Permissions",
   },
   columns: {
@@ -123,7 +124,7 @@ export const positions = {
 
 export const assignment = {
   title: "Permission assignment",
-  description: "Choose which permissions this {{subject}} grants.",
+  description: "Choose which permissions are assigned directly to this {{subject}}, separate from anything granted through its Roles.",
   searchPlaceholder: "Search permissions…",
   selectAll: "Select all",
   deselectAll: "Deselect all",
@@ -134,6 +135,7 @@ export const assignment = {
   cancel: "Cancel",
   saved: "Permissions updated.",
   empty: "No permissions match your search.",
+  selectedCount: "{{selected}} / {{total}} permissions selected",
   subjectLabels: {
     role: "role",
     position: "position",
@@ -141,9 +143,26 @@ export const assignment = {
   },
 };
 
+export const roleAssignment = {
+  title: "Role assignment",
+  description: "Choose which roles this {{subject}} holds.",
+  searchPlaceholder: "Search roles…",
+  columns: {
+    name: "Name",
+    description: "Description",
+    permissionCount: "Permissions",
+  },
+  unsavedChanges: "You have unsaved changes.",
+  save: "Save changes",
+  cancel: "Cancel",
+  saved: "Roles updated.",
+  empty: "No roles match your search.",
+  selectedCount: "{{selected}} / {{total}} roles selected",
+};
+
 export const userPermissions = {
   title: "User Permissions",
-  description: "Search for users and grant them permissions directly.",
+  description: "Search for users and grant them roles or permissions directly.",
   searchPlaceholder: "Search users…",
   columns: {
     name: "Name",
@@ -151,22 +170,50 @@ export const userPermissions = {
   },
   selectedCount: "{{count}} selected",
   clearSelection: "Clear selection",
-  noneSelected: "Select one or more users above to assign permissions.",
+  noneSelected: "Select one or more users above to manage their authorization.",
   empty: "No users match your search.",
+  viewDetail: "Open full authorization detail",
+  tabs: {
+    roles: "Roles",
+    directPermissions: "Direct Permissions",
+  },
   bulk: {
-    title: "Grant permissions to {{count}} users",
-    description: "Existing permissions for each selected user are kept — this only adds the permissions checked below.",
-    confirmTitle: "Grant permissions?",
-    confirmDescription: "This grants {{permissionCount}} permission(s) to {{subjectCount}} user(s). Existing permissions aren't affected.",
-    confirmButton: "Grant permissions",
-    grant: "Grant permissions",
-    granted: "Permissions granted.",
+    title: "Update authorization for {{count}} users",
+    description: "Existing roles and permissions for each selected user are kept — this only adds what's checked below.",
+    confirmTitle: "Apply changes?",
+    confirmDescription: "This grants {{permissionCount}} permission(s) and {{roleCount}} role(s) to {{subjectCount}} user(s). Existing roles and permissions aren't affected.",
+    confirmButton: "Apply",
+    assign: "Apply",
+    assigned: "Roles and permissions updated.",
   },
   howTo: {
     title: "About user permissions",
-    whatIs: "Grant permissions directly to one or more users, in addition to whatever they hold via Roles and Positions.",
+    whatIs:
+      "Grant Roles or direct permissions to one or more users at once. Roles are reusable permission bundles; direct permissions are for exceptions.",
     singleVsBulk:
-      "Selecting one user shows their full current permissions, editable like Role/Position assignment. Selecting several users switches to granting a chosen set of permissions to all of them at once — nothing already held is removed.",
-    notUserManagement: "This page only assigns permissions — user creation, search filters beyond keyword, and profile details live in this application's own user management, not here.",
+      "Selecting one user shows their full current Roles and direct permissions, editable immediately, with a link to their complete authorization detail page. Selecting several users switches to granting a chosen set of Roles/permissions to all of them at once — nothing already held is removed.",
+    notUserManagement:
+      "This page only manages authorization — user creation, search filters beyond keyword, and profile details live in this application's own user management, not here.",
+  },
+};
+
+export const userAuthorizationDetail = {
+  title: "User Authorization",
+  backLink: "Back to User Permissions",
+  notFound: "This user could not be found.",
+  tabs: {
+    overview: "Overview",
+    roles: "Roles",
+    directPermissions: "Direct Permissions",
+    effectivePermissions: "Effective Permissions",
+  },
+  overview: {
+    empty: "No additional profile information is available.",
+  },
+  effectivePermissions: {
+    description: "Every permission this user currently holds, and where each one comes from.",
+    empty: "This user has no effective permissions yet.",
+    sourceDirect: "Direct",
+    sourceRole: "Role — {{name}}",
   },
 };

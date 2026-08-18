@@ -3,7 +3,9 @@ import type {
   assignment as enAssignment,
   permissions as enPermissions,
   positions as enPositions,
+  roleAssignment as enRoleAssignment,
   roles as enRoles,
+  userAuthorizationDetail as enUserAuthorizationDetail,
   userPermissions as enUserPermissions,
 } from "../en/access-control";
 
@@ -109,7 +111,8 @@ export const positions = {
     noParent: "Không có cấp trên (vị trí cao nhất)",
   },
   tabs: {
-    details: "Chi tiết",
+    details: "Tổng quan",
+    roles: "Vai trò",
     permissions: "Quyền hạn",
   },
   columns: {
@@ -131,7 +134,7 @@ export const positions = {
 
 export const assignment = {
   title: "Gán quyền hạn",
-  description: "Chọn những quyền hạn mà {{subject}} này cấp.",
+  description: "Chọn những quyền hạn được gán trực tiếp cho {{subject}} này, tách biệt với những quyền có được qua Vai trò.",
   searchPlaceholder: "Tìm kiếm quyền hạn…",
   selectAll: "Chọn tất cả",
   deselectAll: "Bỏ chọn tất cả",
@@ -142,6 +145,7 @@ export const assignment = {
   cancel: "Hủy",
   saved: "Đã cập nhật quyền hạn.",
   empty: "Không có quyền hạn nào khớp với tìm kiếm của bạn.",
+  selectedCount: "Đã chọn {{selected}} / {{total}} quyền hạn",
   subjectLabels: {
     role: "vai trò",
     position: "vị trí",
@@ -149,9 +153,26 @@ export const assignment = {
   },
 } as const satisfies typeof enAssignment;
 
+export const roleAssignment = {
+  title: "Gán vai trò",
+  description: "Chọn những vai trò mà {{subject}} này nắm giữ.",
+  searchPlaceholder: "Tìm kiếm vai trò…",
+  columns: {
+    name: "Tên",
+    description: "Mô tả",
+    permissionCount: "Số quyền",
+  },
+  unsavedChanges: "Bạn có thay đổi chưa lưu.",
+  save: "Lưu thay đổi",
+  cancel: "Hủy",
+  saved: "Đã cập nhật vai trò.",
+  empty: "Không có vai trò nào khớp với tìm kiếm của bạn.",
+  selectedCount: "Đã chọn {{selected}} / {{total}} vai trò",
+} as const satisfies typeof enRoleAssignment;
+
 export const userPermissions = {
   title: "Quyền người dùng",
-  description: "Tìm kiếm người dùng và cấp quyền trực tiếp cho họ.",
+  description: "Tìm kiếm người dùng và cấp vai trò hoặc quyền trực tiếp cho họ.",
   searchPlaceholder: "Tìm kiếm người dùng…",
   columns: {
     name: "Tên",
@@ -159,23 +180,49 @@ export const userPermissions = {
   },
   selectedCount: "Đã chọn {{count}}",
   clearSelection: "Bỏ chọn",
-  noneSelected: "Chọn một hoặc nhiều người dùng ở trên để gán quyền.",
+  noneSelected: "Chọn một hoặc nhiều người dùng ở trên để quản lý phân quyền.",
   empty: "Không có người dùng nào khớp với tìm kiếm của bạn.",
+  viewDetail: "Mở trang phân quyền đầy đủ",
+  tabs: {
+    roles: "Vai trò",
+    directPermissions: "Quyền trực tiếp",
+  },
   bulk: {
-    title: "Cấp quyền cho {{count}} người dùng",
-    description: "Quyền hiện có của mỗi người dùng được chọn vẫn giữ nguyên — thao tác này chỉ thêm các quyền được chọn bên dưới.",
-    confirmTitle: "Cấp quyền?",
-    confirmDescription: "Thao tác này sẽ cấp {{permissionCount}} quyền cho {{subjectCount}} người dùng. Các quyền hiện có không bị ảnh hưởng.",
-    confirmButton: "Cấp quyền",
-    grant: "Cấp quyền",
-    granted: "Đã cấp quyền.",
+    title: "Cập nhật phân quyền cho {{count}} người dùng",
+    description: "Vai trò và quyền hiện có của mỗi người dùng được chọn vẫn giữ nguyên — thao tác này chỉ thêm những gì được chọn bên dưới.",
+    confirmTitle: "Áp dụng thay đổi?",
+    confirmDescription: "Thao tác này sẽ cấp {{permissionCount}} quyền và {{roleCount}} vai trò cho {{subjectCount}} người dùng. Vai trò và quyền hiện có không bị ảnh hưởng.",
+    confirmButton: "Áp dụng",
+    assign: "Áp dụng",
+    assigned: "Đã cập nhật vai trò và quyền hạn.",
   },
   howTo: {
     title: "Về quyền người dùng",
-    whatIs: "Cấp quyền trực tiếp cho một hoặc nhiều người dùng, bên cạnh những quyền họ có được qua Vai trò và Vị trí.",
+    whatIs: "Cấp Vai trò hoặc quyền trực tiếp cho một hoặc nhiều người dùng cùng lúc. Vai trò là gói quyền có thể tái sử dụng; quyền trực tiếp dành cho các trường hợp ngoại lệ.",
     singleVsBulk:
-      "Chọn một người dùng sẽ hiển thị đầy đủ quyền hiện tại của họ, có thể chỉnh sửa như gán quyền cho Vai trò/Vị trí. Chọn nhiều người dùng sẽ chuyển sang cấp một tập hợp quyền đã chọn cho tất cả cùng lúc — không có quyền nào hiện có bị gỡ bỏ.",
+      "Chọn một người dùng sẽ hiển thị đầy đủ Vai trò và quyền trực tiếp hiện tại của họ, có thể chỉnh sửa ngay, kèm liên kết đến trang phân quyền đầy đủ. Chọn nhiều người dùng sẽ chuyển sang cấp một tập hợp Vai trò/quyền đã chọn cho tất cả cùng lúc — không có gì hiện có bị gỡ bỏ.",
     notUserManagement:
-      "Trang này chỉ gán quyền — việc tạo người dùng, các bộ lọc tìm kiếm ngoài từ khóa, và thông tin hồ sơ thuộc về hệ thống quản lý người dùng riêng của ứng dụng, không phải ở đây.",
+      "Trang này chỉ quản lý phân quyền — việc tạo người dùng, các bộ lọc tìm kiếm ngoài từ khóa, và thông tin hồ sơ thuộc về hệ thống quản lý người dùng riêng của ứng dụng, không phải ở đây.",
   },
 } as const satisfies typeof enUserPermissions;
+
+export const userAuthorizationDetail = {
+  title: "Phân quyền người dùng",
+  backLink: "Quay lại Quyền người dùng",
+  notFound: "Không tìm thấy người dùng này.",
+  tabs: {
+    overview: "Tổng quan",
+    roles: "Vai trò",
+    directPermissions: "Quyền trực tiếp",
+    effectivePermissions: "Quyền hiệu lực",
+  },
+  overview: {
+    empty: "Không có thêm thông tin hồ sơ nào.",
+  },
+  effectivePermissions: {
+    description: "Mọi quyền mà người dùng này đang có, và nguồn gốc của từng quyền.",
+    empty: "Người dùng này chưa có quyền hiệu lực nào.",
+    sourceDirect: "Trực tiếp",
+    sourceRole: "Vai trò — {{name}}",
+  },
+} as const satisfies typeof enUserAuthorizationDetail;

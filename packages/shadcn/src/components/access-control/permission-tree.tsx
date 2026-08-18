@@ -91,25 +91,37 @@ export function PermissionTree({
     onSelectedIdsChange(selectedIds.filter((id) => lockedIds.has(id)));
   }
 
+  const totalCount = React.useMemo(() => groups.reduce((sum, g) => sum + g.permissions.length, 0), [groups]);
+  const totalCheckedCount = React.useMemo(
+    () => groups.reduce((sum, g) => sum + g.permissions.filter((p) => isChecked(p.id)).length, 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [groups, selectedSet, inheritedSet],
+  );
+
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="flex items-center gap-2">
+      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-card pb-2 sm:flex-row sm:items-center">
         <SearchInput
           value={query}
           onValueChange={setQuery}
           placeholder={t("assignment.searchPlaceholder")}
           className="flex-1"
         />
-        {!disabled ? (
-          <>
-            <Button type="button" variant="outline" size="sm" onClick={selectAll}>
-              {t("assignment.selectAll")}
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={deselectAll}>
-              {t("assignment.deselectAll")}
-            </Button>
-          </>
-        ) : null}
+        <div className="flex items-center gap-2">
+          <span className="whitespace-nowrap text-xs text-muted-foreground">
+            {t("assignment.selectedCount", { selected: totalCheckedCount, total: totalCount })}
+          </span>
+          {!disabled ? (
+            <>
+              <Button type="button" variant="outline" size="sm" onClick={selectAll}>
+                {t("assignment.selectAll")}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={deselectAll}>
+                {t("assignment.deselectAll")}
+              </Button>
+            </>
+          ) : null}
+        </div>
       </div>
 
       {filteredGroups.length === 0 ? (
@@ -137,7 +149,7 @@ export function PermissionTree({
                     </span>
                   </CollapsibleTrigger>
                 </div>
-                <CollapsibleContent className="mt-2 flex flex-col gap-1 pl-7">
+                <CollapsibleContent className="mt-2 grid grid-cols-1 gap-1 pl-7 sm:grid-cols-2 xl:grid-cols-3">
                   {group.permissions.map((permission) => {
                     const locked = isLocked(permission.id);
                     const inherited = inheritedSet.has(permission.id);

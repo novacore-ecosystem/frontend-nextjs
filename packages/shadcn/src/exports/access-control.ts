@@ -8,6 +8,8 @@ export type {
   AccessControlServices,
   AccessControlSubjectType,
   AssignedPermissions,
+  EffectivePermission,
+  EffectivePermissionSource,
   PermissionAssignmentService,
   PermissionDefinition,
   PermissionGroup,
@@ -16,9 +18,13 @@ export type {
   PositionRecord,
   PositionService,
   PositionTreeNode,
+  RoleAssignableSubjectType,
+  RoleAssignmentService,
   RoleInput,
   RoleRecord,
   RoleService,
+  SubjectDetail,
+  SubjectDetailField,
   SubjectOption,
   SubjectSearchProvider,
 } from "../components/access-control/types";
@@ -41,6 +47,17 @@ export {
   PositionPermissionAssignment,
   type PositionPermissionAssignmentProps,
 } from "../components/access-control/position-permission-assignment";
+export { RoleAssignment, type RoleAssignmentProps } from "../components/access-control/role-assignment";
+export {
+  PositionRoleAssignment,
+  type PositionRoleAssignmentProps,
+} from "../components/access-control/position-role-assignment";
+export { UserRoleAssignment, type UserRoleAssignmentProps } from "../components/access-control/user-role-assignment";
+export { EffectivePermissions, type EffectivePermissionsProps } from "../components/access-control/effective-permissions";
+export {
+  UserAuthorizationDetail,
+  type UserAuthorizationDetailProps,
+} from "../components/access-control/user-authorization-detail";
 export {
   PositionHierarchy,
   flattenPositionTree,

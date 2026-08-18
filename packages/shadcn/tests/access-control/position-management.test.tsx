@@ -6,7 +6,7 @@ import { PermissionProvider } from "../../src/components/admin/permission-provid
 import { PositionManagement } from "../../src/components/access-control/position-management";
 import { AccessControlPermissions } from "../../src/components/access-control/access-control-permissions";
 import { createMockServices, MOCK_PERMISSIONS } from "./mocks";
-import type { PositionRecord } from "../../src/components/access-control/types";
+import type { PositionRecord, RoleRecord } from "../../src/components/access-control/types";
 
 const SEED_POSITIONS: PositionRecord[] = [
   { id: "pos-1", name: "Regional Director", parentId: null },
@@ -14,8 +14,10 @@ const SEED_POSITIONS: PositionRecord[] = [
   { id: "pos-3", name: "Cashier", parentId: "pos-2" },
 ];
 
+const SEED_ROLES: RoleRecord[] = [{ id: "role-1", name: "Order Manager", permissionCount: 4 }];
+
 function renderPositionManagement() {
-  const services = createMockServices({ positions: SEED_POSITIONS });
+  const services = createMockServices({ positions: SEED_POSITIONS, roles: SEED_ROLES });
   render(
     <PermissionProvider permissions={[AccessControlPermissions.position.view, AccessControlPermissions.position.manage]}>
       <AccessControlProvider services={services}>
@@ -109,6 +111,24 @@ describe("PositionManagement — create/edit/delete", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
     // Still present — the blocked confirm is a no-op.
     expect(await services.positions.getById("pos-2")).not.toBeNull();
+  });
+
+  it("the edit sheet's Roles tab lists roles and lets one be assigned", async () => {
+    const { services } = renderPositionManagement();
+    const row = (await screen.findByText("Regional Director")).closest(".group")!;
+
+    fireEvent.click(within(row).getByRole("button", { name: "Edit" }));
+    await screen.findByLabelText(/^Name/);
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Roles" }));
+    const roleRow = (await screen.findByText("Order Manager")).closest("tr")!;
+    fireEvent.click(within(roleRow).getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(async () => {
+      const assigned = await services.roleAssignments.getAssignedRoleIds("position", "pos-1");
+      expect(assigned).toEqual(["role-1"]);
+    });
   });
 
   it("deleting a leaf position (no subordinates) succeeds", async () => {

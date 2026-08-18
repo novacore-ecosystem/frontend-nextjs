@@ -48,15 +48,28 @@ export interface SubjectOption {
   secondaryText?: string;
 }
 
+/** One label/value pair of read-only profile metadata — open-ended so an application supplies only fields it actually has (status, department, position, tenant, ...) rather than this package inventing a fixed schema no backend may match. */
+export interface SubjectDetailField {
+  label: string;
+  value: string;
+}
+
+/** A `SubjectOption` plus whatever additional profile metadata the application has, for `UserAuthorizationDetail`'s Overview tab. `fields` is omitted (not empty-arrayed) when the application has nothing further to show. */
+export interface SubjectDetail extends SubjectOption {
+  fields?: SubjectDetailField[];
+}
+
 /**
- * The consuming application's user/member search adapter for `UserPermissionAssignment`. Reuses
- * the platform's canonical `CriteriaRequest`/`PaginatedResult` search contract — the same one
- * `RoleService.getList`/`PositionService.getList` already use — rather than a bespoke search
- * type, so an app backed by a real `POST /users/search`-style endpoint (per `CriteriaRequest`'s
- * own doc comment) can implement this with a single `httpClient` call.
+ * The consuming application's user/member search adapter for `UserPermissionAssignment`/
+ * `UserAuthorizationDetail`. `search` reuses the platform's canonical `CriteriaRequest`/
+ * `PaginatedResult` search contract — the same one `RoleService.getList`/`PositionService.getList`
+ * already use — rather than a bespoke search type, so an app backed by a real
+ * `POST /users/search`-style endpoint (per `CriteriaRequest`'s own doc comment) can implement this
+ * with a single `httpClient` call. `getById` backs the detail page's profile header/Overview tab.
  */
 export interface SubjectSearchProvider {
   search(request: CriteriaRequest): Promise<PaginatedResult<SubjectOption>>;
+  getById(id: string): Promise<SubjectDetail | null>;
 }
 
 export interface RoleRecord {
@@ -105,8 +118,24 @@ export interface AssignedPermissions {
   readOnlyPermissionIds?: string[];
 }
 
+/** One source a permission is granted through, for `EffectivePermissions`. `roleId`/`roleName` are present only when `type` is `"role"`. */
+export interface EffectivePermissionSource {
+  type: "direct" | "role";
+  roleId?: string;
+  roleName?: string;
+}
+
+/** A permission the subject currently holds, with every source it comes from (a permission may be granted by more than one role, or by both a role and directly). */
+export interface EffectivePermission {
+  id: string;
+  sources: EffectivePermissionSource[];
+}
+
 /** What kind of entity a `PermissionAssignment` is editing. `"user"` covers `UserPermissionAssignment`'s single-subject path. */
 export type AccessControlSubjectType = "role" | "position" | "user";
+
+/** Positions and Users can hold Roles; Roles cannot (no "Role Group" concept — see `docs/access-control.md`). */
+export type RoleAssignableSubjectType = "position" | "user";
 
 export interface RoleService {
   getList(request: CriteriaRequest): Promise<PaginatedResult<RoleRecord>>;
@@ -125,10 +154,16 @@ export interface PositionService {
   delete(id: string): Promise<void>;
 }
 
-/** Shared by Role/Position/(future User) permission assignment — one contract, one `PermissionAssignment` component, per section 7. */
+/** Shared by Role/Position/User permission assignment — one contract, one `PermissionAssignment` component. */
 export interface PermissionAssignmentService {
   getAssignedPermissions(subjectType: AccessControlSubjectType, subjectId: string): Promise<AssignedPermissions>;
   assignPermissions(subjectType: AccessControlSubjectType, subjectId: string, permissionIds: string[]): Promise<void>;
+}
+
+/** Shared by Position/User Role assignment — one contract, one `RoleAssignment` component (mirrors `PermissionAssignmentService`/`PermissionAssignment`). */
+export interface RoleAssignmentService {
+  getAssignedRoleIds(subjectType: RoleAssignableSubjectType, subjectId: string): Promise<string[]>;
+  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, roleIds: string[]): Promise<void>;
 }
 
 /**
@@ -143,4 +178,5 @@ export interface AccessControlServices {
   roles: RoleService;
   positions: PositionService;
   assignments: PermissionAssignmentService;
+  roleAssignments: RoleAssignmentService;
 }

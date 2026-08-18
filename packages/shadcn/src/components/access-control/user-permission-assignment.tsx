@@ -10,13 +10,16 @@ import { AdminPage, PageHeader, Toolbar } from "../admin/page";
 import { ConfirmDialog } from "../composed/confirm-dialog";
 import { SearchInput } from "../composed/search-input";
 import { Button } from "../ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useAccessControlServices } from "./access-control-provider";
 import { PermissionAssignment } from "./permission-assignment";
 import { PermissionTree } from "./permission-tree";
 import { resolvePermissionCatalog } from "./permission-utils";
-import type { PermissionDefinition, SubjectOption, SubjectSearchProvider } from "./types";
+import { UserRoleAssignment } from "./user-role-assignment";
+import type { PermissionDefinition, RoleRecord, SubjectOption, SubjectSearchProvider } from "./types";
 
 const PAGE_SIZE = 10;
+const ROLE_FETCH_PAGE_SIZE = 200;
 
 export interface UserPermissionAssignmentFilterRenderProps {
   filters: CriteriaFilter[];
@@ -35,29 +38,37 @@ export interface UserPermissionAssignmentProps {
    * controls.
    */
   renderFilters?: (props: UserPermissionAssignmentFilterRenderProps) => React.ReactNode;
+  /**
+   * When supplied, rendered as a plain link next to the single-selected user's inline editor,
+   * pointing at the application's route for `UserAuthorizationDetail` (e.g.
+   * `(id) => \`/access-control/user-permissions/${id}\``). A plain `<a>`, not `next/link` —
+   * this package stays router-agnostic.
+   */
+  getDetailHref?: (subjectId: string) => string;
   breadcrumb?: React.ReactNode;
   className?: string;
 }
 
 /**
- * The complete User Permission Assignment page (section 12-21): server-side searchable,
- * paginated user/member selection (one, many, or a dynamically searched group), assigning
- * permissions from the same catalog and `PermissionTree` selector Role/Position assignment use.
+ * The complete User Permission Assignment page: server-side searchable, paginated user/member
+ * selection (one, many, or a dynamically searched group), managing both Roles and Direct
+ * Permissions from the same catalog/selectors Role/Position management use.
  *
- * Deliberately kept out of any User Management page — assigning permissions is an access-control
+ * Deliberately kept out of any User Management page — assigning authorization is an access-control
  * concern, not a user-CRUD concern (see `docs/access-control.md`).
  *
- * Selection semantics: selecting exactly one subject reuses `PermissionAssignment` unchanged —
- * full load-current-state/edit/save, identical to Role/Position. Selecting multiple subjects
- * switches to an **additive grant**: checked permissions are granted on top of each selected
- * subject's existing permissions (fetched individually before saving), never revoking anything
- * a subject already held — a bulk action shouldn't silently take away permissions granted
- * elsewhere.
+ * Selection semantics: **one subject selected** reuses `UserRoleAssignment`/`PermissionAssignment`
+ * directly (full load-current-state/edit/save per tab, identical to Role/Position), plus an
+ * optional link to the full `UserAuthorizationDetail` page. **Multiple subjects selected**
+ * switches to an additive grant across both Roles and Direct Permissions in one combined action:
+ * checked roles/permissions are added on top of each selected subject's existing roles/permissions
+ * (fetched individually before saving), never revoking anything a subject already held.
  */
 export function UserPermissionAssignment({
   permissions,
   subjectProvider,
   renderFilters,
+  getDetailHref,
   breadcrumb,
   className,
 }: UserPermissionAssignmentProps) {
@@ -73,8 +84,12 @@ export function UserPermissionAssignment({
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
+  const [roles, setRoles] = React.useState<RoleRecord[]>([]);
+  const [roleQuery, setRoleQuery] = React.useState("");
+
   const [selected, setSelected] = React.useState<Map<string, SubjectOption>>(new Map());
   const [draftPermissionIds, setDraftPermissionIds] = React.useState<string[]>([]);
+  const [draftRoleIds, setDraftRoleIds] = React.useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [granting, setGranting] = React.useState(false);
   const [grantError, setGrantError] = React.useState<string | null>(null);
@@ -110,6 +125,16 @@ export function UserPermissionAssignment({
     setPageNumber(1);
   }, [debouncedQuery, filters]);
 
+  React.useEffect(() => {
+    let cancelled = false;
+    void services.roles.getList({ pageSize: ROLE_FETCH_PAGE_SIZE }).then((result) => {
+      if (!cancelled) setRoles(result.items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [services]);
+
   function handleSelectedRowIdsChange(ids: string[]) {
     const idSet = new Set(ids);
     setSelected((prev) => {
@@ -125,23 +150,32 @@ export function UserPermissionAssignment({
   function clearSelection() {
     setSelected(new Map());
     setDraftPermissionIds([]);
+    setDraftRoleIds([]);
     setGrantSuccess(false);
   }
 
-  async function handleGrant() {
+  async function handleApply() {
     setGranting(true);
     setGrantError(null);
     try {
       const subjectIds = [...selected.keys()];
       await Promise.all(
         subjectIds.map(async (subjectId) => {
-          const current = await services.assignments.getAssignedPermissions("user", subjectId);
-          const union = [...new Set([...current.permissionIds, ...draftPermissionIds])];
-          await services.assignments.assignPermissions("user", subjectId, union);
+          const [currentPermissions, currentRoleIds] = await Promise.all([
+            services.assignments.getAssignedPermissions("user", subjectId),
+            services.roleAssignments.getAssignedRoleIds("user", subjectId),
+          ]);
+          const permissionUnion = [...new Set([...currentPermissions.permissionIds, ...draftPermissionIds])];
+          const roleUnion = [...new Set([...currentRoleIds, ...draftRoleIds])];
+          await Promise.all([
+            services.assignments.assignPermissions("user", subjectId, permissionUnion),
+            services.roleAssignments.assignRoles("user", subjectId, roleUnion),
+          ]);
         }),
       );
       setConfirmOpen(false);
       setDraftPermissionIds([]);
+      setDraftRoleIds([]);
       setGrantSuccess(true);
     } catch (err) {
       setGrantError(err instanceof Error ? err.message : String(err));
@@ -160,9 +194,39 @@ export function UserPermissionAssignment({
     },
   ];
 
+  const filteredRoles = React.useMemo(() => {
+    const needle = roleQuery.trim().toLowerCase();
+    if (!needle) return roles;
+    return roles.filter(
+      (role) => role.name.toLowerCase().includes(needle) || (role.description?.toLowerCase().includes(needle) ?? false),
+    );
+  }, [roles, roleQuery]);
+
+  const roleColumns: DataTableColumn<RoleRecord>[] = [
+    { id: "name", header: t("roleAssignment.columns.name") },
+    { id: "description", header: t("roleAssignment.columns.description"), cell: (row) => row.description ?? "—" },
+    {
+      id: "permissionCount",
+      header: t("roleAssignment.columns.permissionCount"),
+      cell: (row) => row.permissionCount ?? "—",
+      className: "w-1 text-right",
+    },
+  ];
+
+  function handleDraftRoleIdsChange(ids: string[]) {
+    const idSet = new Set(ids);
+    const visibleIds = new Set(filteredRoles.map((role) => role.id));
+    setDraftRoleIds((prev) => {
+      const kept = prev.filter((id) => !visibleIds.has(id) || idSet.has(id));
+      const added = [...idSet].filter((id) => !kept.includes(id));
+      return [...kept, ...added];
+    });
+  }
+
   const selectedIds = React.useMemo(() => rows.filter((row) => selected.has(row.id)).map((row) => row.id), [rows, selected]);
   const selectedCount = selected.size;
   const singleSelectedId = selectedCount === 1 ? [...selected.keys()][0] : undefined;
+  const selectedRoleRowIds = filteredRoles.filter((role) => draftRoleIds.includes(role.id)).map((role) => role.id);
 
   return (
     <AdminPage className={className}>
@@ -206,15 +270,53 @@ export function UserPermissionAssignment({
           {t("userPermissions.noneSelected")}
         </p>
       ) : selectedCount === 1 && singleSelectedId ? (
-        <PermissionAssignment permissions={permissions} subjectType="user" subjectId={singleSelectedId} />
+        <div className="flex flex-col gap-3">
+          <Tabs defaultValue="roles">
+            <TabsList>
+              <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
+              <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="roles">
+              <UserRoleAssignment userId={singleSelectedId} />
+            </TabsContent>
+            <TabsContent value="directPermissions">
+              <PermissionAssignment permissions={permissions} subjectType="user" subjectId={singleSelectedId} />
+            </TabsContent>
+          </Tabs>
+          {getDetailHref ? (
+            <a href={getDetailHref(singleSelectedId)} className="text-sm font-medium text-primary hover:underline">
+              {t("userPermissions.viewDetail")}
+            </a>
+          ) : null}
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           <div>
             <h3 className="text-sm font-medium">{t("userPermissions.bulk.title", { count: selectedCount })}</h3>
             <p className="text-sm text-muted-foreground">{t("userPermissions.bulk.description")}</p>
           </div>
-          <PermissionTree groups={groups} selectedIds={draftPermissionIds} onSelectedIdsChange={setDraftPermissionIds} />
-          {grantSuccess ? <p className="text-sm text-primary">{t("userPermissions.bulk.granted")}</p> : null}
+          <Tabs defaultValue="roles">
+            <TabsList>
+              <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
+              <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="roles" className="flex flex-col gap-3">
+              <SearchInput value={roleQuery} onValueChange={setRoleQuery} placeholder={t("roleAssignment.searchPlaceholder")} />
+              <DataTable
+                data={filteredRoles}
+                columns={roleColumns}
+                getRowId={(row) => row.id}
+                emptyMessage={t("roleAssignment.empty")}
+                selectable
+                selectedRowIds={selectedRoleRowIds}
+                onSelectedRowIdsChange={handleDraftRoleIdsChange}
+              />
+            </TabsContent>
+            <TabsContent value="directPermissions">
+              <PermissionTree groups={groups} selectedIds={draftPermissionIds} onSelectedIdsChange={setDraftPermissionIds} />
+            </TabsContent>
+          </Tabs>
+          {grantSuccess ? <p className="text-sm text-primary">{t("userPermissions.bulk.assigned")}</p> : null}
           <div className="flex justify-end">
             <Button
               onClick={() => {
@@ -222,9 +324,9 @@ export function UserPermissionAssignment({
                 setGrantSuccess(false);
                 setConfirmOpen(true);
               }}
-              disabled={draftPermissionIds.length === 0}
+              disabled={draftPermissionIds.length === 0 && draftRoleIds.length === 0}
             >
-              {t("userPermissions.bulk.grant")}
+              {t("userPermissions.bulk.assign")}
             </Button>
           </div>
         </div>
@@ -245,12 +347,13 @@ export function UserPermissionAssignment({
         title={t("userPermissions.bulk.confirmTitle")}
         description={t("userPermissions.bulk.confirmDescription", {
           permissionCount: draftPermissionIds.length,
+          roleCount: draftRoleIds.length,
           subjectCount: selectedCount,
         })}
         confirmLabel={t("userPermissions.bulk.confirmButton")}
         loading={granting}
         error={grantError}
-        onConfirm={() => void handleGrant()}
+        onConfirm={() => void handleApply()}
       />
     </AdminPage>
   );

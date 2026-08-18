@@ -22,6 +22,7 @@ import { AccessControlPermissions } from "./access-control-permissions";
 import { useAccessControlServices } from "./access-control-provider";
 import { PositionHierarchy } from "./position-hierarchy";
 import { PositionPermissionAssignment } from "./position-permission-assignment";
+import { PositionRoleAssignment } from "./position-role-assignment";
 import { PositionSelector } from "./position-selector";
 import type { PermissionDefinition, PositionRecord, PositionTreeNode } from "./types";
 
@@ -451,7 +452,7 @@ function PositionEditSheet({
 
   return (
     <Sheet open onOpenChange={onOpenChange}>
-      <SheetContent className="flex w-full max-w-md flex-col sm:max-w-md">
+      <SheetContent size="wide" className="flex flex-col">
         <SheetHeader>
           <SheetTitle>{position.name}</SheetTitle>
           <SheetDescription>{t("positions.edit.title")}</SheetDescription>
@@ -459,6 +460,7 @@ function PositionEditSheet({
         <Tabs defaultValue="details" className="flex flex-1 flex-col overflow-hidden px-4 pb-4">
           <TabsList>
             <TabsTrigger value="details">{t("positions.tabs.details")}</TabsTrigger>
+            <TabsTrigger value="roles">{t("positions.tabs.roles")}</TabsTrigger>
             <TabsTrigger value="permissions">{t("positions.tabs.permissions")}</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="flex flex-1 flex-col gap-4 overflow-y-auto">
@@ -511,6 +513,9 @@ function PositionEditSheet({
                 </Button>
               </FormActions>
             ) : null}
+          </TabsContent>
+          <TabsContent value="roles" className="flex-1 overflow-y-auto">
+            <PositionRoleAssignment positionId={position.id} readOnly={!canManage} />
           </TabsContent>
           <TabsContent value="permissions" className="flex-1 overflow-y-auto">
             <PositionPermissionAssignment permissions={permissions} positionId={position.id} readOnly={!canManage} />

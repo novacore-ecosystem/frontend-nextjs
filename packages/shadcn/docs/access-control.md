@@ -1,14 +1,15 @@
 # Access Control
 
-Shared, complete Permission / Role / Position management for every NovaCore Admin application.
-This is a platform module, not an app feature — do not reimplement these pages in a consuming
-app; compose them.
+Shared, complete Permission / Role / Position / User authorization management for every NovaCore
+Admin application. This is a platform module, not an app feature — do not reimplement these pages
+in a consuming app; compose them.
 
 ```tsx
 <PermissionManagement permissions={myAppPermissions} />
 <RoleManagement permissions={myAppPermissions} />
 <PositionManagement permissions={myAppPermissions} />
 <UserPermissionAssignment permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
+<UserAuthorizationDetail subjectId={id} permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
 ```
 
 Each renders a full page: breadcrumb slot, header, toolbar, table/tree, dialogs, validation,
@@ -16,15 +17,35 @@ loading/error/empty states, and a How-To section — with built-in English/Vietn
 Chinese translations. The only required prop is `permissions` — the application's own permission
 catalog (see "Permission catalog" below).
 
+## Authorization model
+
+```
+Role
+ └── Permission[]
+
+Position
+ ├── Role[]              (reusable permission bundles it holds)
+ └── Direct Permission[]  (exceptions, granted straight to the Position)
+
+User
+ ├── Role[]
+ └── Direct Permission[]
+```
+
+Two intentionally-separate mechanisms, both always available — never forced through one or the
+other. Roles are reusable permission bundles (define once in Role Management, assign to any
+number of Positions/Users). Direct permissions are for one-off exceptions that don't warrant a
+whole Role. There is deliberately **no "Role Group" concept** — Roles cannot hold other Roles.
+
 ## Installation
 
 Part of `@novacore/frontend-next-shadcn`, importable from the package root or the `./access-control`
 subpath (identical exports — the subpath exists for consumers who prefer narrower imports):
 
 ```ts
-import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, AccessControlProvider } from "@novacore/frontend-next-shadcn";
+import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, UserAuthorizationDetail, AccessControlProvider } from "@novacore/frontend-next-shadcn";
 // or
-import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, AccessControlProvider } from "@novacore/frontend-next-shadcn/access-control";
+import { PermissionManagement, RoleManagement, PositionManagement, UserPermissionAssignment, UserAuthorizationDetail, AccessControlProvider } from "@novacore/frontend-next-shadcn/access-control";
 ```
 
 ## Permission catalog
@@ -67,21 +88,44 @@ admin-editable runtime data (permissions are system-defined capabilities, not bu
 ## Provider setup
 
 Role/Position/assignment data still flows through service adapters — implement `RoleService`/
-`PositionService`/`PermissionAssignmentService` (see `src/components/access-control/types.ts`)
-against your app's real API, then mount `AccessControlProvider` once:
+`PositionService`/`PermissionAssignmentService`/`RoleAssignmentService` (see
+`src/components/access-control/types.ts`) against your app's real API, then mount
+`AccessControlProvider` once:
 
 ```tsx
-<AccessControlProvider services={{ roles, positions, assignments }}>
-  {/* PermissionManagement / RoleManagement / PositionManagement / UserPermissionAssignment anywhere below */}
+<AccessControlProvider services={{ roles, positions, assignments, roleAssignments }}>
+  {/* PermissionManagement / RoleManagement / PositionManagement / UserPermissionAssignment / UserAuthorizationDetail anywhere below */}
 </AccessControlProvider>
 ```
 
 Unlike `PermissionProvider`/`I18nProvider`, there is **no permissive default** — every access-control
 component throws a clear error if rendered without a provider, since there's no sane fallback for
 missing data. Note `AccessControlServices` has no `permissions` key — the catalog is a prop, not
-a service (see above), and subject/user search for `UserPermissionAssignment` is a separate
-`subjectProvider` prop, not part of this provider either (too application-specific to standardize
-— see "User Permission Assignment" below).
+a service (see above), and subject/user search for `UserPermissionAssignment`/
+`UserAuthorizationDetail` is a separate `subjectProvider` prop, not part of this provider either
+(too application-specific to standardize — see "User Permission Assignment" below).
+
+## Role assignment
+
+`RoleAssignmentService` is the Position/User → Role[] half of the model, separate from
+`PermissionAssignmentService` (which still also handles Role → Permission[], unchanged):
+
+```ts
+export type RoleAssignableSubjectType = "position" | "user"; // not "role" — no Role Group
+
+export interface RoleAssignmentService {
+  getAssignedRoleIds(subjectType: RoleAssignableSubjectType, subjectId: string): Promise<string[]>;
+  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, roleIds: string[]): Promise<void>;
+}
+```
+
+`RoleAssignment` (and its `PositionRoleAssignment`/`UserRoleAssignment` sugar) is the reusable
+picker: loads the full role catalog once (roles are typically a small list, unlike permissions)
+plus the subject's currently-assigned roles, and renders a searchable checkbox list — same
+load/dirty-state/save/cancel shape as `PermissionAssignment`, just for roles instead of
+permissions. `PositionManagement`'s edit sheet uses it for its **Roles** tab, alongside the
+existing **Permissions** tab (direct permissions — unchanged, still only ever direct, never
+shows Roles).
 
 ## User Permission Assignment
 
@@ -110,17 +154,24 @@ export interface SubjectOption {
   secondaryText?: string;
 }
 
+export interface SubjectDetailField { label: string; value: string }
+export interface SubjectDetail extends SubjectOption { fields?: SubjectDetailField[] }
+
 export interface SubjectSearchProvider {
   search(request: CriteriaRequest): Promise<PaginatedResult<SubjectOption>>;
+  getById(id: string): Promise<SubjectDetail | null>;
 }
 ```
 
-`SubjectSearchProvider` reuses the platform's canonical `CriteriaRequest`/`PaginatedResult` search
-contract — the same one `RoleService.getList`/`PositionService.getList` already use — so an app
-backed by a real search endpoint (Users included, per `CriteriaRequest`'s own doc comment) can
-implement this with one `httpClient` call. `subjectProvider` is **not** part of `AccessControlServices`
-— pass it directly as a prop, since (unlike Role/Position/assignment data) it's too
-application-specific to standardize into the shared provider.
+`SubjectSearchProvider.search` reuses the platform's canonical `CriteriaRequest`/`PaginatedResult`
+search contract — the same one `RoleService.getList`/`PositionService.getList` already use — so an
+app backed by a real search endpoint (Users included, per `CriteriaRequest`'s own doc comment) can
+implement this with one `httpClient` call. `getById` backs `UserAuthorizationDetail`'s header and
+Overview tab — `fields` is open-ended precisely so you only ever surface metadata your backend
+actually has (status, department, position, tenant, ...), never an invented fixed schema.
+`subjectProvider` is **not** part of `AccessControlServices` — pass it directly as a prop, since
+(unlike Role/Position/assignment data) it's too application-specific to standardize into the
+shared provider.
 
 The component never loads an entire user list — every keystroke/page/filter change re-queries
 `subjectProvider.search()` server-side, so it scales to large installations the same way
@@ -144,17 +195,57 @@ threads it into every search call; you only supply the controls:
 
 ### Selection and assignment semantics
 
-- **One user selected** — the full `PermissionAssignment` editor (identical to Role/Position):
-  loads their current permissions, lets you check/uncheck freely, Save replaces their permission
-  set with exactly what's checked.
-- **Multiple users selected** — a fresh, unchecked `PermissionTree` (the same selector Role/Position
-  use) plus a confirmation dialog summarizing "grants N permissions to M users." Confirming is an
-  **additive grant**: each selected user's *existing* permissions (fetched individually first) are
-  preserved, and the checked permissions are added on top — a bulk action never silently revokes
-  a permission a user already held for an unrelated reason.
+- **One user selected** — a `Roles`/`Direct Permissions` tab pair, each the full
+  `UserRoleAssignment`/`PermissionAssignment` editor (identical to Role/Position): loads current
+  state, lets you check/uncheck freely, Save replaces that subject's set with exactly what's
+  checked. If `getDetailHref` is supplied, a link to the full `UserAuthorizationDetail` page for
+  this user is rendered alongside (see below).
+- **Multiple users selected** — the same `Roles`/`Direct Permissions` tabs, but each starts
+  unchecked (roles/permissions being *granted*, not each user's current individual state, which
+  may differ per user) and share one combined "Apply" action + one confirmation dialog summarizing
+  "grants N permissions and M roles to K users." Confirming is an **additive grant** for both:
+  each selected user's *existing* roles and permissions (fetched individually first) are
+  preserved, and the checked ones are added on top — a bulk action never silently revokes
+  anything a user already held for an unrelated reason.
 
 The running selection (`Map<id, SubjectOption>`) survives searches/pagination, and the toolbar
 shows a live "N selected" count with a "Clear selection" action.
+
+## Effective Permissions & User Authorization Detail
+
+`UserAuthorizationDetail` is the complete single-user workspace — different from
+`UserPermissionAssignment`'s bulk page, which operates on many users and links here for the full
+picture on one:
+
+```tsx
+<UserAuthorizationDetail subjectId={id} permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
+```
+
+A full page (not a `Sheet`), with tabs: **Overview** (renders `SubjectDetail.fields` — whatever
+read-only profile metadata your adapter supplies, e.g. status/department/position; nothing is
+invented if your backend doesn't have a field), **Roles** (`UserRoleAssignment`), **Direct
+Permissions** (`PermissionAssignment`, reused unchanged), and **Effective Permissions**.
+
+`EffectivePermissions` answers "what can this person actually do, and why" — every permission the
+subject holds, whether via a Role or granted directly, each tagged with its source(s) (a
+permission can come from more than one place at once):
+
+```ts
+export interface EffectivePermissionSource { type: "direct" | "role"; roleId?: string; roleName?: string }
+export interface EffectivePermission { id: string; sources: EffectivePermissionSource[] }
+```
+
+**This is computed client-side**, by composing existing services: direct permissions +
+`roleAssignments.getAssignedRoleIds` + one `assignments.getAssignedPermissions("role", ...)` per
+assigned role (parallelized). That's correct — the underlying assignment relationships are real —
+but it's an **N+1 read** (one round trip per role the subject holds), which is fine against a
+mocked or small-role-count backend but not a substitute for a real backend endpoint at scale. If
+your backend can compute this itself (e.g. a single `GET /users/{id}/effective-permissions`),
+that's strictly better; this frontend composition is the fallback when it can't, not the
+recommended long-term source of truth.
+
+`getById` on `SubjectSearchProvider` (see below) backs the Overview tab and page header — it's a
+required method alongside `search`, added specifically to support this page.
 
 ### Position has no existing backend contract
 
@@ -236,11 +327,21 @@ Reusable outside the three page components, if you're composing your own screen:
 - `PermissionAssignment` — owns loading/save/dirty-state for one subject's permissions:
   `<PermissionAssignment permissions={myAppPermissions} subjectType="role" subjectId={id} />`.
   `RolePermissionAssignment`/`PositionPermissionAssignment` are `subjectType`-preset sugar over it.
+- `RoleAssignment` — the Role[] equivalent of `PermissionAssignment`:
+  `<RoleAssignment subjectType="position" subjectId={id} />`. `PositionRoleAssignment`/
+  `UserRoleAssignment` are `subjectType`-preset sugar over it.
+- `EffectivePermissions` — read-only merged Role+Direct permission view with source badges, see
+  above.
 - `PositionHierarchy` — presentational superior/subordinate tree (expand/collapse, `renderActions`
   escape hatch).
 - `PositionSelector` — indented, cycle-safe single-select for choosing a superior position.
-- `DataTable`'s `selectable`/`selectedRowIds`/`onSelectedRowIdsChange` — what `UserPermissionAssignment`
-  is built on for paginated multi-select; reuse it directly if composing a custom subject picker.
+- `DataTable`'s `selectable`/`selectedRowIds`/`onSelectedRowIdsChange` — what `UserPermissionAssignment`/
+  `RoleAssignment` are built on for paginated/searchable multi-select; reuse it directly if
+  composing a custom subject or role picker.
+- `SheetContent`'s `size="wide"` — `w-full sm:w-[85vw] lg:w-[65vw] lg:max-w-5xl`, used by
+  `RoleManagement`/`PositionManagement`'s edit sheets now that they hold a real authorization
+  workspace (Roles + Permissions tabs), not just a details form. Reuse it for any other
+  content-heavy `Sheet` rather than repeating a `max-w-*` className by hand.
 
 ## Example: minimal new Admin application
 
@@ -253,6 +354,7 @@ export const accessControlServices: AccessControlServices = {
   roles: myRoleApiAdapter,
   positions: myPositionApiAdapter,
   assignments: myAssignmentApiAdapter,
+  roleAssignments: myRoleAssignmentApiAdapter,
 };
 export const myAppSubjectProvider: SubjectSearchProvider = myUserSearchApiAdapter;
 
@@ -274,9 +376,19 @@ export default () => <RoleManagement permissions={myAppPermissions} />;
 // app/admin/access-control/positions/page.tsx
 export default () => <PositionManagement permissions={myAppPermissions} />;
 // app/admin/access-control/user-permissions/page.tsx
-export default () => <UserPermissionAssignment permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />;
+export default () => (
+  <UserPermissionAssignment
+    permissions={myAppPermissions}
+    subjectProvider={myAppSubjectProvider}
+    getDetailHref={(id) => `/admin/access-control/user-permissions/${id}`}
+  />
+);
+// app/admin/access-control/user-permissions/[id]/page.tsx
+export default ({ params }) => (
+  <UserAuthorizationDetail subjectId={params.id} permissions={myAppPermissions} subjectProvider={myAppSubjectProvider} />
+);
 ```
 
-Four route files, one permission catalog, one service adapter module, zero access-control UI
+Five route files, one permission catalog, one service adapter module, zero access-control UI
 code. `myAppTranslations` is where `myAppPermissions`' `translationKey`/`groupTranslationKey`
 values actually resolve — see "Permission catalog" above.

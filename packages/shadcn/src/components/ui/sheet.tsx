@@ -34,14 +34,36 @@ const SIDE_CLASSES: Record<SheetSide, string> = {
     "inset-x-0 bottom-0 border-t data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom",
 };
 
+/**
+ * `"default"` keeps the historical `w-80` from `SIDE_CLASSES` (callers may still override via
+ * `className`, e.g. the old `max-w-md` pattern). `"wide"` is for a real workspace — content-heavy
+ * panels like Role/Position authorization editing — sized responsively rather than a single fixed
+ * pixel width: full width on mobile, ~85vw on tablet, ~65vw capped at 64rem (`max-w-5xl`) on
+ * desktop, so it scales with the viewport instead of feeling cramped on a laptop or wasted on an
+ * ultrawide monitor.
+ */
+export type SheetContentSize = "default" | "wide";
+
+const SIZE_CLASSES: Record<SheetContentSize, string> = {
+  default: "",
+  wide: "w-full sm:w-[85vw] lg:w-[65vw] lg:max-w-5xl",
+};
+
 export interface SheetContentProps {
   children: React.ReactNode;
   className?: string;
   side?: SheetSide;
   showCloseButton?: boolean;
+  size?: SheetContentSize;
 }
 
-export function SheetContent({ children, className, side = "right", showCloseButton = true }: SheetContentProps) {
+export function SheetContent({
+  children,
+  className,
+  side = "right",
+  showCloseButton = true,
+  size = "default",
+}: SheetContentProps) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
@@ -49,6 +71,7 @@ export function SheetContent({ children, className, side = "right", showCloseBut
         className={cn(
           "fixed z-50 flex flex-col gap-4 border-border bg-card p-0 shadow-lg outline-none",
           SIDE_CLASSES[side],
+          SIZE_CLASSES[size],
           className,
         )}
       >
