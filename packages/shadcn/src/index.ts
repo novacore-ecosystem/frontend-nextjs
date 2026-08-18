@@ -212,6 +212,7 @@ export type {
   AssignedPermissions,
   EffectivePermission,
   EffectivePermissionSource,
+  EntitlementStatus,
   PermissionAssignmentService,
   PermissionDefinition,
   PermissionGroup,
@@ -229,14 +230,23 @@ export type {
   SubjectDetailField,
   SubjectOption,
   SubjectSearchProvider,
+  TenantEntitlementState,
 } from "./components/access-control/types";
 export {
+  annotateEntitlement,
   derivePermissionCategory,
+  deriveUnavailablePermissionIds,
   matchesPermissionSearch,
   resolvePermissionCatalog,
 } from "./components/access-control/permission-utils";
 export {
+  TenantEntitlementProvider,
+  useTenantEntitlement,
+  type TenantEntitlementProviderProps,
+} from "./components/access-control/tenant-entitlement-provider";
+export {
   PermissionTree,
+  PermissionEntitlementIndicator,
   PermissionInheritanceIndicator,
   type PermissionTreeProps,
 } from "./components/access-control/permission-tree";

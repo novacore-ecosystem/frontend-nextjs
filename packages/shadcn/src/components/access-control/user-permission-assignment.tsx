@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useAccessControlServices } from "./access-control-provider";
 import { PermissionAssignment } from "./permission-assignment";
 import { PermissionTree } from "./permission-tree";
-import { resolvePermissionCatalog } from "./permission-utils";
+import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
+import { useTenantEntitlement } from "./tenant-entitlement-provider";
 import { UserRoleAssignment } from "./user-role-assignment";
 import type { PermissionDefinition, RoleRecord, SubjectOption, SubjectSearchProvider } from "./types";
 
@@ -74,6 +75,7 @@ export function UserPermissionAssignment({
 }: UserPermissionAssignmentProps) {
   const { t } = useTranslation();
   const services = useAccessControlServices();
+  const entitlement = useTenantEntitlement();
 
   const [query, setQuery] = React.useState("");
   const debouncedQuery = useDebouncedValue(query, 300);
@@ -96,6 +98,10 @@ export function UserPermissionAssignment({
   const [grantSuccess, setGrantSuccess] = React.useState(false);
 
   const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
+  const unavailableIds = React.useMemo(
+    () => deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement),
+    [permissions, entitlement],
+  );
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -313,7 +319,12 @@ export function UserPermissionAssignment({
               />
             </TabsContent>
             <TabsContent value="directPermissions">
-              <PermissionTree groups={groups} selectedIds={draftPermissionIds} onSelectedIdsChange={setDraftPermissionIds} />
+              <PermissionTree
+                groups={groups}
+                selectedIds={draftPermissionIds}
+                onSelectedIdsChange={setDraftPermissionIds}
+                unavailableIds={unavailableIds}
+              />
             </TabsContent>
           </Tabs>
           {grantSuccess ? <p className="text-sm text-primary">{t("userPermissions.bulk.assigned")}</p> : null}

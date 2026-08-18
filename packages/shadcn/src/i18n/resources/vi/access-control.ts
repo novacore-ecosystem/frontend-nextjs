@@ -24,7 +24,15 @@ export const permissions = {
     category: "Nhóm",
     name: "Tên",
     description: "Mô tả",
+    permission: "Quyền hạn",
+    status: "Trạng thái",
   },
+  status: {
+    active: "Đang hoạt động",
+    inactive: "Không khả dụng",
+    unknown: "Không xác định trạng thái",
+  },
+  entitlementUnavailable: "Không thể tải thông tin gói quyền hạn của tenant — quyền hạn được hiển thị mà không có trạng thái khả dụng.",
   empty: "Không có quyền hạn nào khớp với tìm kiếm của bạn.",
   howTo: {
     title: "Về quyền hạn",
@@ -43,10 +51,12 @@ export const roles = {
   create: {
     trigger: "Tạo vai trò",
     title: "Tạo vai trò",
+    description: "Xác định một vai trò mới và mô tả của nó.",
     success: "Đã tạo vai trò.",
   },
   edit: {
     title: "Sửa vai trò",
+    description: "Quản lý quyền hạn và cài đặt phân quyền của vai trò này.",
   },
   delete: {
     title: "Xóa vai trò",
@@ -88,11 +98,13 @@ export const positions = {
   create: {
     trigger: "Tạo vị trí",
     title: "Tạo vị trí",
+    description: "Xác định một vị trí mới trong sơ đồ tổ chức.",
     success: "Đã tạo vị trí.",
   },
   addChild: "Thêm vị trí cấp dưới",
   edit: {
     title: "Sửa vị trí",
+    description: "Quản lý vị trí này, các vai trò được gán và quyền hạn trực tiếp.",
   },
   delete: {
     title: "Xóa vị trí",
@@ -140,6 +152,7 @@ export const assignment = {
   deselectAll: "Bỏ chọn tất cả",
   inherited: "Kế thừa",
   readOnly: "Bạn không thể cấp quyền này",
+  unavailable: "Đã được gán, nhưng hiện không khả dụng theo gói của bạn",
   unsavedChanges: "Bạn có thay đổi chưa lưu.",
   save: "Lưu thay đổi",
   cancel: "Hủy",
@@ -208,6 +221,7 @@ export const userPermissions = {
 
 export const userAuthorizationDetail = {
   title: "Phân quyền người dùng",
+  description: "Quản lý vai trò và quyền trực tiếp của người dùng này.",
   backLink: "Quay lại Quyền người dùng",
   notFound: "Không tìm thấy người dùng này.",
   tabs: {
@@ -224,5 +238,7 @@ export const userAuthorizationDetail = {
     empty: "Người dùng này chưa có quyền hiệu lực nào.",
     sourceDirect: "Trực tiếp",
     sourceRole: "Vai trò — {{name}}",
+    unavailableTitle: "Hiện không khả dụng",
+    unavailableDescription: "Được gán qua vai trò hoặc trực tiếp, nhưng hiện không khả dụng theo gói của tenant.",
   },
 } as const satisfies typeof enUserAuthorizationDetail;

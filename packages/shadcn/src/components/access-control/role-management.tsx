@@ -12,9 +12,8 @@ import { ConfirmDialog } from "../composed/confirm-dialog";
 import { FormActions, FormField } from "../composed/form-field";
 import { SearchInput } from "../composed/search-input";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { AccessControlPermissions } from "./access-control-permissions";
@@ -161,7 +160,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
       </HowTo>
 
       {canManage ? (
-        <RoleCreateDialog
+        <RoleCreateSheet
           open={createOpen}
           onOpenChange={setCreateOpen}
           onCreated={(role) => {
@@ -205,7 +204,8 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
   );
 }
 
-function RoleCreateDialog({
+/** Uses the same `Sheet`/`size="wide"` workspace as `RoleEditSheet` — Create/Edit/Detail share one drawer pattern rather than a small centered popup for what immediately becomes a permission-assignment workspace once the role exists. */
+function RoleCreateSheet({
   open,
   onOpenChange,
   onCreated,
@@ -243,12 +243,13 @@ function RoleCreateDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("roles.create.title")}</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-4">
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent size="wide" className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>{t("roles.create.title")}</SheetTitle>
+          <SheetDescription>{t("roles.create.description")}</SheetDescription>
+        </SheetHeader>
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
           <FormField label={t("roles.fields.name")} required htmlFor="role-create-name">
             <Input
               id="role-create-name"
@@ -272,16 +273,16 @@ function RoleCreateDialog({
             </p>
           ) : null}
         </div>
-        <DialogFooter>
+        <SheetFooter className="justify-end">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             {t("common.actions.cancel")}
           </Button>
           <Button onClick={() => void handleCreate()} loading={saving} disabled={!name.trim()}>
             {t("common.actions.create")}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -333,7 +334,7 @@ function RoleEditSheet({
       <SheetContent size="wide" className="flex flex-col">
         <SheetHeader>
           <SheetTitle>{role.name}</SheetTitle>
-          <SheetDescription>{t("roles.edit.title")}</SheetDescription>
+          <SheetDescription>{t("roles.edit.description")}</SheetDescription>
         </SheetHeader>
         <Tabs defaultValue="details" className="flex flex-1 flex-col overflow-hidden px-4 pb-4">
           <TabsList>
@@ -376,7 +377,7 @@ function RoleEditSheet({
               </FormActions>
             ) : null}
           </TabsContent>
-          <TabsContent value="permissions" className="flex-1 overflow-y-auto">
+          <TabsContent value="permissions" className="flex flex-1 flex-col gap-4 overflow-y-auto">
             <RolePermissionAssignment permissions={permissions} roleId={role.id} readOnly={!canManage} />
           </TabsContent>
         </Tabs>

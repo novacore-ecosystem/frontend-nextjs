@@ -12,6 +12,7 @@ const SEED_SUBJECTS: SubjectDetail[] = [
     displayName: "John Doe",
     secondaryText: "john@example.com",
     fields: [
+      { label: "Email", value: "john@example.com" },
       { label: "Status", value: "Active" },
       { label: "Department", value: "Sales" },
     ],

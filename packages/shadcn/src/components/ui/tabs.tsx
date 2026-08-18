@@ -10,7 +10,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, React.ComponentPropsWit
   ({ className, ...props }, ref) => (
     <TabsPrimitive.List
       ref={ref}
-      className={cn("inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground", className)}
+      className={cn(
+        "inline-flex h-9 w-fit shrink-0 items-center justify-start self-start rounded-lg bg-muted p-1 text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   ),

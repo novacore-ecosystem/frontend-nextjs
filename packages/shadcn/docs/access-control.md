@@ -85,6 +85,70 @@ permission keys aren't a CRUD resource, and their display copy is application co
 admin-editable runtime data (permissions are system-defined capabilities, not business content).
 `PermissionManagement` reflects that: browse + search only, on whatever catalog you pass it.
 
+`descriptionTranslationKey` is optional supporting copy shown as secondary text under the
+permission's name in `PermissionManagement` and as a tooltip context in assignment UIs — keep it
+short (one sentence answering "what does this allow?"), the same style as `translationKey` itself.
+The raw `id` is intentionally never rendered as visible text anywhere in this module (only as a
+`data-permission-id` attribute, for devtools/debugging) — administrators see localized name/
+description, not the wire format; the identifier remains available to application code via the
+`permissions` prop itself for API calls, assignment, and tooling.
+
+## Tenant entitlement
+
+Three concepts must stay separate, and this package models exactly the first and third — the
+second (tenant entitlement) sits between them and is what this section covers:
+
+```
+Application Permission Catalog   →  PermissionDefinition[] (static, application-owned, above)
+Tenant Root Entitlement          →  TenantEntitlementProvider (this section)
+Assignment (Role/Position/User)  →  AssignedPermissions / RoleAssignmentService (below)
+```
+
+A tenant's subscription/package may not currently include every permission the application
+defines — that's an *entitlement* concern, distinct from whether a Role/Position/User has been
+*assigned* the permission. `TenantEntitlementProvider` supplies this to every Access Control
+component in a subtree:
+
+```tsx
+import { TenantEntitlementProvider } from "@novacore/frontend-next-shadcn";
+
+<TenantEntitlementProvider status={entitlementQuery.status} entitledPermissionIds={entitlementQuery.entitledIds}>
+  {children}
+</TenantEntitlementProvider>
+```
+
+- `status: "loading" | "ready" | "error"` — while `"loading"`, `PermissionManagement` shows a
+  skeleton instead of a table; on `"error"`, it shows a non-blocking banner and marks every
+  permission's status `"unknown"` rather than silently rendering it as unavailable (an entitlement
+  fetch failure must never look identical to "the tenant doesn't have this").
+- `entitledPermissionIds: string[] | "all"` — `"all"` (the default when no provider is mounted at
+  all) means no entitlement gating is configured; every catalog permission renders as available.
+  Otherwise, it's the tenant's currently-owned subset of permission ids.
+
+Consumed *internally* — `PermissionManagement` (Status column), `PermissionTree`/
+`PermissionAssignment`/`RolePermissionAssignment`/`PositionPermissionAssignment`/
+`UserPermissionAssignment` (assignment locking), and `EffectivePermissions` (partitioning effective
+vs. currently-unavailable) all call `useTenantEntitlement()` themselves. No page-level prop changes
+are needed to adopt this — mount the provider once, typically fed from your application's bootstrap/
+session flow, the same way `PermissionProvider`/`AccessControlProvider` already are.
+
+**Assignment semantics under entitlement** (`PermissionTree`'s `unavailableIds` prop, derived via
+`deriveUnavailablePermissionIds(catalogIds, entitlement)`):
+
+- A permission the tenant doesn't currently own, **already assigned**, renders checked with a
+  distinct "unavailable" indicator — and can be unchecked (explicitly removed) but not re-checked.
+- A permission the tenant doesn't currently own, **not assigned**, renders disabled — the UI can't
+  create a new assignment to it.
+- Neither state ever deletes or filters an existing assignment automatically. A tenant package
+  downgrade only shrinks `entitledPermissionIds`; existing `AssignedPermissions.permissionIds`
+  untouched by an admin are preserved verbatim and become effective again automatically the moment
+  the tenant's package is upgraded back — no re-assignment needed.
+
+**Security note:** entitlement here, like `usePermission()`, is UX only — it improves what the
+admin sees and prevents the UI from proposing an invalid new assignment, but it is never a
+substitute for server-side entitlement enforcement. The backend must independently intersect
+candidate permissions with its own (cached) root-tenant entitlement before authorizing anything.
+
 ## Provider setup
 
 Role/Position/assignment data still flows through service adapters — implement `RoleService`/

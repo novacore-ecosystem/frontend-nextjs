@@ -84,6 +84,18 @@ describe("RoleManagement", () => {
     });
   });
 
+  it("switching tabs in the edit sheet removes the previous tab's content from the document (no leftover layout)", async () => {
+    renderRoleManagement();
+    const row = (await screen.findByText("Warehouse Manager")).closest("tr")!;
+
+    fireEvent.click(within(row).getByRole("button", { name: "Edit" }));
+    await screen.findByLabelText(/^Name/);
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Permissions" }));
+
+    await waitFor(() => expect(screen.queryByLabelText(/^Name/)).not.toBeInTheDocument());
+  });
+
   it("deletes a role after confirmation", async () => {
     const { services } = renderRoleManagement();
     const row = (await screen.findByText("Support Agent")).closest("tr")!;

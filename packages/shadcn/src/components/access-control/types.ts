@@ -33,12 +33,36 @@ export interface PermissionRecord {
   category: string;
   displayName: string;
   description?: string;
+  /**
+   * Whether the tenant currently owns this permission, per `annotateEntitlement`. `"unknown"`
+   * means entitlement failed to load — never silently treated as unavailable (see task's "don't
+   * confuse inactive with unknown" rule). Omitted only transiently while entitlement is loading.
+   */
+  entitled?: boolean | "unknown";
 }
 
 export interface PermissionGroup {
   category: string;
   categoryLabel: string;
   permissions: PermissionRecord[];
+}
+
+export type EntitlementStatus = "loading" | "ready" | "error";
+
+/**
+ * The tenant/root-tenant's current permission entitlement — the middle layer between the
+ * application's static `PermissionDefinition[]` catalog and a subject's `AssignedPermissions`:
+ * `Effective Permission = Application Catalog ∩ Tenant Entitlement ∩ Assignment`. Supplied via
+ * `<TenantEntitlementProvider>`, typically sourced once from the application's bootstrap/session
+ * flow (see `docs/access-control.md`'s "Tenant entitlement" section) — never fetched per-page.
+ *
+ * `entitledPermissionIds: "all"` means no entitlement gating is configured for this application
+ * (the default when no provider is mounted) — every catalog permission renders as available, so
+ * apps that don't model tenant packages/subscriptions are unaffected.
+ */
+export interface TenantEntitlementState {
+  status: EntitlementStatus;
+  entitledPermissionIds: string[] | "all";
 }
 
 /** An authorization subject selectable in `UserPermissionAssignment` — deliberately generic since a "user" may be a Member/Account/Employee/Operator depending on the consuming application's domain (see `docs/access-control.md`). */

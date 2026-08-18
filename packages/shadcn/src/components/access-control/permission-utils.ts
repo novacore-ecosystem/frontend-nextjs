@@ -1,5 +1,5 @@
 import type { Translator } from "@novacore/frontend-foundation";
-import type { PermissionDefinition, PermissionGroup, PermissionRecord } from "./types";
+import type { PermissionDefinition, PermissionGroup, PermissionRecord, TenantEntitlementState } from "./types";
 
 /** `id.split(":")[0]` — the same module-prefix convention `@novacore/frontend-foundation`'s `Permissions` catalog uses (`"order:view"` -> `"order"`). The default `PermissionDefinition.group` when the application doesn't supply one. */
 export function derivePermissionCategory(id: string): string {
@@ -53,6 +53,34 @@ export function resolvePermissionCatalog(definitions: PermissionDefinition[], t:
   return [...byGroup.entries()]
     .map(([category, { label, permissions }]) => ({ category, categoryLabel: label, permissions }))
     .sort((a, b) => a.categoryLabel.localeCompare(b.categoryLabel));
+}
+
+/**
+ * Which of `catalogIds` the tenant does NOT currently own, per `entitlement`. `[]` unless
+ * entitlement is `"ready"` and gating is actually configured (`entitledPermissionIds !== "all"`) —
+ * while loading or on error, nothing is treated as unavailable (fail-open; the caller should show
+ * a loading/error state of its own rather than relying on this to signal it).
+ */
+export function deriveUnavailablePermissionIds(catalogIds: string[], entitlement: TenantEntitlementState): string[] {
+  if (entitlement.status !== "ready" || entitlement.entitledPermissionIds === "all") return [];
+  const entitled = new Set(entitlement.entitledPermissionIds);
+  return catalogIds.filter((id) => !entitled.has(id));
+}
+
+/**
+ * Annotates already-resolved `PermissionRecord`s with `entitled`, given the tenant's current
+ * entitlement — a separate step from `resolvePermissionCatalog` so that function stays a pure
+ * translation-only concern with no entitlement fixture needed in its own tests. `"unknown"` when
+ * entitlement failed to load (never silently mapped to "not entitled"); every record is `entitled:
+ * true` when no gating is configured (`"all"`); unchanged (no `entitled` field) while loading —
+ * callers should render a loading state instead of this data during that window.
+ */
+export function annotateEntitlement(records: PermissionRecord[], entitlement: TenantEntitlementState): PermissionRecord[] {
+  if (entitlement.status === "error") return records.map((record) => ({ ...record, entitled: "unknown" as const }));
+  if (entitlement.status === "loading") return records;
+  if (entitlement.entitledPermissionIds === "all") return records.map((record) => ({ ...record, entitled: true as const }));
+  const entitled = new Set(entitlement.entitledPermissionIds);
+  return records.map((record) => ({ ...record, entitled: entitled.has(record.id) }));
 }
 
 /** Case-insensitive match against a permission's id/displayName/description — the filter `PermissionTree`'s search box applies. */

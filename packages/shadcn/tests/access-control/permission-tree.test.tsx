@@ -9,12 +9,14 @@ function Controlled({
   selectedIds = [],
   inheritedIds,
   readOnlyIds,
+  unavailableIds,
   disabled,
 }: {
   onSelectedIdsChange: (ids: string[]) => void;
   selectedIds?: string[];
   inheritedIds?: string[];
   readOnlyIds?: string[];
+  unavailableIds?: string[];
   disabled?: boolean;
 }) {
   const [ids, setIds] = React.useState(selectedIds);
@@ -28,6 +30,7 @@ function Controlled({
       }}
       inheritedIds={inheritedIds}
       readOnlyIds={readOnlyIds}
+      unavailableIds={unavailableIds}
       disabled={disabled}
     />
   );
@@ -90,6 +93,45 @@ describe("PermissionTree selection", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Select all" }));
     const selected = new Set(onChange.mock.calls.at(-1)?.[0] as string[]);
+    expect(selected.has("inventory:adjust")).toBe(false);
+    expect(selected.has("inventory:view")).toBe(true);
+  });
+
+  it("an existing assignment to an unavailable permission stays checked and can be unchecked (removed)", () => {
+    const onChange = vi.fn();
+    render(
+      <Controlled onSelectedIdsChange={onChange} selectedIds={["order:view"]} unavailableIds={["order:view"]} />,
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: /View orders/ });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toBeEnabled();
+
+    fireEvent.click(checkbox);
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it("an unavailable permission with no existing assignment cannot be newly checked", () => {
+    const onChange = vi.fn();
+    render(<Controlled onSelectedIdsChange={onChange} unavailableIds={["order:view"]} />);
+
+    const checkbox = screen.getByRole("checkbox", { name: /View orders/ });
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+
+    fireEvent.click(checkbox);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("select all skips unavailable permissions that aren't already assigned, but keeps ones that are", () => {
+    const onChange = vi.fn();
+    render(
+      <Controlled onSelectedIdsChange={onChange} selectedIds={["order:view"]} unavailableIds={["order:view", "inventory:adjust"]} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Select all" }));
+    const selected = new Set(onChange.mock.calls.at(-1)?.[0] as string[]);
+    expect(selected.has("order:view")).toBe(true);
     expect(selected.has("inventory:adjust")).toBe(false);
     expect(selected.has("inventory:view")).toBe(true);
   });

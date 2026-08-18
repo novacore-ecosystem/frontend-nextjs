@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock } from "lucide-react";
+import { Ban, Lock } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
@@ -21,6 +21,14 @@ export interface PermissionTreeProps {
   inheritedIds?: string[];
   /** Rendered locked (not toggleable) with a "Not grantable by you" indicator — e.g. the current actor doesn't hold the permission themselves. */
   readOnlyIds?: string[];
+  /**
+   * Catalog permission ids the tenant does NOT currently own (see `deriveUnavailablePermissionIds`).
+   * Already-checked ids in this set stay checked and toggleable-off (existing assignments are
+   * preserved, never auto-removed); unchecked ids in this set are locked so the UI can't create a
+   * new assignment to something the tenant isn't entitled to. Distinct from `inheritedIds`/
+   * `readOnlyIds`, which are actor-centric (why *you* can't toggle it), not tenant-centric.
+   */
+  unavailableIds?: string[];
   /** Read-only mode: every checkbox is locked and select-all/deselect-all are hidden. */
   disabled?: boolean;
   className?: string;
@@ -38,6 +46,7 @@ export function PermissionTree({
   onSelectedIdsChange,
   inheritedIds = [],
   readOnlyIds = [],
+  unavailableIds = [],
   disabled,
   className,
 }: PermissionTreeProps) {
@@ -47,6 +56,7 @@ export function PermissionTree({
   const selectedSet = React.useMemo(() => new Set(selectedIds), [selectedIds]);
   const inheritedSet = React.useMemo(() => new Set(inheritedIds), [inheritedIds]);
   const readOnlySet = React.useMemo(() => new Set(readOnlyIds), [readOnlyIds]);
+  const unavailableSet = React.useMemo(() => new Set(unavailableIds), [unavailableIds]);
 
   const filteredGroups = React.useMemo(() => {
     if (!query.trim()) return groups;
@@ -63,8 +73,13 @@ export function PermissionTree({
     return selectedSet.has(id) || inheritedSet.has(id);
   }
 
+  /** Would adding `id` (it's currently unchecked) be creating a brand-new assignment to a permission the tenant doesn't own? Existing checked-but-unavailable ids are never blocked from being unchecked — only new checks of an unavailable id are rejected. */
+  function blockedByEntitlement(id: string) {
+    return unavailableSet.has(id) && !selectedSet.has(id);
+  }
+
   function toggle(id: string) {
-    if (isLocked(id)) return;
+    if (isLocked(id) || blockedByEntitlement(id)) return;
     onSelectedIdsChange(selectedSet.has(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]);
   }
 
@@ -72,16 +87,19 @@ export function PermissionTree({
     if (disabled) return;
     const toggleableIds = group.permissions.map((p) => p.id).filter((id) => !isLocked(id));
     const allChecked = toggleableIds.length > 0 && toggleableIds.every((id) => selectedSet.has(id));
-    onSelectedIdsChange(
-      allChecked
-        ? selectedIds.filter((id) => !toggleableIds.includes(id))
-        : [...new Set([...selectedIds, ...toggleableIds])],
-    );
+    if (allChecked) {
+      onSelectedIdsChange(selectedIds.filter((id) => !toggleableIds.includes(id)));
+    } else {
+      const addableIds = toggleableIds.filter((id) => !blockedByEntitlement(id));
+      onSelectedIdsChange([...new Set([...selectedIds, ...addableIds])]);
+    }
   }
 
   function selectAll() {
     if (disabled) return;
-    const allIds = groups.flatMap((g) => g.permissions.map((p) => p.id)).filter((id) => !isLocked(id));
+    const allIds = groups
+      .flatMap((g) => g.permissions.map((p) => p.id))
+      .filter((id) => !isLocked(id) && !blockedByEntitlement(id));
     onSelectedIdsChange([...new Set([...selectedIds, ...allIds])]);
   }
 
@@ -154,18 +172,22 @@ export function PermissionTree({
                     const locked = isLocked(permission.id);
                     const inherited = inheritedSet.has(permission.id);
                     const readOnly = !inherited && readOnlySet.has(permission.id);
+                    const checked = isChecked(permission.id);
+                    const showEntitlementIndicator = !inherited && !readOnly && unavailableSet.has(permission.id);
+                    const interactive = !locked && !blockedByEntitlement(permission.id);
                     return (
                       <label
                         key={permission.id}
+                        data-permission-id={permission.id}
                         className={cn(
                           "flex items-start gap-2 rounded-md px-2 py-1.5 text-sm",
-                          !locked && "cursor-pointer hover:bg-accent/50",
+                          interactive && "cursor-pointer hover:bg-accent/50",
                         )}
                       >
                         <Checkbox
-                          checked={isChecked(permission.id)}
+                          checked={checked}
                           onCheckedChange={() => toggle(permission.id)}
-                          disabled={locked}
+                          disabled={!interactive}
                           className="mt-0.5"
                         />
                         <span className="flex-1">
@@ -173,9 +195,10 @@ export function PermissionTree({
                             {permission.displayName}
                             {inherited || readOnly ? (
                               <PermissionInheritanceIndicator kind={inherited ? "inherited" : "readOnly"} />
+                            ) : showEntitlementIndicator ? (
+                              <PermissionEntitlementIndicator />
                             ) : null}
                           </span>
-                          <span className="block text-xs text-muted-foreground">{permission.id}</span>
                         </span>
                       </label>
                     );
@@ -196,6 +219,17 @@ export function PermissionInheritanceIndicator({ kind }: { kind: "inherited" | "
   return (
     <Tooltip content={label}>
       <Lock className="size-3 shrink-0 text-muted-foreground" aria-label={label} />
+    </Tooltip>
+  );
+}
+
+/** Shown on a permission the tenant doesn't currently own — whether it's an existing assignment being preserved (checked) or blocked from a new assignment (unchecked). Distinct icon/color from `PermissionInheritanceIndicator` since this is tenant-centric, not actor-centric. */
+export function PermissionEntitlementIndicator() {
+  const { t } = useTranslation();
+  const label = t("assignment.unavailable");
+  return (
+    <Tooltip content={label}>
+      <Ban className="size-3 shrink-0 text-amber-600 dark:text-amber-500" aria-label={label} />
     </Tooltip>
   );
 }

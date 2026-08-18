@@ -13,7 +13,15 @@ export const permissions = {
     category: "Category",
     name: "Name",
     description: "Description",
+    permission: "Permission",
+    status: "Status",
   },
+  status: {
+    active: "Active",
+    inactive: "Not available",
+    unknown: "Status unavailable",
+  },
+  entitlementUnavailable: "Unable to load your plan's permission availability — permissions are shown without an availability status.",
   empty: "No permissions match your search.",
   howTo: {
     title: "About permissions",
@@ -32,10 +40,12 @@ export const roles = {
   create: {
     trigger: "Create role",
     title: "Create role",
+    description: "Define a new role and its description.",
     success: "Role created.",
   },
   edit: {
     title: "Edit role",
+    description: "Manage this role's permissions and authorization settings.",
   },
   delete: {
     title: "Delete role",
@@ -78,11 +88,13 @@ export const positions = {
   create: {
     trigger: "Create position",
     title: "Create position",
+    description: "Define a new position in the org chart.",
     success: "Position created.",
   },
   addChild: "Add subordinate position",
   edit: {
     title: "Edit position",
+    description: "Manage this position, assigned roles, and direct permissions.",
   },
   delete: {
     title: "Delete position",
@@ -130,6 +142,7 @@ export const assignment = {
   deselectAll: "Deselect all",
   inherited: "Inherited",
   readOnly: "Not grantable by you",
+  unavailable: "Assigned, but not currently available under your plan",
   unsavedChanges: "You have unsaved changes.",
   save: "Save changes",
   cancel: "Cancel",
@@ -199,6 +212,7 @@ export const userPermissions = {
 
 export const userAuthorizationDetail = {
   title: "User Authorization",
+  description: "Manage this user's roles and direct permissions.",
   backLink: "Back to User Permissions",
   notFound: "This user could not be found.",
   tabs: {
@@ -215,5 +229,7 @@ export const userAuthorizationDetail = {
     empty: "This user has no effective permissions yet.",
     sourceDirect: "Direct",
     sourceRole: "Role — {{name}}",
+    unavailableTitle: "Currently unavailable",
+    unavailableDescription: "Assigned via a role or directly, but not currently available under the tenant's plan.",
   },
 };

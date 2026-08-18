@@ -63,7 +63,7 @@ export function UserAuthorizationDetail({
 
   return (
     <AdminPage className={className}>
-      <PageHeader title={subject.displayName} description={subject.secondaryText} breadcrumb={breadcrumb} />
+      <PageHeader title={subject.displayName} description={t("userAuthorizationDetail.description")} breadcrumb={breadcrumb} />
 
       <Tabs defaultValue="overview" className="flex flex-1 flex-col gap-4">
         <TabsList>

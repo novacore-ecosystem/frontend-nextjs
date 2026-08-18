@@ -24,7 +24,15 @@ export const permissions = {
     category: "分类",
     name: "名称",
     description: "描述",
+    permission: "权限",
+    status: "状态",
   },
+  status: {
+    active: "已启用",
+    inactive: "不可用",
+    unknown: "状态未知",
+  },
+  entitlementUnavailable: "无法加载租户的权限可用性信息——权限将不显示可用性状态。",
   empty: "没有符合搜索条件的权限。",
   howTo: {
     title: "关于权限",
@@ -41,10 +49,12 @@ export const roles = {
   create: {
     trigger: "创建角色",
     title: "创建角色",
+    description: "定义一个新角色及其描述。",
     success: "角色已创建。",
   },
   edit: {
     title: "编辑角色",
+    description: "管理此角色的权限与授权设置。",
   },
   delete: {
     title: "删除角色",
@@ -86,11 +96,13 @@ export const positions = {
   create: {
     trigger: "创建职位",
     title: "创建职位",
+    description: "在组织架构中定义一个新职位。",
     success: "职位已创建。",
   },
   addChild: "添加下级职位",
   edit: {
     title: "编辑职位",
+    description: "管理此职位、已分配的角色及直接权限。",
   },
   delete: {
     title: "删除职位",
@@ -135,6 +147,7 @@ export const assignment = {
   deselectAll: "取消全选",
   inherited: "继承",
   readOnly: "您无法授予此权限",
+  unavailable: "已分配，但目前您的套餐不包含此权限",
   unsavedChanges: "您有未保存的更改。",
   save: "保存更改",
   cancel: "取消",
@@ -201,6 +214,7 @@ export const userPermissions = {
 
 export const userAuthorizationDetail = {
   title: "用户权限详情",
+  description: "管理此用户的角色与直接权限。",
   backLink: "返回用户权限",
   notFound: "未找到该用户。",
   tabs: {
@@ -217,5 +231,7 @@ export const userAuthorizationDetail = {
     empty: "该用户暂无生效权限。",
     sourceDirect: "直接授予",
     sourceRole: "角色 — {{name}}",
+    unavailableTitle: "当前不可用",
+    unavailableDescription: "通过角色或直接授予，但目前租户的套餐不包含此权限。",
   },
 } as const satisfies typeof enUserAuthorizationDetail;

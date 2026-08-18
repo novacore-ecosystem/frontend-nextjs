@@ -7,8 +7,9 @@ import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { FormActions } from "../composed/form-field";
 import { Button } from "../ui/button";
 import { useAccessControlServices } from "./access-control-provider";
-import { resolvePermissionCatalog } from "./permission-utils";
+import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
 import { PermissionTree } from "./permission-tree";
+import { useTenantEntitlement } from "./tenant-entitlement-provider";
 import type { AccessControlSubjectType, AssignedPermissions, PermissionDefinition } from "./types";
 
 export interface PermissionAssignmentProps {
@@ -40,8 +41,13 @@ export function PermissionAssignment({
 }: PermissionAssignmentProps) {
   const { t } = useTranslation();
   const services = useAccessControlServices();
+  const entitlement = useTenantEntitlement();
 
   const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
+  const unavailableIds = React.useMemo(
+    () => deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement),
+    [permissions, entitlement],
+  );
   const [assigned, setAssigned] = React.useState<AssignedPermissions | null>(null);
   const [draftIds, setDraftIds] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -114,6 +120,7 @@ export function PermissionAssignment({
         onSelectedIdsChange={setDraftIds}
         inheritedIds={assigned?.inheritedPermissionIds}
         readOnlyIds={assigned?.readOnlyPermissionIds}
+        unavailableIds={unavailableIds}
         disabled={readOnly}
       />
 

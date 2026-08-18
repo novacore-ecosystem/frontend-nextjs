@@ -3,6 +3,7 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { AccessControlProvider } from "../../src/components/access-control/access-control-provider";
 import { PermissionAssignment } from "../../src/components/access-control/permission-assignment";
+import { TenantEntitlementProvider } from "../../src/components/access-control/tenant-entitlement-provider";
 import { createMockServices, MOCK_PERMISSIONS } from "./mocks";
 
 function renderAssignment(services = createMockServices({ assignments: { "role:role-1": ["order:view"] } })) {
@@ -73,5 +74,65 @@ describe("PermissionAssignment", () => {
 
     expect(await screen.findByRole("checkbox", { name: /View orders/ })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Save changes" })).not.toBeInTheDocument();
+  });
+});
+
+describe("PermissionAssignment tenant entitlement", () => {
+  it("preserves an existing assignment outside the current entitlement across a save (downgrade doesn't delete it)", async () => {
+    const services = createMockServices({ assignments: { "role:role-1": ["order:view", "order:manage"] } });
+    render(
+      <AccessControlProvider services={services}>
+        <TenantEntitlementProvider status="ready" entitledPermissionIds={["order:view"]}>
+          <PermissionAssignment permissions={MOCK_PERMISSIONS} subjectType="role" subjectId="role-1" />
+        </TenantEntitlementProvider>
+      </AccessControlProvider>,
+    );
+
+    const manageCheckbox = await screen.findByRole("checkbox", { name: /Manage orders/ });
+    expect(manageCheckbox).toBeChecked();
+    expect(manageCheckbox).toBeEnabled();
+
+    // Nothing was touched, so Save has nothing to submit — the assignment stays exactly as loaded.
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+    const assigned = await services.assignments.getAssignedPermissions("role", "role-1");
+    expect(new Set(assigned.permissionIds)).toEqual(new Set(["order:view", "order:manage"]));
+  });
+
+  it("a re-upgrade (entitlement grows back) makes a previously-unavailable assignment freely editable again, with no reassignment needed", async () => {
+    const services = createMockServices({ assignments: { "role:role-1": ["order:view", "order:manage"] } });
+    render(
+      <AccessControlProvider services={services}>
+        <TenantEntitlementProvider status="ready" entitledPermissionIds={["order:view", "order:manage"]}>
+          <PermissionAssignment permissions={MOCK_PERMISSIONS} subjectType="role" subjectId="role-1" />
+        </TenantEntitlementProvider>
+      </AccessControlProvider>,
+    );
+
+    const manageCheckbox = await screen.findByRole("checkbox", { name: /Manage orders/ });
+    expect(manageCheckbox).toBeChecked();
+    expect(manageCheckbox).toBeEnabled();
+
+    fireEvent.click(manageCheckbox);
+    expect(manageCheckbox).not.toBeChecked();
+    fireEvent.click(manageCheckbox);
+    expect(manageCheckbox).toBeChecked();
+  });
+
+  it("rejects a brand-new assignment to a permission outside the current entitlement", async () => {
+    const services = createMockServices({ assignments: { "role:role-1": ["order:view"] } });
+    render(
+      <AccessControlProvider services={services}>
+        <TenantEntitlementProvider status="ready" entitledPermissionIds={["order:view"]}>
+          <PermissionAssignment permissions={MOCK_PERMISSIONS} subjectType="role" subjectId="role-1" />
+        </TenantEntitlementProvider>
+      </AccessControlProvider>,
+    );
+
+    const manageCheckbox = await screen.findByRole("checkbox", { name: /Manage orders/ });
+    expect(manageCheckbox).toBeDisabled();
+
+    fireEvent.click(manageCheckbox);
+    expect(manageCheckbox).not.toBeChecked();
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
   });
 });

@@ -12,9 +12,8 @@ import { ConfirmDialog } from "../composed/confirm-dialog";
 import { FormActions, FormField } from "../composed/form-field";
 import { SearchInput } from "../composed/search-input";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Tooltip } from "../ui/tooltip";
@@ -251,7 +250,7 @@ export function PositionManagement({ permissions, breadcrumb, readOnly, classNam
       </HowTo>
 
       {createOpen ? (
-        <PositionCreateDialog
+        <PositionCreateSheet
           tree={tree ?? []}
           parentId={createParentId}
           onOpenChange={setCreateOpen}
@@ -304,7 +303,8 @@ export function PositionManagement({ permissions, breadcrumb, readOnly, classNam
   );
 }
 
-function PositionCreateDialog({
+/** Uses the same `Sheet`/`size="wide"` workspace as `PositionEditSheet` — Create/Edit/Detail share one drawer pattern rather than a small centered popup. */
+function PositionCreateSheet({
   tree,
   parentId,
   onOpenChange,
@@ -343,12 +343,13 @@ function PositionCreateDialog({
   }
 
   return (
-    <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("positions.create.title")}</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-4">
+    <Sheet open onOpenChange={onOpenChange}>
+      <SheetContent size="wide" className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>{t("positions.create.title")}</SheetTitle>
+          <SheetDescription>{t("positions.create.description")}</SheetDescription>
+        </SheetHeader>
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
           <FormField label={t("positions.fields.name")} required htmlFor="position-create-name">
             <Input
               id="position-create-name"
@@ -382,16 +383,16 @@ function PositionCreateDialog({
             </p>
           ) : null}
         </div>
-        <DialogFooter>
+        <SheetFooter className="justify-end">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             {t("common.actions.cancel")}
           </Button>
           <Button onClick={() => void handleCreate()} loading={saving} disabled={!name.trim()}>
             {t("common.actions.create")}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -455,7 +456,7 @@ function PositionEditSheet({
       <SheetContent size="wide" className="flex flex-col">
         <SheetHeader>
           <SheetTitle>{position.name}</SheetTitle>
-          <SheetDescription>{t("positions.edit.title")}</SheetDescription>
+          <SheetDescription>{t("positions.edit.description")}</SheetDescription>
         </SheetHeader>
         <Tabs defaultValue="details" className="flex flex-1 flex-col overflow-hidden px-4 pb-4">
           <TabsList>
@@ -514,10 +515,10 @@ function PositionEditSheet({
               </FormActions>
             ) : null}
           </TabsContent>
-          <TabsContent value="roles" className="flex-1 overflow-y-auto">
+          <TabsContent value="roles" className="flex flex-1 flex-col gap-4 overflow-y-auto">
             <PositionRoleAssignment positionId={position.id} readOnly={!canManage} />
           </TabsContent>
-          <TabsContent value="permissions" className="flex-1 overflow-y-auto">
+          <TabsContent value="permissions" className="flex flex-1 flex-col gap-4 overflow-y-auto">
             <PositionPermissionAssignment permissions={permissions} positionId={position.id} readOnly={!canManage} />
           </TabsContent>
         </Tabs>
