@@ -79,7 +79,7 @@ export function AdminLayout({
 
   return (
     <AdminLayoutContext.Provider value={contextValue}>
-      <div className={cn("flex min-h-screen bg-background text-foreground", className)}>
+      <div className={cn("flex h-screen overflow-hidden bg-background text-foreground", className)}>
         <aside
           className="hidden shrink-0 overflow-hidden border-r border-sidebar-border transition-[width] duration-200 ease-in-out md:block"
           style={{ width: sidebarCollapsed ? collapsedWidth : sidebarWidth }}
@@ -96,7 +96,7 @@ export function AdminLayout({
 
         <div className="flex min-w-0 flex-1 flex-col">
           {topbar}
-          <main className="flex-1 overflow-x-hidden">{children}</main>
+          <main className="flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
         </div>
       </div>
     </AdminLayoutContext.Provider>
