@@ -16,6 +16,7 @@ import { pagination } from "./pagination";
 import { profile } from "./profile";
 import { sort } from "./sort";
 import { states } from "./states";
+import { tenantSelector } from "./tenant-selector";
 import { userProfile } from "./user-profile";
 
 /**
@@ -39,6 +40,7 @@ export const en = {
   accessDenied,
   userProfile,
   profile,
+  tenantSelector,
   accessControlNavigation,
   permissions,
   roles,

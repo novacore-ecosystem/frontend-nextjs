@@ -307,5 +307,10 @@ export type {
   UserProfileService,
 } from "./components/user-profile/types";
 
+// Tenant
+export { useTenantLoginConfiguration } from "./lib/tenant-login-config";
+export { TenantSelector, type TenantSelectorProps } from "./components/tenant/TenantSelector";
+export type { TenantOption, TenantDirectoryService } from "./components/tenant/types";
+
 // Utility
 export { cn } from "./lib/cn";

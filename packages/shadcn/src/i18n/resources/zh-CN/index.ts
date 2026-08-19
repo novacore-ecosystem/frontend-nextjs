@@ -17,6 +17,7 @@ import { pagination } from "./pagination";
 import { profile } from "./profile";
 import { sort } from "./sort";
 import { states } from "./states";
+import { tenantSelector } from "./tenant-selector";
 import { userProfile } from "./user-profile";
 
 /** The Simplified Chinese translation resource. Shape-checked against `typeof en` — see `../en/index.ts`. */
@@ -30,6 +31,7 @@ export const zhCN = {
   accessDenied,
   userProfile,
   profile,
+  tenantSelector,
   accessControlNavigation,
   permissions,
   roles,
