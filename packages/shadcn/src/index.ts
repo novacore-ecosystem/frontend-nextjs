@@ -293,5 +293,19 @@ export {
   type AccessControlNavigationOptions,
 } from "./components/access-control/navigation";
 
+// User Profile
+export {
+  UserProfileProvider,
+  useUserProfileService,
+  type UserProfileProviderProps,
+} from "./components/user-profile/user-profile-provider";
+export { UserProfilePage } from "./components/user-profile/UserProfilePage";
+export type {
+  UserProfileData,
+  UserProfileCapabilities,
+  UserProfileUpdateInput,
+  UserProfileService,
+} from "./components/user-profile/types";
+
 // Utility
 export { cn } from "./lib/cn";

@@ -13,6 +13,7 @@ import { accessDenied } from "./access-denied";
 import { columns } from "./columns";
 import { filter } from "./filter";
 import { pagination } from "./pagination";
+import { profile } from "./profile";
 import { sort } from "./sort";
 import { states } from "./states";
 import { userProfile } from "./user-profile";
@@ -37,6 +38,7 @@ export const en = {
   states,
   accessDenied,
   userProfile,
+  profile,
   accessControlNavigation,
   permissions,
   roles,
