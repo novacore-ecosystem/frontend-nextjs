@@ -170,16 +170,24 @@ export function createMockServices(seed?: {
       async getAssignedPermissions(subjectType, subjectId) {
         return { permissionIds: assignments.get(`${subjectType}:${subjectId}`) ?? [] };
       },
-      async assignPermissions(subjectType, subjectId, permissionIds) {
-        assignments.set(`${subjectType}:${subjectId}`, permissionIds);
+      async assignPermissions(subjectType, subjectId, { grant, revoke }) {
+        const key = `${subjectType}:${subjectId}`;
+        const current = new Set(assignments.get(key) ?? []);
+        for (const id of revoke) current.delete(id);
+        for (const id of grant) current.add(id);
+        assignments.set(key, [...current]);
       },
     },
     roleAssignments: {
       async getAssignedRoleIds(subjectType, subjectId) {
         return roleAssignments.get(`${subjectType}:${subjectId}`) ?? [];
       },
-      async assignRoles(subjectType, subjectId, roleIds) {
-        roleAssignments.set(`${subjectType}:${subjectId}`, roleIds);
+      async assignRoles(subjectType, subjectId, { grant, revoke }) {
+        const key = `${subjectType}:${subjectId}`;
+        const current = new Set(roleAssignments.get(key) ?? []);
+        for (const id of revoke) current.delete(id);
+        for (const id of grant) current.add(id);
+        roleAssignments.set(key, [...current]);
       },
     },
   };

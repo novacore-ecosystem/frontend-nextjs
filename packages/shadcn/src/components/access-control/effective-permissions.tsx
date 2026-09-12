@@ -5,7 +5,7 @@ import { useTranslation } from "../../i18n";
 import { cn } from "../../lib/cn";
 import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { Badge } from "../ui/badge";
-import { useAccessControlServices } from "./access-control-provider";
+import { requireAccessControlService, useAccessControlServices } from "./access-control-provider";
 import { PermissionEntitlementIndicator } from "./permission-tree";
 import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
@@ -34,7 +34,11 @@ export interface EffectivePermissionsProps {
  */
 export function EffectivePermissions({ permissions, subjectType, subjectId, className }: EffectivePermissionsProps) {
   const { t } = useTranslation();
+  // `roleAssignments`/`roles` are only actually needed for subjectType "position"/"user" (see
+  // `load()` below) — looked up on demand via `requireAccessControlService` rather than
+  // unconditionally, so a "role"/"tenant" consumer isn't forced to configure services it never uses.
   const services = useAccessControlServices();
+  const assignments = requireAccessControlService(services, "assignments");
   const entitlement = useTenantEntitlement();
 
   const [effective, setEffective] = React.useState<Map<string, EffectivePermission> | null>(null);
@@ -51,19 +55,21 @@ export function EffectivePermissions({ permissions, subjectType, subjectId, clas
     setLoading(true);
     setError(null);
     try {
-      const direct = await services.assignments.getAssignedPermissions(subjectType, subjectId);
+      const direct = await assignments.getAssignedPermissions(subjectType, subjectId);
       const map = new Map<string, EffectivePermission>();
       for (const id of direct.permissionIds) {
         map.set(id, { id, sources: [{ type: "direct" }] });
       }
 
       if (subjectType === "position" || subjectType === "user") {
-        const roleIds = await services.roleAssignments.getAssignedRoleIds(subjectType, subjectId);
+        const roleAssignments = requireAccessControlService(services, "roleAssignments");
+        const roleService = requireAccessControlService(services, "roles");
+        const roleIds = await roleAssignments.getAssignedRoleIds(subjectType, subjectId);
         const roleData = await Promise.all(
           roleIds.map(async (roleId) => {
             const [role, assignedPermissions] = await Promise.all([
-              services.roles.getById(roleId),
-              services.assignments.getAssignedPermissions("role", roleId),
+              roleService.getById(roleId),
+              assignments.getAssignedPermissions("role", roleId),
             ]);
             return { roleId, roleName: role?.name ?? roleId, permissionIds: assignedPermissions.permissionIds };
           }),

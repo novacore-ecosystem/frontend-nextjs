@@ -155,11 +155,33 @@ export interface EffectivePermission {
   sources: EffectivePermissionSource[];
 }
 
-/** What kind of entity a `PermissionAssignment` is editing. `"user"` covers `UserPermissionAssignment`'s single-subject path. */
-export type AccessControlSubjectType = "role" | "position" | "user";
+/**
+ * What kind of entity a `PermissionAssignment` is editing. `"user"` covers `UserPermissionAssignment`'s
+ * single-subject path. `"tenant"` covers a Root-level actor granting a tenant its permission
+ * entitlement (see `TenantEntitlementProvider`'s "gating" side — this is the "editing" side of the
+ * same concept, e.g. nova-console's Tenant Permission Scope page) — added so that use case reuses
+ * `PermissionAssignment` itself rather than a second, app-local reimplementation of the same tree/
+ * dirty-state/save flow.
+ */
+export type AccessControlSubjectType = "role" | "position" | "user" | "tenant";
 
 /** Positions and Users can hold Roles; Roles cannot (no "Role Group" concept — see `docs/access-control.md`). */
 export type RoleAssignableSubjectType = "position" | "user";
+
+/**
+ * An explicit mutation to apply to a subject's assignment set — never a full replacement list.
+ * `grant`/`revoke` are disjoint id sets computed by `PermissionAssignment`/`RoleAssignment` as the
+ * diff between what was loaded and what the actor changed, **scoped to the ids the host application
+ * actually declared** (its `permissions`/loaded-roles catalog). An id the subject holds that falls
+ * outside that scope (e.g. granted by a different NovaCore application) is never included in either
+ * array and must be left untouched by the adapter — this is the core cross-application safety
+ * contract the whole module exists to enforce (see `docs/access-control.md`'s "Grant/revoke
+ * semantics" section). An empty `grant`/`revoke` array is a valid no-op call.
+ */
+export interface AssignmentMutation {
+  grant: string[];
+  revoke: string[];
+}
 
 export interface RoleService {
   getList(request: CriteriaRequest): Promise<PaginatedResult<RoleRecord>>;
@@ -178,16 +200,28 @@ export interface PositionService {
   delete(id: string): Promise<void>;
 }
 
-/** Shared by Role/Position/User permission assignment — one contract, one `PermissionAssignment` component. */
+/**
+ * Shared by Role/Position/User/Tenant permission assignment — one contract, one `PermissionAssignment`
+ * component. `assignPermissions` takes an explicit {@link AssignmentMutation} — `grant`/`revoke` ids
+ * to apply — never the subject's full desired permission list. This is intentional and load-bearing:
+ * a backend that instead diffs a submitted full list against its own DB state would revoke every
+ * permission the submitter's application doesn't itself know about, which is unsafe the moment more
+ * than one NovaCore application can grant permissions to the same subject. See
+ * `docs/access-control.md`'s "Grant/revoke semantics" section before implementing this adapter.
+ */
 export interface PermissionAssignmentService {
   getAssignedPermissions(subjectType: AccessControlSubjectType, subjectId: string): Promise<AssignedPermissions>;
-  assignPermissions(subjectType: AccessControlSubjectType, subjectId: string, permissionIds: string[]): Promise<void>;
+  assignPermissions(subjectType: AccessControlSubjectType, subjectId: string, mutation: AssignmentMutation): Promise<void>;
 }
 
-/** Shared by Position/User Role assignment — one contract, one `RoleAssignment` component (mirrors `PermissionAssignmentService`/`PermissionAssignment`). */
+/**
+ * Shared by Position/User Role assignment — one contract, one `RoleAssignment` component (mirrors
+ * `PermissionAssignmentService`/`PermissionAssignment`, including its explicit-mutation `assignRoles`
+ * contract — see that interface's doc comment).
+ */
 export interface RoleAssignmentService {
   getAssignedRoleIds(subjectType: RoleAssignableSubjectType, subjectId: string): Promise<string[]>;
-  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, roleIds: string[]): Promise<void>;
+  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, mutation: AssignmentMutation): Promise<void>;
 }
 
 /**

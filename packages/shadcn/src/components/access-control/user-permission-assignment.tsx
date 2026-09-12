@@ -11,7 +11,7 @@ import { ConfirmDialog } from "../composed/confirm-dialog";
 import { SearchInput } from "../composed/search-input";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { useAccessControlServices } from "./access-control-provider";
+import { useAccessControlService } from "./access-control-provider";
 import { PermissionAssignment } from "./permission-assignment";
 import { PermissionTree } from "./permission-tree";
 import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
@@ -74,7 +74,9 @@ export function UserPermissionAssignment({
   className,
 }: UserPermissionAssignmentProps) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const roleService = useAccessControlService("roles");
+  const assignments = useAccessControlService("assignments");
+  const roleAssignments = useAccessControlService("roleAssignments");
   const entitlement = useTenantEntitlement();
 
   const [query, setQuery] = React.useState("");
@@ -133,13 +135,13 @@ export function UserPermissionAssignment({
 
   React.useEffect(() => {
     let cancelled = false;
-    void services.roles.getList({ pageSize: ROLE_FETCH_PAGE_SIZE }).then((result) => {
+    void roleService.getList({ pageSize: ROLE_FETCH_PAGE_SIZE }).then((result) => {
       if (!cancelled) setRoles(result.items);
     });
     return () => {
       cancelled = true;
     };
-  }, [services]);
+  }, [roleService]);
 
   function handleSelectedRowIdsChange(ids: string[]) {
     const idSet = new Set(ids);
@@ -164,18 +166,20 @@ export function UserPermissionAssignment({
     setGranting(true);
     setGrantError(null);
     try {
+      // Purely additive — every selected subject's existing roles/permissions (including anything
+      // outside this application's own catalog) are left alone; `revoke` is always empty here. No
+      // need to fetch each subject's current state first, since a grant-only mutation doesn't
+      // depend on it.
       const subjectIds = [...selected.keys()];
       await Promise.all(
         subjectIds.map(async (subjectId) => {
-          const [currentPermissions, currentRoleIds] = await Promise.all([
-            services.assignments.getAssignedPermissions("user", subjectId),
-            services.roleAssignments.getAssignedRoleIds("user", subjectId),
-          ]);
-          const permissionUnion = [...new Set([...currentPermissions.permissionIds, ...draftPermissionIds])];
-          const roleUnion = [...new Set([...currentRoleIds, ...draftRoleIds])];
           await Promise.all([
-            services.assignments.assignPermissions("user", subjectId, permissionUnion),
-            services.roleAssignments.assignRoles("user", subjectId, roleUnion),
+            draftPermissionIds.length > 0
+              ? assignments.assignPermissions("user", subjectId, { grant: draftPermissionIds, revoke: [] })
+              : Promise.resolve(),
+            draftRoleIds.length > 0
+              ? roleAssignments.assignRoles("user", subjectId, { grant: draftRoleIds, revoke: [] })
+              : Promise.resolve(),
           ]);
         }),
       );

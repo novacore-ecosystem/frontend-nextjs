@@ -6,7 +6,7 @@ import { cn } from "../../lib/cn";
 import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { FormActions } from "../composed/form-field";
 import { Button } from "../ui/button";
-import { useAccessControlServices } from "./access-control-provider";
+import { useAccessControlService } from "./access-control-provider";
 import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
 import { PermissionTree } from "./permission-tree";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
@@ -40,9 +40,10 @@ export function PermissionAssignment({
   className,
 }: PermissionAssignmentProps) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const assignments = useAccessControlService("assignments");
   const entitlement = useTenantEntitlement();
 
+  const catalogIds = React.useMemo(() => new Set(permissions.map((p) => p.id)), [permissions]);
   const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
   const unavailableIds = React.useMemo(
     () => deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement),
@@ -59,7 +60,7 @@ export function PermissionAssignment({
     setLoading(true);
     setError(null);
     try {
-      const assignedPermissions = await services.assignments.getAssignedPermissions(subjectType, subjectId);
+      const assignedPermissions = await assignments.getAssignedPermissions(subjectType, subjectId);
       setAssigned(assignedPermissions);
       setDraftIds(assignedPermissions.permissionIds);
     } catch (err) {
@@ -67,7 +68,7 @@ export function PermissionAssignment({
     } finally {
       setLoading(false);
     }
-  }, [services, subjectType, subjectId]);
+  }, [assignments, subjectType, subjectId]);
 
   React.useEffect(() => {
     void load();
@@ -83,12 +84,25 @@ export function PermissionAssignment({
   }, [assigned, draftIds]);
 
   async function handleSave() {
+    if (!assigned) return;
     setSaving(true);
     setSaveError(null);
     try {
-      await services.assignments.assignPermissions(subjectType, subjectId, draftIds);
-      setAssigned((prev) => (prev ? { ...prev, permissionIds: draftIds } : prev));
-      onSaved?.(draftIds);
+      // Compute the explicit delta scoped to this host's own `permissions` catalog only — an id
+      // outside `catalogIds` (granted by a different application) is never inspected here, so it
+      // can never end up in `grant`/`revoke` regardless of what `draftIds` happens to contain.
+      // This is the actual safety boundary, not just careful bookkeeping in `draftIds`.
+      const beforeInScope = new Set(assigned.permissionIds.filter((id) => catalogIds.has(id)));
+      const afterInScope = new Set(draftIds.filter((id) => catalogIds.has(id)));
+      const grant = [...afterInScope].filter((id) => !beforeInScope.has(id));
+      const revoke = [...beforeInScope].filter((id) => !afterInScope.has(id));
+
+      await assignments.assignPermissions(subjectType, subjectId, { grant, revoke });
+
+      const newPermissionIds = [...assigned.permissionIds.filter((id) => !catalogIds.has(id)), ...afterInScope];
+      setAssigned({ ...assigned, permissionIds: newPermissionIds });
+      setDraftIds(newPermissionIds);
+      onSaved?.(newPermissionIds);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : String(err));
     } finally {

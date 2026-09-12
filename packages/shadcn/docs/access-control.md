@@ -163,11 +163,73 @@ Role/Position/assignment data still flows through service adapters — implement
 ```
 
 Unlike `PermissionProvider`/`I18nProvider`, there is **no permissive default** — every access-control
-component throws a clear error if rendered without a provider, since there's no sane fallback for
-missing data. Note `AccessControlServices` has no `permissions` key — the catalog is a prop, not
-a service (see above), and subject/user search for `UserPermissionAssignment`/
-`UserAuthorizationDetail` is a separate `subjectProvider` prop, not part of this provider either
-(too application-specific to standardize — see "User Permission Assignment" below).
+component throws a clear, service-named error if the *specific service it needs* wasn't provided,
+since there's no sane fallback for missing data. Note `AccessControlServices` has no `permissions`
+key — the catalog is a prop, not a service (see above), and subject/user search for
+`UserPermissionAssignment`/`UserAuthorizationDetail` is a separate `subjectProvider` prop, not part
+of this provider either (too application-specific to standardize — see "User Permission Assignment"
+below).
+
+**`services` accepts a partial bundle** — provide only what your application actually uses.
+`RoleManagement`/`PositionManagement`/`RoleAssignment` need `roles`/`positions`/`roleAssignments`,
+but an application with no Role/Position domain of its own only needs `assignments`. For example, a
+Root-level application that only grants a tenant its permission entitlement (see "Tenant entitlement"
+above) can mount:
+
+```tsx
+<AccessControlProvider services={{ assignments: tenantPermissionAssignmentService }}>
+  <PermissionAssignment permissions={rootPermissionCatalog} subjectType="tenant" subjectId={tenantId} />
+</AccessControlProvider>
+```
+
+without implementing `RoleService`/`PositionService`/`RoleAssignmentService` at all — don't invent
+stub implementations of a service your application has no real backing for just to satisfy the type.
+Each component asks for exactly the service(s) it needs via `useAccessControlService("assignments")`
+(or, for a service that's only conditionally needed — like `EffectivePermissions`'s `roleAssignments`/
+`roles`, only required for `subjectType` `"position"`/`"user"` — `requireAccessControlService()` called
+inline inside that condition) and throws immediately, naming the missing key, instead of a generic
+`Cannot read properties of undefined` deep inside a click handler.
+
+## Grant/revoke semantics
+
+**This is the module's core safety contract — read this before implementing `PermissionAssignmentService`/
+`RoleAssignmentService`.** `assignPermissions`/`assignRoles` take an explicit
+`{ grant: string[]; revoke: string[] }` mutation, never the subject's full desired list:
+
+```ts
+export interface AssignmentMutation {
+  grant: string[];
+  revoke: string[];
+}
+
+export interface PermissionAssignmentService {
+  getAssignedPermissions(subjectType: AccessControlSubjectType, subjectId: string): Promise<AssignedPermissions>;
+  assignPermissions(subjectType: AccessControlSubjectType, subjectId: string, mutation: AssignmentMutation): Promise<void>;
+}
+```
+
+`PermissionAssignment`/`RoleAssignment` compute this delta themselves on Save, scoped strictly to
+the ids the host application actually declared (its `permissions` prop, or its loaded role catalog):
+an id the subject holds that falls **outside** that scope — e.g. granted by a different NovaCore
+application against the same shared backend — is never inspected, never included in `grant` or
+`revoke`, and is therefore never touched by your adapter. Concretely:
+
+```
+Backend state:      A = granted, B = granted, C = revoked, D = granted (D is App B's, not this app's)
+This app's scope:    A, B, C
+User unchecks A, checks C in this app's UI.
+assignPermissions("role", roleId, { grant: ["C"], revoke: ["A"] })   // D is never mentioned
+```
+
+**Do not implement the "replace" alternative** — an adapter that receives the full submitted list
+and diffs it against the database, revoking anything absent, is exactly the unsafe pattern this
+contract exists to prevent: it would silently revoke App B's `D` the moment App A's admin saves,
+purely because App A's UI never knew `D` existed. Your adapter's job is simpler than a full-list
+diff: apply `grant` (add if not already present) and `revoke` (remove if present) as two small,
+idempotent, ideally-batched writes — nothing else.
+
+Bulk multi-subject grants (`UserPermissionAssignment`'s multi-select path) are always
+`{ grant: [...], revoke: [] }` — purely additive, by construction, not by convention.
 
 ## Role assignment
 
@@ -179,9 +241,14 @@ export type RoleAssignableSubjectType = "position" | "user"; // not "role" — n
 
 export interface RoleAssignmentService {
   getAssignedRoleIds(subjectType: RoleAssignableSubjectType, subjectId: string): Promise<string[]>;
-  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, roleIds: string[]): Promise<void>;
+  assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, mutation: AssignmentMutation): Promise<void>;
 }
 ```
+
+Same explicit `{ grant, revoke }` contract as `PermissionAssignmentService` — see "Grant/revoke
+semantics" above (roles have no host-declared "scope" the way permissions do, since `RoleAssignment`
+always loads the full role catalog, but the mutation itself is still always an explicit delta, never
+a full replacement list).
 
 `RoleAssignment` (and its `PositionRoleAssignment`/`UserRoleAssignment` sugar) is the reusable
 picker: loads the full role catalog once (roles are typically a small list, unlike permissions)
@@ -261,9 +328,9 @@ threads it into every search call; you only supply the controls:
 
 - **One user selected** — a `Roles`/`Direct Permissions` tab pair, each the full
   `UserRoleAssignment`/`PermissionAssignment` editor (identical to Role/Position): loads current
-  state, lets you check/uncheck freely, Save replaces that subject's set with exactly what's
-  checked. If `getDetailHref` is supplied, a link to the full `UserAuthorizationDetail` page for
-  this user is rendered alongside (see below).
+  state, lets you check/uncheck freely, Save sends only the explicit grant/revoke delta (see "Grant/
+  revoke semantics" above) — never a full replacement list. If `getDetailHref` is supplied, a link to
+  the full `UserAuthorizationDetail` page for this user is rendered alongside (see below).
 - **Multiple users selected** — the same `Roles`/`Direct Permissions` tabs, but each starts
   unchecked (roles/permissions being *granted*, not each user's current individual state, which
   may differ per user) and share one combined "Apply" action + one confirmation dialog summarizing

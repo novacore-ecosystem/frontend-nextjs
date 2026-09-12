@@ -77,6 +77,27 @@ describe("PermissionAssignment", () => {
   });
 });
 
+describe("PermissionAssignment cross-application scope safety", () => {
+  it("never revokes a permission outside this host's catalog, even after unrelated edits and Deselect All", async () => {
+    // "billing:export" is outside MOCK_PERMISSIONS entirely — simulates a permission another
+    // NovaCore application granted this role. This host must never send it as a revoke.
+    const services = createMockServices({ assignments: { "role:role-1": ["order:view", "billing:export"] } });
+    renderAssignment(services);
+
+    const manageCheckbox = await screen.findByRole("checkbox", { name: /Manage orders/ });
+    fireEvent.click(manageCheckbox);
+    fireEvent.click(screen.getByRole("button", { name: "Deselect all" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(async () => {
+      const assigned = await services.assignments.getAssignedPermissions("role", "role-1");
+      // Every in-scope permission (order:view, order:manage) was deselected and saved as revoked;
+      // the out-of-scope "billing:export" was never part of the mutation and must still be present.
+      expect(assigned.permissionIds).toEqual(["billing:export"]);
+    });
+  });
+});
+
 describe("PermissionAssignment tenant entitlement", () => {
   it("preserves an existing assignment outside the current entitlement across a save (downgrade doesn't delete it)", async () => {
     const services = createMockServices({ assignments: { "role:role-1": ["order:view", "order:manage"] } });

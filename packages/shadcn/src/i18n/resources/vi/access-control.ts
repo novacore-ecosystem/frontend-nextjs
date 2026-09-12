@@ -163,6 +163,7 @@ export const assignment = {
     role: "vai trò",
     position: "vị trí",
     user: "người dùng",
+    tenant: "tenant",
   },
 } as const satisfies typeof enAssignment;
 

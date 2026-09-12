@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Tooltip } from "../ui/tooltip";
 import { AccessControlPermissions } from "./access-control-permissions";
-import { useAccessControlServices } from "./access-control-provider";
+import { useAccessControlService } from "./access-control-provider";
 import { PositionHierarchy } from "./position-hierarchy";
 import { PositionPermissionAssignment } from "./position-permission-assignment";
 import { PositionRoleAssignment } from "./position-role-assignment";
@@ -70,7 +70,7 @@ function findNode(nodes: PositionTreeNode[], id: string): PositionTreeNode | nul
 /** The complete Position Management page (section 8/9): tree + flat views, create/edit/delete, superior selection, and permission assignment. Position is organizational hierarchy, not a permission bundle — see `HowTo` at the bottom for the Role/Position distinction. */
 export function PositionManagement({ permissions, breadcrumb, readOnly, className }: PositionManagementProps) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const positions = useAccessControlService("positions");
   const { can } = usePermission();
   const canManage = !readOnly && can(AccessControlPermissions.position.manage);
 
@@ -91,14 +91,14 @@ export function PositionManagement({ permissions, breadcrumb, readOnly, classNam
     setLoading(true);
     setError(null);
     try {
-      const nodes = await services.positions.getTree();
+      const nodes = await positions.getTree();
       setTree(nodes);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
-  }, [services]);
+  }, [positions]);
 
   React.useEffect(() => {
     void load();
@@ -124,7 +124,7 @@ export function PositionManagement({ permissions, breadcrumb, readOnly, classNam
     setDeleting(true);
     setDeleteError(null);
     try {
-      await services.positions.delete(deleteTarget.id);
+      await positions.delete(deleteTarget.id);
       setDeleteTarget(null);
       await load();
     } catch (err) {
@@ -316,7 +316,7 @@ function PositionCreateSheet({
   onCreated: (record: PositionRecord) => void;
 }) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const positions = useAccessControlService("positions");
   const [name, setName] = React.useState("");
   const [code, setCode] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -328,7 +328,7 @@ function PositionCreateSheet({
     setSaving(true);
     setError(null);
     try {
-      const record = await services.positions.create({
+      const record = await positions.create({
         name: name.trim(),
         code: code.trim() || undefined,
         description: description.trim() || undefined,
@@ -412,7 +412,7 @@ function PositionEditSheet({
   onUpdated: (record: PositionRecord) => void;
 }) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const positions = useAccessControlService("positions");
   const [name, setName] = React.useState(position.name);
   const [code, setCode] = React.useState(position.code ?? "");
   const [description, setDescription] = React.useState(position.description ?? "");
@@ -437,7 +437,7 @@ function PositionEditSheet({
     setSaving(true);
     setError(null);
     try {
-      const updated = await services.positions.update(position.id, {
+      const updated = await positions.update(position.id, {
         name: name.trim(),
         code: code.trim() || undefined,
         description: description.trim() || undefined,

@@ -66,6 +66,19 @@ describe("PermissionTree selection", () => {
     expect(onChange).toHaveBeenLastCalledWith([]);
   });
 
+  it("deselect all never touches a selected id outside the rendered groups (cross-application scope safety)", () => {
+    // "billing:export" belongs to no group in MOCK_PERMISSION_GROUPS — simulates a permission
+    // another NovaCore application granted this subject, which this host's catalog doesn't know
+    // about. Deselect All must clear only in-scope ids and leave it exactly as-is.
+    const onChange = vi.fn();
+    render(
+      <Controlled onSelectedIdsChange={onChange} selectedIds={["order:view", "order:manage", "billing:export"]} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Deselect all" }));
+    expect(onChange).toHaveBeenLastCalledWith(["billing:export"]);
+  });
+
   it("toggling a group header checks/unchecks every permission in that group only", () => {
     const onChange = vi.fn();
     render(<Controlled onSelectedIdsChange={onChange} />);

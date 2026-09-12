@@ -8,7 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { FormActions } from "../composed/form-field";
 import { SearchInput } from "../composed/search-input";
 import { Button } from "../ui/button";
-import { useAccessControlServices } from "./access-control-provider";
+import { useAccessControlService } from "./access-control-provider";
 import type { RoleAssignableSubjectType, RoleRecord } from "./types";
 
 /** Role catalogs are typically small (unlike permissions) — one unpaginated fetch + client-side search, same mental model `PermissionTree` uses over an already-loaded catalog. */
@@ -34,7 +34,8 @@ export interface RoleAssignmentProps {
  */
 export function RoleAssignment({ subjectType, subjectId, readOnly, onSaved, className }: RoleAssignmentProps) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const roleService = useAccessControlService("roles");
+  const roleAssignments = useAccessControlService("roleAssignments");
 
   const [roles, setRoles] = React.useState<RoleRecord[]>([]);
   const [assignedIds, setAssignedIds] = React.useState<string[] | null>(null);
@@ -50,8 +51,8 @@ export function RoleAssignment({ subjectType, subjectId, readOnly, onSaved, clas
     setError(null);
     try {
       const [roleList, assignedRoleIds] = await Promise.all([
-        services.roles.getList({ pageSize: ROLE_FETCH_PAGE_SIZE }),
-        services.roleAssignments.getAssignedRoleIds(subjectType, subjectId),
+        roleService.getList({ pageSize: ROLE_FETCH_PAGE_SIZE }),
+        roleAssignments.getAssignedRoleIds(subjectType, subjectId),
       ]);
       setRoles(roleList.items);
       setAssignedIds(assignedRoleIds);
@@ -61,7 +62,7 @@ export function RoleAssignment({ subjectType, subjectId, readOnly, onSaved, clas
     } finally {
       setLoading(false);
     }
-  }, [services, subjectType, subjectId]);
+  }, [roleService, roleAssignments, subjectType, subjectId]);
 
   React.useEffect(() => {
     void load();
@@ -85,10 +86,15 @@ export function RoleAssignment({ subjectType, subjectId, readOnly, onSaved, clas
   }, [assignedIds, draftIds]);
 
   async function handleSave() {
+    if (!assignedIds) return;
     setSaving(true);
     setSaveError(null);
     try {
-      await services.roleAssignments.assignRoles(subjectType, subjectId, draftIds);
+      const before = new Set(assignedIds);
+      const after = new Set(draftIds);
+      const grant = draftIds.filter((id) => !before.has(id));
+      const revoke = assignedIds.filter((id) => !after.has(id));
+      await roleAssignments.assignRoles(subjectType, subjectId, { grant, revoke });
       setAssignedIds(draftIds);
       onSaved?.(draftIds);
     } catch (err) {

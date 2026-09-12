@@ -158,6 +158,7 @@ export const assignment = {
     role: "角色",
     position: "职位",
     user: "用户",
+    tenant: "租户",
   },
 } as const satisfies typeof enAssignment;
 

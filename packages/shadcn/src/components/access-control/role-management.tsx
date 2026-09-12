@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { AccessControlPermissions } from "./access-control-permissions";
-import { useAccessControlServices } from "./access-control-provider";
+import { useAccessControlService } from "./access-control-provider";
 import { RolePermissionAssignment } from "./role-permission-assignment";
 import type { PermissionDefinition, RoleRecord } from "./types";
 
@@ -36,7 +36,7 @@ export interface RoleManagementProps {
 /** The complete Role Management page (section 6): search, create, edit (details + permission assignment), delete. */
 export function RoleManagement({ permissions, breadcrumb, readOnly, className }: RoleManagementProps) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const roles = useAccessControlService("roles");
   const { can } = usePermission();
 
   const [query, setQuery] = React.useState("");
@@ -59,7 +59,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
     setLoading(true);
     setError(null);
     try {
-      const result = await services.roles.getList({
+      const result = await roles.getList({
         keyword: debouncedQuery || undefined,
         page: pageNumber,
         pageSize: PAGE_SIZE,
@@ -72,7 +72,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
     } finally {
       setLoading(false);
     }
-  }, [services, debouncedQuery, pageNumber]);
+  }, [roles, debouncedQuery, pageNumber]);
 
   React.useEffect(() => {
     void load();
@@ -87,7 +87,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
     setDeleting(true);
     setDeleteError(null);
     try {
-      await services.roles.delete(deleteTarget.id);
+      await roles.delete(deleteTarget.id);
       setDeleteTarget(null);
       await load();
     } catch (err) {
@@ -215,7 +215,7 @@ function RoleCreateSheet({
   onCreated: (role: RoleRecord) => void;
 }) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const roles = useAccessControlService("roles");
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [saving, setSaving] = React.useState(false);
@@ -233,7 +233,7 @@ function RoleCreateSheet({
     setSaving(true);
     setError(null);
     try {
-      const role = await services.roles.create({ name: name.trim(), description: description.trim() || undefined });
+      const role = await roles.create({ name: name.trim(), description: description.trim() || undefined });
       onCreated(role);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -300,7 +300,7 @@ function RoleEditSheet({
   onUpdated: (role: RoleRecord) => void;
 }) {
   const { t } = useTranslation();
-  const services = useAccessControlServices();
+  const roles = useAccessControlService("roles");
   const [name, setName] = React.useState(role.name);
   const [description, setDescription] = React.useState(role.description ?? "");
   const [saving, setSaving] = React.useState(false);
@@ -317,7 +317,7 @@ function RoleEditSheet({
     setSaving(true);
     setError(null);
     try {
-      const updated = await services.roles.update(role.id, {
+      const updated = await roles.update(role.id, {
         name: name.trim(),
         description: description.trim() || undefined,
       });

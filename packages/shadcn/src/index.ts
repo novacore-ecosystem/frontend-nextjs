@@ -203,6 +203,8 @@ export {
 export {
   AccessControlProvider,
   useAccessControlServices,
+  useAccessControlService,
+  requireAccessControlService,
   type AccessControlProviderProps,
 } from "./components/access-control/access-control-provider";
 export { AccessControlPermissions } from "./components/access-control/access-control-permissions";
@@ -210,6 +212,7 @@ export type {
   AccessControlServices,
   AccessControlSubjectType,
   AssignedPermissions,
+  AssignmentMutation,
   EffectivePermission,
   EffectivePermissionSource,
   EntitlementStatus,

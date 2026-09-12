@@ -153,6 +153,7 @@ export const assignment = {
     role: "role",
     position: "position",
     user: "user",
+    tenant: "tenant",
   },
 };
 

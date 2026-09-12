@@ -105,8 +105,13 @@ export function PermissionTree({
 
   function deselectAll() {
     if (disabled) return;
-    const lockedIds = new Set(groups.flatMap((g) => g.permissions.map((p) => p.id)).filter((id) => isLocked(id)));
-    onSelectedIdsChange(selectedIds.filter((id) => lockedIds.has(id)));
+    // Only ids that are both rendered here (in `groups`) AND unlocked may be cleared. Anything
+    // outside `groups` entirely (out of this host application's declared scope) must survive
+    // untouched — the whole point of scoping `groups` to the host's own `permissions` catalog is
+    // that this component never even sees, let alone clears, a permission another application
+    // granted. Locked in-scope ids (inherited/read-only) are never toggleable, same as `toggle()`.
+    const catalogIds = new Set(groups.flatMap((g) => g.permissions.map((p) => p.id)));
+    onSelectedIdsChange(selectedIds.filter((id) => !catalogIds.has(id) || isLocked(id)));
   }
 
   const totalCount = React.useMemo(() => groups.reduce((sum, g) => sum + g.permissions.length, 0), [groups]);
