@@ -10,3 +10,9 @@ export type {
   NotificationStatus,
   NotificationTypeRenderConfig,
 } from "../components/notifications/types";
+export {
+  useNotifications,
+  type NotificationRealtimeHub,
+  type UseNotificationsOptions,
+  type UseNotificationsResult,
+} from "../components/notifications/use-notifications";

@@ -17,6 +17,7 @@ export type {
   PermissionDefinition,
   PermissionGroup,
   PermissionRecord,
+  PermissionUiStatus,
   PositionInput,
   PositionRecord,
   PositionService,
@@ -34,10 +35,14 @@ export type {
 export {
   derivePermissionCategory,
   matchesPermissionSearch,
+  resolveNormalizedPermissionCatalog,
   resolvePermissionCatalog,
+  type NormalizedPermissionCatalog,
 } from "../components/access-control/permission-utils";
+export { usePermissionCatalog } from "../components/access-control/use-permission-catalog";
 export {
   PermissionTree,
+  PermissionDisabledIndicator,
   PermissionInheritanceIndicator,
   type PermissionTreeProps,
 } from "../components/access-control/permission-tree";

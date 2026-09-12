@@ -220,6 +220,7 @@ export type {
   PermissionDefinition,
   PermissionGroup,
   PermissionRecord,
+  PermissionUiStatus,
   PositionInput,
   PositionRecord,
   PositionService,
@@ -240,8 +241,11 @@ export {
   derivePermissionCategory,
   deriveUnavailablePermissionIds,
   matchesPermissionSearch,
+  resolveNormalizedPermissionCatalog,
   resolvePermissionCatalog,
+  type NormalizedPermissionCatalog,
 } from "./components/access-control/permission-utils";
+export { usePermissionCatalog } from "./components/access-control/use-permission-catalog";
 export {
   TenantEntitlementProvider,
   useTenantEntitlement,
@@ -249,6 +253,7 @@ export {
 } from "./components/access-control/tenant-entitlement-provider";
 export {
   PermissionTree,
+  PermissionDisabledIndicator,
   PermissionEntitlementIndicator,
   PermissionInheritanceIndicator,
   type PermissionTreeProps,
@@ -309,6 +314,15 @@ export type {
   NotificationStatus,
   NotificationTypeRenderConfig,
 } from "./components/notifications/types";
+export {
+  useNotifications,
+  type NotificationRealtimeHub,
+  type UseNotificationsOptions,
+  type UseNotificationsResult,
+} from "./components/notifications/use-notifications";
+
+// Auth
+export { useAuth, type UseAuthOptions, type UseAuthResult } from "./components/auth/use-auth";
 
 // User Profile
 export {
@@ -323,6 +337,11 @@ export type {
   UserProfileUpdateInput,
   UserProfileService,
 } from "./components/user-profile/types";
+export {
+  useUserProfile,
+  type UseUserProfileOptions,
+  type UseUserProfileResult,
+} from "./components/user-profile/use-user-profile";
 
 // Tenant
 export { useTenantLoginConfiguration } from "./lib/tenant-login-config";
