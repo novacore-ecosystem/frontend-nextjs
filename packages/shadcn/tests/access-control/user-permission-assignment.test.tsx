@@ -125,6 +125,43 @@ describe("UserPermissionAssignment", () => {
     expect(await screen.findByText("Roles and permissions updated.")).toBeInTheDocument();
   });
 
+  it("bulk Revoke mode removes one chosen permission only from selected users who currently hold it", async () => {
+    const { services } = renderUserPermissionAssignment({
+      assignments: { "user:user-1": ["order:view", "order:manage"], "user:user-2": ["order:manage"] },
+    });
+    const rowA = await rowFor("John Doe");
+    const rowB = await rowFor("Jane Doe");
+    fireEvent.click(within(rowA).getByRole("checkbox"));
+    fireEvent.click(within(rowB).getByRole("checkbox"));
+    await screen.findByText("2 selected");
+
+    // Switch from the default Grant mode into Revoke.
+    fireEvent.click(screen.getByRole("button", { name: "Revoke" }));
+    expect(screen.getByText(/Choose one permission to remove/)).toBeInTheDocument();
+
+    const permissionRow = (await screen.findByText("View orders")).closest("tr")!;
+    fireEvent.click(within(permissionRow).getByRole("checkbox"));
+
+    const triggerButton = screen.getByRole("button", { name: "Revoke permission" });
+    expect(triggerButton).toBeEnabled();
+    fireEvent.click(triggerButton);
+
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText(/revokes "View orders" from any of the 2 selected/i)).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Revoke" }));
+
+    await waitFor(async () => {
+      // user-1 held "order:view" -> revoked, but its unrelated "order:manage" grant survives untouched.
+      const userOne = await services.assignments.getAssignedPermissions("user", "user-1");
+      expect(userOne.permissionIds).toEqual(["order:manage"]);
+    });
+    // user-2 never held "order:view" -> left completely alone, not force-revoked.
+    const userTwo = await services.assignments.getAssignedPermissions("user", "user-2");
+    expect(userTwo.permissionIds).toEqual(["order:manage"]);
+
+    expect(await screen.findByText("Permission revoked where held.")).toBeInTheDocument();
+  });
+
   it("Clear selection returns to the prompt state", async () => {
     renderUserPermissionAssignment();
     const row = await rowFor("John Doe");

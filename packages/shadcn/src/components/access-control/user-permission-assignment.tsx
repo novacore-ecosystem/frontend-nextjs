@@ -14,10 +14,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useAccessControlService } from "./access-control-provider";
 import { PermissionAssignment } from "./permission-assignment";
 import { PermissionTree } from "./permission-tree";
-import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
+import { deriveUnavailablePermissionIds, matchesPermissionSearch } from "./permission-utils";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
+import { usePermissionCatalog } from "./use-permission-catalog";
 import { UserRoleAssignment } from "./user-role-assignment";
-import type { PermissionDefinition, RoleRecord, SubjectOption, SubjectSearchProvider } from "./types";
+import type { PermissionDefinition, PermissionRecord, RoleRecord, SubjectOption, SubjectSearchProvider } from "./types";
+
+/** `UserPermissionAssignment`'s bulk section operates in one of two mutually exclusive modes — see that component's doc comment for the safety rationale behind keeping revoke deliberately narrower (one permission only) than grant (any number of roles/permissions). */
+type BulkMode = "grant" | "revoke";
 
 const PAGE_SIZE = 10;
 const ROLE_FETCH_PAGE_SIZE = 200;
@@ -60,10 +64,19 @@ export interface UserPermissionAssignmentProps {
  *
  * Selection semantics: **one subject selected** reuses `UserRoleAssignment`/`PermissionAssignment`
  * directly (full load-current-state/edit/save per tab, identical to Role/Position), plus an
- * optional link to the full `UserAuthorizationDetail` page. **Multiple subjects selected**
- * switches to an additive grant across both Roles and Direct Permissions in one combined action:
- * checked roles/permissions are added on top of each selected subject's existing roles/permissions
- * (fetched individually before saving), never revoking anything a subject already held.
+ * optional link to the full `UserAuthorizationDetail` page. **Multiple subjects selected** shows a
+ * Grant/Revoke mode toggle:
+ * - **Grant** (default) — an additive grant across both Roles and Direct Permissions in one
+ *   combined action: checked roles/permissions are added on top of each selected subject's
+ *   existing roles/permissions, never revoking anything a subject already held.
+ * - **Revoke** — deliberately narrower than grant: exactly one Direct Permission, chosen from
+ *   this application's own catalog, removed from whichever selected subjects currently hold it.
+ *   Diff-based like every other mutation in this module (see `docs/access-control.md`'s "Grant/
+ *   revoke semantics") — a subject who doesn't hold the chosen permission is left untouched, not
+ *   force-revoked, and nothing outside this app's declared `permissions` catalog is ever
+ *   inspected. Roles have no bulk-revoke here (only Direct Permissions) — revoking a Role from
+ *   many subjects at once is a materially different, larger action than revoking one permission,
+ *   and isn't part of this pass.
  */
 export function UserPermissionAssignment({
   permissions,
@@ -92,17 +105,24 @@ export function UserPermissionAssignment({
   const [roleQuery, setRoleQuery] = React.useState("");
 
   const [selected, setSelected] = React.useState<Map<string, SubjectOption>>(new Map());
+  const [bulkMode, setBulkMode] = React.useState<BulkMode>("grant");
   const [draftPermissionIds, setDraftPermissionIds] = React.useState<string[]>([]);
   const [draftRoleIds, setDraftRoleIds] = React.useState<string[]>([]);
+  const [revokePermissionId, setRevokePermissionId] = React.useState<string | null>(null);
+  const [revokeQuery, setRevokeQuery] = React.useState("");
   const [confirmOpen, setConfirmOpen] = React.useState(false);
-  const [granting, setGranting] = React.useState(false);
-  const [grantError, setGrantError] = React.useState<string | null>(null);
-  const [grantSuccess, setGrantSuccess] = React.useState(false);
+  const [applying, setApplying] = React.useState(false);
+  const [applyError, setApplyError] = React.useState<string | null>(null);
+  const [applySuccess, setApplySuccess] = React.useState(false);
 
-  const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
+  const { groups, recordsById } = usePermissionCatalog(permissions);
   const unavailableIds = React.useMemo(
     () => deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement),
     [permissions, entitlement],
+  );
+  const revokeCandidates = React.useMemo(
+    () => [...recordsById.values()].filter((record) => matchesPermissionSearch(record, revokeQuery)),
+    [recordsById, revokeQuery],
   );
 
   const load = React.useCallback(async () => {
@@ -157,40 +177,68 @@ export function UserPermissionAssignment({
 
   function clearSelection() {
     setSelected(new Map());
+    setBulkMode("grant");
     setDraftPermissionIds([]);
     setDraftRoleIds([]);
-    setGrantSuccess(false);
+    setRevokePermissionId(null);
+    setRevokeQuery("");
+    setApplySuccess(false);
+  }
+
+  async function handleApplyGrant() {
+    // Purely additive — every selected subject's existing roles/permissions (including anything
+    // outside this application's own catalog) are left alone; `revoke` is always empty here. No
+    // need to fetch each subject's current state first, since a grant-only mutation doesn't
+    // depend on it.
+    const subjectIds = [...selected.keys()];
+    await Promise.all(
+      subjectIds.map(async (subjectId) => {
+        await Promise.all([
+          draftPermissionIds.length > 0
+            ? assignments.assignPermissions("user", subjectId, { grant: draftPermissionIds, revoke: [] })
+            : Promise.resolve(),
+          draftRoleIds.length > 0
+            ? roleAssignments.assignRoles("user", subjectId, { grant: draftRoleIds, revoke: [] })
+            : Promise.resolve(),
+        ]);
+      }),
+    );
+    setDraftPermissionIds([]);
+    setDraftRoleIds([]);
+  }
+
+  async function handleApplyRevoke() {
+    if (!revokePermissionId) return;
+    // Diff-based, per `docs/access-control.md`'s "Grant/revoke semantics": check each selected
+    // subject's *actual current* assignment first, and only call `assignPermissions` (with this
+    // one explicit id in `revoke`, nothing else) for subjects who genuinely hold it — a subject
+    // who doesn't hold it is left completely untouched, never force-revoked "just in case."
+    const subjectIds = [...selected.keys()];
+    const holderIds = await Promise.all(
+      subjectIds.map(async (subjectId) => {
+        const assigned = await assignments.getAssignedPermissions("user", subjectId);
+        return assigned.permissionIds.includes(revokePermissionId) ? subjectId : null;
+      }),
+    );
+    const targets = holderIds.filter((id): id is string => id !== null);
+    await Promise.all(
+      targets.map((subjectId) => assignments.assignPermissions("user", subjectId, { grant: [], revoke: [revokePermissionId] })),
+    );
+    setRevokePermissionId(null);
   }
 
   async function handleApply() {
-    setGranting(true);
-    setGrantError(null);
+    setApplying(true);
+    setApplyError(null);
     try {
-      // Purely additive — every selected subject's existing roles/permissions (including anything
-      // outside this application's own catalog) are left alone; `revoke` is always empty here. No
-      // need to fetch each subject's current state first, since a grant-only mutation doesn't
-      // depend on it.
-      const subjectIds = [...selected.keys()];
-      await Promise.all(
-        subjectIds.map(async (subjectId) => {
-          await Promise.all([
-            draftPermissionIds.length > 0
-              ? assignments.assignPermissions("user", subjectId, { grant: draftPermissionIds, revoke: [] })
-              : Promise.resolve(),
-            draftRoleIds.length > 0
-              ? roleAssignments.assignRoles("user", subjectId, { grant: draftRoleIds, revoke: [] })
-              : Promise.resolve(),
-          ]);
-        }),
-      );
+      if (bulkMode === "revoke") await handleApplyRevoke();
+      else await handleApplyGrant();
       setConfirmOpen(false);
-      setDraftPermissionIds([]);
-      setDraftRoleIds([]);
-      setGrantSuccess(true);
+      setApplySuccess(true);
     } catch (err) {
-      setGrantError(err instanceof Error ? err.message : String(err));
+      setApplyError(err instanceof Error ? err.message : String(err));
     } finally {
-      setGranting(false);
+      setApplying(false);
     }
   }
 
@@ -221,6 +269,20 @@ export function UserPermissionAssignment({
       cell: (row) => row.permissionCount ?? "—",
       className: "w-1 text-right",
     },
+  ];
+
+  const revokeColumns: DataTableColumn<PermissionRecord>[] = [
+    {
+      id: "permission",
+      header: t("permissions.columns.permission"),
+      cell: (row) => (
+        <div data-permission-id={row.id}>
+          <p className="font-medium">{row.displayName}</p>
+          {row.description ? <p className="text-xs text-muted-foreground">{row.description}</p> : null}
+        </div>
+      ),
+    },
+    { id: "category", header: t("permissions.columns.category"), className: "capitalize" },
   ];
 
   function handleDraftRoleIdsChange(ids: string[]) {
@@ -301,47 +363,104 @@ export function UserPermissionAssignment({
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div>
-            <h3 className="text-sm font-medium">{t("userPermissions.bulk.title", { count: selectedCount })}</h3>
-            <p className="text-sm text-muted-foreground">{t("userPermissions.bulk.description")}</p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-medium">{t("userPermissions.bulk.title", { count: selectedCount })}</h3>
+              <p className="text-sm text-muted-foreground">
+                {bulkMode === "grant" ? t("userPermissions.bulk.description") : t("userPermissions.bulk.revoke.description")}
+              </p>
+            </div>
+            <div className="inline-flex shrink-0 rounded-md border border-border p-0.5">
+              <Button
+                type="button"
+                size="sm"
+                variant={bulkMode === "grant" ? "primary" : "ghost"}
+                onClick={() => {
+                  setBulkMode("grant");
+                  setApplySuccess(false);
+                }}
+              >
+                {t("userPermissions.bulk.mode.grant")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={bulkMode === "revoke" ? "primary" : "ghost"}
+                onClick={() => {
+                  setBulkMode("revoke");
+                  setApplySuccess(false);
+                }}
+              >
+                {t("userPermissions.bulk.mode.revoke")}
+              </Button>
+            </div>
           </div>
-          <Tabs defaultValue="roles">
-            <TabsList>
-              <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
-              <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="roles" className="flex flex-col gap-3">
-              <SearchInput value={roleQuery} onValueChange={setRoleQuery} placeholder={t("roleAssignment.searchPlaceholder")} />
+
+          {bulkMode === "grant" ? (
+            <Tabs defaultValue="roles">
+              <TabsList>
+                <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
+                <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
+              </TabsList>
+              <TabsContent value="roles" className="flex flex-col gap-3">
+                <SearchInput value={roleQuery} onValueChange={setRoleQuery} placeholder={t("roleAssignment.searchPlaceholder")} />
+                <DataTable
+                  data={filteredRoles}
+                  columns={roleColumns}
+                  getRowId={(row) => row.id}
+                  emptyMessage={t("roleAssignment.empty")}
+                  selectable
+                  selectedRowIds={selectedRoleRowIds}
+                  onSelectedRowIdsChange={handleDraftRoleIdsChange}
+                />
+              </TabsContent>
+              <TabsContent value="directPermissions">
+                <PermissionTree
+                  groups={groups}
+                  selectedIds={draftPermissionIds}
+                  onSelectedIdsChange={setDraftPermissionIds}
+                  unavailableIds={unavailableIds}
+                />
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <SearchInput
+                value={revokeQuery}
+                onValueChange={setRevokeQuery}
+                placeholder={t("userPermissions.bulk.revoke.searchPlaceholder")}
+              />
               <DataTable
-                data={filteredRoles}
-                columns={roleColumns}
+                data={revokeCandidates}
+                columns={revokeColumns}
                 getRowId={(row) => row.id}
-                emptyMessage={t("roleAssignment.empty")}
+                emptyMessage={t("userPermissions.bulk.revoke.empty")}
                 selectable
-                selectedRowIds={selectedRoleRowIds}
-                onSelectedRowIdsChange={handleDraftRoleIdsChange}
+                selectedRowIds={revokePermissionId ? [revokePermissionId] : []}
+                onSelectedRowIdsChange={(ids) => setRevokePermissionId(ids[ids.length - 1] ?? null)}
               />
-            </TabsContent>
-            <TabsContent value="directPermissions">
-              <PermissionTree
-                groups={groups}
-                selectedIds={draftPermissionIds}
-                onSelectedIdsChange={setDraftPermissionIds}
-                unavailableIds={unavailableIds}
-              />
-            </TabsContent>
-          </Tabs>
-          {grantSuccess ? <p className="text-sm text-primary">{t("userPermissions.bulk.assigned")}</p> : null}
+            </div>
+          )}
+
+          {applySuccess ? (
+            <p className="text-sm text-primary">
+              {bulkMode === "grant" ? t("userPermissions.bulk.assigned") : t("userPermissions.bulk.revoke.revoked")}
+            </p>
+          ) : null}
           <div className="flex justify-end">
             <Button
               onClick={() => {
-                setGrantError(null);
-                setGrantSuccess(false);
+                setApplyError(null);
+                setApplySuccess(false);
                 setConfirmOpen(true);
               }}
-              disabled={draftPermissionIds.length === 0 && draftRoleIds.length === 0}
+              disabled={
+                bulkMode === "grant"
+                  ? draftPermissionIds.length === 0 && draftRoleIds.length === 0
+                  : !revokePermissionId
+              }
             >
-              {t("userPermissions.bulk.assign")}
+              {bulkMode === "grant" ? t("userPermissions.bulk.assign") : t("userPermissions.bulk.revoke.trigger")}
             </Button>
           </div>
         </div>
@@ -357,17 +476,24 @@ export function UserPermissionAssignment({
         open={confirmOpen}
         onOpenChange={(open) => {
           setConfirmOpen(open);
-          if (!open) setGrantError(null);
+          if (!open) setApplyError(null);
         }}
-        title={t("userPermissions.bulk.confirmTitle")}
-        description={t("userPermissions.bulk.confirmDescription", {
-          permissionCount: draftPermissionIds.length,
-          roleCount: draftRoleIds.length,
-          subjectCount: selectedCount,
-        })}
-        confirmLabel={t("userPermissions.bulk.confirmButton")}
-        loading={granting}
-        error={grantError}
+        title={bulkMode === "grant" ? t("userPermissions.bulk.confirmTitle") : t("userPermissions.bulk.revoke.confirmTitle")}
+        description={
+          bulkMode === "grant"
+            ? t("userPermissions.bulk.confirmDescription", {
+                permissionCount: draftPermissionIds.length,
+                roleCount: draftRoleIds.length,
+                subjectCount: selectedCount,
+              })
+            : t("userPermissions.bulk.revoke.confirmDescription", {
+                permission: revokePermissionId ? recordsById.get(revokePermissionId)?.displayName ?? revokePermissionId : "",
+                subjectCount: selectedCount,
+              })
+        }
+        confirmLabel={bulkMode === "grant" ? t("userPermissions.bulk.confirmButton") : t("userPermissions.bulk.revoke.confirmButton")}
+        loading={applying}
+        error={applyError}
         onConfirm={() => void handleApply()}
       />
     </AdminPage>
