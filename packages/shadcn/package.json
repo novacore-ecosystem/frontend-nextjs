@@ -39,6 +39,10 @@
       "types": "./dist/exports/access-control.d.ts",
       "import": "./dist/exports/access-control.js"
     },
+    "./notifications": {
+      "types": "./dist/exports/notifications.d.ts",
+      "import": "./dist/exports/notifications.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },

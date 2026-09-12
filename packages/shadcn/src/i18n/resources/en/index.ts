@@ -12,6 +12,7 @@ import {
 import { accessDenied } from "./access-denied";
 import { columns } from "./columns";
 import { filter } from "./filter";
+import { notifications } from "./notifications";
 import { pagination } from "./pagination";
 import { profile } from "./profile";
 import { sort } from "./sort";
@@ -41,6 +42,7 @@ export const en = {
   userProfile,
   profile,
   tenantSelector,
+  notifications,
   accessControlNavigation,
   permissions,
   roles,

@@ -296,6 +296,20 @@ export {
   type AccessControlNavigationOptions,
 } from "./components/access-control/navigation";
 
+// Notifications
+export { NotificationBell, type NotificationBellProps } from "./components/notifications/notification-bell";
+export {
+  NotificationItemContent,
+  type NotificationItemContentProps,
+} from "./components/notifications/notification-item-content";
+export type {
+  NotificationItem,
+  NotificationRenderComponentProps,
+  NotificationRenderRegistry,
+  NotificationStatus,
+  NotificationTypeRenderConfig,
+} from "./components/notifications/types";
+
 // User Profile
 export {
   UserProfileProvider,
