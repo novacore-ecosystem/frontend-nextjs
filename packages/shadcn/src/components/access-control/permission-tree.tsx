@@ -57,6 +57,16 @@ export function PermissionTree({
   const inheritedSet = React.useMemo(() => new Set(inheritedIds), [inheritedIds]);
   const readOnlySet = React.useMemo(() => new Set(readOnlyIds), [readOnlyIds]);
   const unavailableSet = React.useMemo(() => new Set(unavailableIds), [unavailableIds]);
+  /** `PermissionDefinition.status === "disabled"` ids -> their resolved reason, straight off `groups` (already computed once by `usePermissionCatalog`) — not a separate prop, since this is intrinsic to the catalog itself rather than a per-subject overlay like `inheritedIds`/`readOnlyIds`. */
+  const disabledReasonById = React.useMemo(() => {
+    const map = new Map<string, string | undefined>();
+    for (const group of groups) {
+      for (const permission of group.permissions) {
+        if (permission.status === "disabled") map.set(permission.id, permission.disabledReason);
+      }
+    }
+    return map;
+  }, [groups]);
 
   const filteredGroups = React.useMemo(() => {
     if (!query.trim()) return groups;
@@ -66,7 +76,7 @@ export function PermissionTree({
   }, [groups, query]);
 
   function isLocked(id: string) {
-    return Boolean(disabled) || inheritedSet.has(id) || readOnlySet.has(id);
+    return Boolean(disabled) || inheritedSet.has(id) || readOnlySet.has(id) || disabledReasonById.has(id);
   }
 
   function isChecked(id: string) {
@@ -177,8 +187,10 @@ export function PermissionTree({
                     const locked = isLocked(permission.id);
                     const inherited = inheritedSet.has(permission.id);
                     const readOnly = !inherited && readOnlySet.has(permission.id);
+                    const uiDisabled = !inherited && !readOnly && disabledReasonById.has(permission.id);
                     const checked = isChecked(permission.id);
-                    const showEntitlementIndicator = !inherited && !readOnly && unavailableSet.has(permission.id);
+                    const showEntitlementIndicator =
+                      !inherited && !readOnly && !uiDisabled && unavailableSet.has(permission.id);
                     const interactive = !locked && !blockedByEntitlement(permission.id);
                     return (
                       <label
@@ -200,6 +212,8 @@ export function PermissionTree({
                             {permission.displayName}
                             {inherited || readOnly ? (
                               <PermissionInheritanceIndicator kind={inherited ? "inherited" : "readOnly"} />
+                            ) : uiDisabled ? (
+                              <PermissionDisabledIndicator reason={disabledReasonById.get(permission.id)} />
                             ) : showEntitlementIndicator ? (
                               <PermissionEntitlementIndicator />
                             ) : null}
@@ -224,6 +238,17 @@ export function PermissionInheritanceIndicator({ kind }: { kind: "inherited" | "
   return (
     <Tooltip content={label}>
       <Lock className="size-3 shrink-0 text-muted-foreground" aria-label={label} />
+    </Tooltip>
+  );
+}
+
+/** Shown on a `PermissionDefinition.status === "disabled"` permission — an application-level statement (e.g. "not implemented here yet"), distinct from both `PermissionInheritanceIndicator` (actor-centric) and `PermissionEntitlementIndicator` (tenant-centric). `reason` is the resolved `disabledReasonTranslationKey` text; falls back to a generic built-in reason when the definition didn't supply one. */
+export function PermissionDisabledIndicator({ reason }: { reason?: string }) {
+  const { t } = useTranslation();
+  const label = reason ?? t("assignment.disabledDefaultReason");
+  return (
+    <Tooltip content={label}>
+      <Ban className="size-3 shrink-0 text-muted-foreground" aria-label={label} />
     </Tooltip>
   );
 }

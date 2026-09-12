@@ -20,6 +20,7 @@ export const permissions = {
     active: "Active",
     inactive: "Not available",
     unknown: "Status unavailable",
+    disabled: "Disabled",
   },
   entitlementUnavailable: "Unable to load your plan's permission availability — permissions are shown without an availability status.",
   empty: "No permissions match your search.",
@@ -143,6 +144,7 @@ export const assignment = {
   inherited: "Inherited",
   readOnly: "Not grantable by you",
   unavailable: "Assigned, but not currently available under your plan",
+  disabledDefaultReason: "This permission isn't available in this application yet.",
   unsavedChanges: "You have unsaved changes.",
   save: "Save changes",
   cancel: "Cancel",
@@ -199,13 +201,27 @@ export const userPermissions = {
     confirmButton: "Apply",
     assign: "Apply",
     assigned: "Roles and permissions updated.",
+    mode: {
+      grant: "Grant",
+      revoke: "Revoke",
+    },
+    revoke: {
+      description: "Choose one permission to remove from every selected user who currently holds it. Users who don't hold it are left unchanged.",
+      searchPlaceholder: "Search permissions…",
+      empty: "No permissions match your search.",
+      trigger: "Revoke permission",
+      confirmTitle: "Revoke permission?",
+      confirmDescription: "This revokes \"{{permission}}\" from any of the {{subjectCount}} selected user(s) who currently hold it. Users who don't hold it are left unchanged.",
+      confirmButton: "Revoke",
+      revoked: "Permission revoked where held.",
+    },
   },
   howTo: {
     title: "About user permissions",
     whatIs:
       "Grant Roles or direct permissions to one or more users at once. Roles are reusable permission bundles; direct permissions are for exceptions.",
     singleVsBulk:
-      "Selecting one user shows their full current Roles and direct permissions, editable immediately, with a link to their complete authorization detail page. Selecting several users switches to granting a chosen set of Roles/permissions to all of them at once — nothing already held is removed.",
+      "Selecting one user shows their full current Roles and direct permissions, editable immediately, with a link to their complete authorization detail page. Selecting several users switches to a Grant or Revoke action: Grant adds a chosen set of Roles/permissions to all of them at once (nothing already held is removed); Revoke removes one chosen permission from whichever of them currently hold it (others are left unchanged).",
     notUserManagement:
       "This page only manages authorization — user creation, search filters beyond keyword, and profile details live in this application's own user management, not here.",
   },

@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { PermissionTree } from "../../src/components/access-control/permission-tree";
+import type { PermissionGroup } from "../../src/components/access-control/types";
 import { MOCK_PERMISSION_GROUPS } from "./mocks";
 
 function Controlled({
@@ -154,6 +155,44 @@ describe("PermissionTree selection", () => {
 
     expect(screen.getByRole("checkbox", { name: /View orders/ })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Select all" })).not.toBeInTheDocument();
+  });
+
+  it("a `status: \"disabled\"` permission renders locked, with a tooltip explaining why", () => {
+    const groupsWithDisabled: PermissionGroup[] = [
+      {
+        category: "order",
+        categoryLabel: "Orders",
+        permissions: [
+          { id: "order:view", category: "order", displayName: "View orders", status: "enabled" },
+          {
+            id: "order:export",
+            category: "order",
+            displayName: "Export orders",
+            status: "disabled",
+            disabledReason: "Coming soon",
+          },
+        ],
+      },
+    ];
+
+    function DisabledControlled() {
+      const [ids, setIds] = React.useState<string[]>([]);
+      return <PermissionTree groups={groupsWithDisabled} selectedIds={ids} onSelectedIdsChange={setIds} />;
+    }
+
+    render(<DisabledControlled />);
+
+    const checkbox = screen.getByRole("checkbox", { name: /Export orders/ });
+    expect(checkbox).toBeDisabled();
+    expect(screen.getByLabelText("Coming soon")).toBeInTheDocument();
+
+    fireEvent.click(checkbox);
+    expect(checkbox).not.toBeChecked();
+
+    // Select all must skip the disabled permission but still pick up the enabled sibling.
+    fireEvent.click(screen.getByRole("button", { name: "Select all" }));
+    expect(screen.getByRole("checkbox", { name: /View orders/ })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /Export orders/ })).not.toBeChecked();
   });
 
   it("the search box filters permissions across groups, hiding non-matching groups entirely", () => {

@@ -25,7 +25,34 @@ export interface PermissionDefinition {
   groupTranslationKey?: string;
   /** Sort order within its group; ties broken by `id`. Omitted definitions sort after ordered ones. */
   order?: number;
+  /**
+   * Frontend-owned UI status — a purely application-level rendering decision (e.g. "not
+   * implemented in this application yet", "coming soon"), independent of `entitled`
+   * (`PermissionRecord`'s backend/tenant availability signal, see `TenantEntitlementProvider`).
+   * Defaults to `"enabled"` when omitted.
+   *
+   * - `"enabled"` — renders and behaves normally (subject to `entitled`/inherited/read-only as
+   *   already documented elsewhere).
+   * - `"hidden"` — excluded entirely from `resolvePermissionCatalog`'s output, in every
+   *   access-control component that consumes it (`PermissionTree`, `PermissionManagement`,
+   *   `PermissionAssignment`, `EffectivePermissions`, ...) — as if the definition didn't exist.
+   *   A group left with no visible permissions after hiding is itself omitted.
+   * - `"disabled"` — renders normally but with interaction blocked (locked, same as an
+   *   inherited/read-only permission) and a tooltip explaining why, via
+   *   `disabledReasonTranslationKey`.
+   */
+  status?: PermissionUiStatus;
+  /**
+   * Localized reason shown as a tooltip wherever this permission renders, when `status` is
+   * `"disabled"`. Resolved via the same `I18nProvider` translator as `translationKey`; falls
+   * back to a generic built-in reason when omitted or unresolved. Ignored for any other
+   * `status`.
+   */
+  disabledReasonTranslationKey?: string;
 }
+
+/** See `PermissionDefinition.status`'s doc comment for what each value means. */
+export type PermissionUiStatus = "enabled" | "disabled" | "hidden";
 
 /** A permission resolved for rendering — `PermissionTree`/`PermissionManagement`'s internal shape, produced from a `PermissionDefinition[]` by `resolvePermissionCatalog`. Not application-authored. */
 export interface PermissionRecord {
@@ -39,6 +66,10 @@ export interface PermissionRecord {
    * confuse inactive with unknown" rule). Omitted only transiently while entitlement is loading.
    */
   entitled?: boolean | "unknown";
+  /** Resolved from `PermissionDefinition.status`, defaulting to `"enabled"`. A record with `status: "hidden"` never actually appears here — see that field's doc comment — so in practice this is always `"enabled"` or `"disabled"` on any record you actually observe. */
+  status: PermissionUiStatus;
+  /** Resolved `disabledReasonTranslationKey` text, present only when `status === "disabled"`. */
+  disabledReason?: string;
 }
 
 export interface PermissionGroup {

@@ -31,6 +31,7 @@ export const permissions = {
     active: "Đang hoạt động",
     inactive: "Không khả dụng",
     unknown: "Không xác định trạng thái",
+    disabled: "Đã tắt",
   },
   entitlementUnavailable: "Không thể tải thông tin gói quyền hạn của tenant — quyền hạn được hiển thị mà không có trạng thái khả dụng.",
   empty: "Không có quyền hạn nào khớp với tìm kiếm của bạn.",
@@ -153,6 +154,7 @@ export const assignment = {
   inherited: "Kế thừa",
   readOnly: "Bạn không thể cấp quyền này",
   unavailable: "Đã được gán, nhưng hiện không khả dụng theo gói của bạn",
+  disabledDefaultReason: "Quyền này chưa khả dụng trong ứng dụng này.",
   unsavedChanges: "Bạn có thay đổi chưa lưu.",
   save: "Lưu thay đổi",
   cancel: "Hủy",
@@ -209,12 +211,26 @@ export const userPermissions = {
     confirmButton: "Áp dụng",
     assign: "Áp dụng",
     assigned: "Đã cập nhật vai trò và quyền hạn.",
+    mode: {
+      grant: "Cấp quyền",
+      revoke: "Thu hồi",
+    },
+    revoke: {
+      description: "Chọn một quyền để gỡ khỏi mọi người dùng đã chọn đang có quyền đó. Người dùng chưa có quyền này sẽ không bị ảnh hưởng.",
+      searchPlaceholder: "Tìm kiếm quyền hạn…",
+      empty: "Không có quyền hạn nào khớp với tìm kiếm của bạn.",
+      trigger: "Thu hồi quyền",
+      confirmTitle: "Thu hồi quyền?",
+      confirmDescription: "Thao tác này sẽ thu hồi \"{{permission}}\" khỏi những người (trong số {{subjectCount}} người dùng đã chọn) hiện đang có quyền này. Người dùng chưa có quyền này sẽ không bị ảnh hưởng.",
+      confirmButton: "Thu hồi",
+      revoked: "Đã thu hồi quyền ở những nơi đang được cấp.",
+    },
   },
   howTo: {
     title: "Về quyền người dùng",
     whatIs: "Cấp Vai trò hoặc quyền trực tiếp cho một hoặc nhiều người dùng cùng lúc. Vai trò là gói quyền có thể tái sử dụng; quyền trực tiếp dành cho các trường hợp ngoại lệ.",
     singleVsBulk:
-      "Chọn một người dùng sẽ hiển thị đầy đủ Vai trò và quyền trực tiếp hiện tại của họ, có thể chỉnh sửa ngay, kèm liên kết đến trang phân quyền đầy đủ. Chọn nhiều người dùng sẽ chuyển sang cấp một tập hợp Vai trò/quyền đã chọn cho tất cả cùng lúc — không có gì hiện có bị gỡ bỏ.",
+      "Chọn một người dùng sẽ hiển thị đầy đủ Vai trò và quyền trực tiếp hiện tại của họ, có thể chỉnh sửa ngay, kèm liên kết đến trang phân quyền đầy đủ. Chọn nhiều người dùng sẽ chuyển sang thao tác Cấp quyền hoặc Thu hồi: Cấp quyền thêm một tập hợp Vai trò/quyền đã chọn cho tất cả cùng lúc (không có gì hiện có bị gỡ bỏ); Thu hồi gỡ một quyền đã chọn khỏi những người đang có quyền đó (những người khác không bị ảnh hưởng).",
     notUserManagement:
       "Trang này chỉ quản lý phân quyền — việc tạo người dùng, các bộ lọc tìm kiếm ngoài từ khóa, và thông tin hồ sơ thuộc về hệ thống quản lý người dùng riêng của ứng dụng, không phải ở đây.",
   },

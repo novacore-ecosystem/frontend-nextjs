@@ -7,9 +7,10 @@ import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { FormActions } from "../composed/form-field";
 import { Button } from "../ui/button";
 import { useAccessControlService } from "./access-control-provider";
-import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
+import { deriveUnavailablePermissionIds } from "./permission-utils";
 import { PermissionTree } from "./permission-tree";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
+import { usePermissionCatalog } from "./use-permission-catalog";
 import type { AccessControlSubjectType, AssignedPermissions, PermissionDefinition } from "./types";
 
 export interface PermissionAssignmentProps {
@@ -44,7 +45,7 @@ export function PermissionAssignment({
   const entitlement = useTenantEntitlement();
 
   const catalogIds = React.useMemo(() => new Set(permissions.map((p) => p.id)), [permissions]);
-  const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
+  const { groups } = usePermissionCatalog(permissions);
   const unavailableIds = React.useMemo(
     () => deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement),
     [permissions, entitlement],

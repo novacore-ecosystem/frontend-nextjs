@@ -1,6 +1,12 @@
 import type { Translator } from "@novacore/frontend-foundation";
 import type { PermissionDefinition, PermissionGroup, PermissionRecord, TenantEntitlementState } from "./types";
 
+/** The flat `id -> PermissionRecord` shape alongside the hierarchical `PermissionGroup[]` shape — see `resolveNormalizedPermissionCatalog`'s doc comment. */
+export interface NormalizedPermissionCatalog {
+  groups: PermissionGroup[];
+  recordsById: ReadonlyMap<string, PermissionRecord>;
+}
+
 /** `id.split(":")[0]` — the same module-prefix convention `@novacore/frontend-foundation`'s `Permissions` catalog uses (`"order:view"` -> `"order"`). The default `PermissionDefinition.group` when the application doesn't supply one. */
 export function derivePermissionCategory(id: string): string {
   const separatorIndex = id.indexOf(":");
@@ -38,12 +44,20 @@ export function resolvePermissionCatalog(definitions: PermissionDefinition[], t:
 
   const byGroup = new Map<string, { label: string; permissions: PermissionRecord[] }>();
   for (const definition of sorted) {
+    // "hidden" is excluded entirely — as if the definition didn't exist — rather than filtered
+    // by each consumer, so every access-control component gets this for free (see
+    // `PermissionDefinition.status`'s doc comment).
+    if (definition.status === "hidden") continue;
+
     const group = definition.group ?? derivePermissionCategory(definition.id);
+    const status = definition.status ?? "enabled";
     const record: PermissionRecord = {
       id: definition.id,
       category: group,
       displayName: t(definition.translationKey),
       description: resolveOptional(definition.descriptionTranslationKey, t),
+      status,
+      disabledReason: status === "disabled" ? resolveOptional(definition.disabledReasonTranslationKey, t) : undefined,
     };
     const bucket = byGroup.get(group);
     if (bucket) bucket.permissions.push(record);
@@ -54,6 +68,51 @@ export function resolvePermissionCatalog(definitions: PermissionDefinition[], t:
     .map(([category, { label, permissions }]) => ({ category, categoryLabel: label, permissions }))
     .sort((a, b) => a.categoryLabel.localeCompare(b.categoryLabel));
 }
+
+/**
+ * Resolves once per distinct `(definitions, t)` pair — cached in a `WeakMap` keyed by the
+ * `definitions` array reference, then by translator instance — and reused by every caller that
+ * shares that same catalog reference and translator, instead of every `PermissionTree`/
+ * `PermissionManagement`/`PermissionAssignment`/etc. instance independently re-running
+ * `resolvePermissionCatalog` (sort + per-key translation + grouping) and re-`flatMap`ping the
+ * result into a lookup map on every render. Both entries are garbage-collected automatically
+ * once `definitions`/`t` are no longer referenced elsewhere — no manual cache invalidation
+ * needed, and no leak from a component that unmounts.
+ *
+ * Preserves the existing hierarchical `PermissionGroup[]` shape (`groups`) alongside the new
+ * flat `id -> PermissionRecord` lookup (`recordsById`) — components that need one permission by
+ * id (e.g. `PermissionManagement`'s browse table) no longer need to `flatMap` `groups`
+ * themselves to get it.
+ *
+ * Prefer the `usePermissionCatalog` hook (`./use-permission-catalog`) from a component — it
+ * additionally memoizes the result reference itself via `useMemo`, so the returned object is
+ * stable across re-renders when `permissions`/`t` haven't changed, not just cheap to recompute.
+ */
+export function resolveNormalizedPermissionCatalog(
+  definitions: PermissionDefinition[],
+  t: Translator,
+): NormalizedPermissionCatalog {
+  let byTranslator = catalogCache.get(definitions);
+  if (!byTranslator) {
+    byTranslator = new Map();
+    catalogCache.set(definitions, byTranslator);
+  }
+
+  const cached = byTranslator.get(t);
+  if (cached) return cached;
+
+  const groups = resolvePermissionCatalog(definitions, t);
+  const recordsById = new Map<string, PermissionRecord>();
+  for (const group of groups) {
+    for (const record of group.permissions) recordsById.set(record.id, record);
+  }
+
+  const normalized: NormalizedPermissionCatalog = { groups, recordsById };
+  byTranslator.set(t, normalized);
+  return normalized;
+}
+
+const catalogCache = new WeakMap<PermissionDefinition[], Map<Translator, NormalizedPermissionCatalog>>();
 
 /**
  * Which of `catalogIds` the tenant does NOT currently own, per `entitlement`. `[]` unless

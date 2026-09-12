@@ -7,8 +7,9 @@ import { EmptyState, ErrorState, LoadingState } from "../admin/states";
 import { Badge } from "../ui/badge";
 import { requireAccessControlService, useAccessControlServices } from "./access-control-provider";
 import { PermissionEntitlementIndicator } from "./permission-tree";
-import { deriveUnavailablePermissionIds, resolvePermissionCatalog } from "./permission-utils";
+import { deriveUnavailablePermissionIds } from "./permission-utils";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
+import { usePermissionCatalog } from "./use-permission-catalog";
 import type { AccessControlSubjectType, EffectivePermission, PermissionDefinition } from "./types";
 
 export interface EffectivePermissionsProps {
@@ -45,7 +46,7 @@ export function EffectivePermissions({ permissions, subjectType, subjectId, clas
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const groups = React.useMemo(() => resolvePermissionCatalog(permissions, t), [permissions, t]);
+  const { groups } = usePermissionCatalog(permissions);
   const unavailableSet = React.useMemo(
     () => new Set(deriveUnavailablePermissionIds(permissions.map((p) => p.id), entitlement)),
     [permissions, entitlement],

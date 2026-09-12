@@ -93,6 +93,73 @@ The raw `id` is intentionally never rendered as visible text anywhere in this mo
 description, not the wire format; the identifier remains available to application code via the
 `permissions` prop itself for API calls, assignment, and tooling.
 
+## Permission UI status (enabled/disabled/hidden)
+
+Distinct from `entitled` (tenant/backend availability, see "Tenant entitlement" below),
+`PermissionDefinition.status` is a purely **frontend-owned, application-level** rendering
+decision — e.g. "this permission isn't implemented in this application's UI yet":
+
+```ts
+export const myAppPermissions: PermissionDefinition[] = [
+  { id: "order:view", translationKey: "myApp.permissions.order.view" },
+  {
+    id: "order:export",
+    translationKey: "myApp.permissions.order.export",
+    status: "disabled",
+    disabledReasonTranslationKey: "myApp.permissions.order.exportComingSoon",
+  },
+  { id: "order:internalDebug", translationKey: "myApp.permissions.order.internalDebug", status: "hidden" },
+];
+```
+
+- **`"enabled"`** (default when omitted) — renders and behaves normally.
+- **`"hidden"`** — excluded entirely from `resolvePermissionCatalog`'s output, in every
+  access-control component that consumes it (`PermissionTree`, `PermissionManagement`,
+  `PermissionAssignment`, `UserPermissionAssignment`, `EffectivePermissions`, ...) — as if the
+  definition didn't exist. A group left with no visible permissions after hiding is itself
+  omitted, not rendered empty.
+- **`"disabled"`** — renders normally but locked (same visual treatment as an inherited/
+  read-only permission) with a tooltip explaining why, resolved from
+  `disabledReasonTranslationKey` via the active `I18nProvider` (falls back to a generic built-in
+  reason when omitted or unresolved).
+
+Wired into `PermissionTree` (locks the checkbox, shows `PermissionDisabledIndicator`'s tooltip,
+and excludes disabled ids from select-all/deselect-all/group-toggle, exactly like an inherited or
+read-only permission) and `PermissionManagement` (the Status column shows a "Disabled" badge with
+the same tooltip, taking precedence over the tenant-entitlement badge — a `status: "disabled"`
+permission renders as disabled regardless of what the tenant's plan says). Every other component
+that composes `PermissionTree`/`resolvePermissionCatalog` internally (`PermissionAssignment`,
+`UserPermissionAssignment`, `EffectivePermissions`) gets both behaviors for free.
+
+## Catalog normalization
+
+`resolvePermissionCatalog(permissions, t)` does real work per call — sort, translate every key,
+group — and every access-control component that takes a `permissions` prop used to call it (and,
+for anything needing one permission by id, re-`flatMap` the grouped result) independently.
+`usePermissionCatalog(permissions)` is the one place to do this now:
+
+```tsx
+import { usePermissionCatalog } from "@novacore/frontend-next-shadcn";
+
+const { groups, recordsById } = usePermissionCatalog(myAppPermissions);
+```
+
+- **`groups: PermissionGroup[]`** — the same hierarchical shape `resolvePermissionCatalog`
+  already returned, for `PermissionTree`/grouped rendering.
+- **`recordsById: ReadonlyMap<string, PermissionRecord>`** — the flat lookup components used to
+  build themselves via `.flatMap(...)`.
+
+Under the hood (`resolveNormalizedPermissionCatalog`, `permission-utils.ts`), results are cached
+in a `WeakMap` keyed by the `permissions` array reference, then by translator instance — so two
+components rendering with the same catalog reference and the same active locale reuse one
+computed result instead of each redoing the sort/translate/group work, with no manual
+invalidation needed (entries are garbage-collected once `permissions`/the translator are no
+longer referenced). `usePermissionCatalog` layers a `useMemo` on top so the returned object
+reference itself stays stable across re-renders too. Every built-in component
+(`PermissionManagement`/`PermissionAssignment`/`UserPermissionAssignment`/`EffectivePermissions`)
+already uses this internally — reach for it yourself only when composing a custom screen with
+`PermissionTree` directly.
+
 ## Tenant entitlement
 
 Three concepts must stay separate, and this package models exactly the first and third — the
@@ -331,13 +398,22 @@ threads it into every search call; you only supply the controls:
   state, lets you check/uncheck freely, Save sends only the explicit grant/revoke delta (see "Grant/
   revoke semantics" above) — never a full replacement list. If `getDetailHref` is supplied, a link to
   the full `UserAuthorizationDetail` page for this user is rendered alongside (see below).
-- **Multiple users selected** — the same `Roles`/`Direct Permissions` tabs, but each starts
-  unchecked (roles/permissions being *granted*, not each user's current individual state, which
-  may differ per user) and share one combined "Apply" action + one confirmation dialog summarizing
-  "grants N permissions and M roles to K users." Confirming is an **additive grant** for both:
-  each selected user's *existing* roles and permissions (fetched individually first) are
-  preserved, and the checked ones are added on top — a bulk action never silently revokes
-  anything a user already held for an unrelated reason.
+- **Multiple users selected** — a **Grant**/**Revoke** mode toggle:
+  - **Grant** (default) — the same `Roles`/`Direct Permissions` tabs, but each starts unchecked
+    (roles/permissions being *granted*, not each user's current individual state, which may
+    differ per user) and share one combined "Apply" action + one confirmation dialog summarizing
+    "grants N permissions and M roles to K users." Confirming is an **additive grant** for both:
+    each selected user's *existing* roles and permissions are preserved, and the checked ones are
+    added on top — never revokes anything a user already held for an unrelated reason.
+  - **Revoke** — deliberately narrower: a single-select picker over this application's own
+    permission catalog (`recordsById`/`usePermissionCatalog`, no Roles) for **exactly one Direct
+    Permission** to remove. Confirming fetches each selected user's *actual current* assignment
+    first and calls `assignPermissions("user", subjectId, { grant: [], revoke: [id] })` only for
+    the ones who genuinely hold it — a user who doesn't hold the chosen permission is left
+    completely untouched, never force-revoked "just in case." Same diff-based safety contract as
+    every other mutation in this module (see "Grant/revoke semantics" above); bulk role revoke
+    isn't part of this — revoking a whole Role from many subjects at once is a materially larger,
+    separate action.
 
 The running selection (`Map<id, SubjectOption>`) survives searches/pagination, and the toolbar
 shows a live "N selected" count with a "Clear selection" action.
@@ -451,10 +527,12 @@ module (new prop, discussed as a real requirement), not to fork it in one app.
 Reusable outside the three page components, if you're composing your own screen:
 
 - `PermissionTree` — grouped, searchable permission checkbox tree (select all/deselect all,
-  inherited/read-only locked indicators). Takes already-resolved `PermissionGroup[]` — pass it
-  `resolvePermissionCatalog(permissions, t)`'s result if composing a custom screen.
-- `resolvePermissionCatalog(permissions, t)` — turns a `PermissionDefinition[]` into the
-  `PermissionGroup[]` shape `PermissionTree` renders.
+  inherited/read-only/disabled locked indicators). Takes already-resolved `PermissionGroup[]` —
+  pass it `usePermissionCatalog(permissions).groups` if composing a custom screen.
+- `usePermissionCatalog(permissions)` — the one place to resolve a `PermissionDefinition[]`
+  catalog (see "Catalog normalization" above); returns `{ groups, recordsById }`, cached per
+  catalog reference + locale. `resolvePermissionCatalog(permissions, t)` (the lower-level function
+  it's built on) is still exported directly for non-React/one-off use.
 - `PermissionAssignment` — owns loading/save/dirty-state for one subject's permissions:
   `<PermissionAssignment permissions={myAppPermissions} subjectType="role" subjectId={id} />`.
   `RolePermissionAssignment`/`PositionPermissionAssignment` are `subjectType`-preset sugar over it.

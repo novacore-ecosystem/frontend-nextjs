@@ -7,9 +7,11 @@ import { AdminPage, PageHeader, Toolbar } from "../admin/page";
 import { DataTable, type DataTableColumn } from "../admin/data-table";
 import { SkeletonList } from "../admin/states";
 import { SearchInput } from "../composed/search-input";
-import { annotateEntitlement, matchesPermissionSearch, resolvePermissionCatalog } from "./permission-utils";
+import { Tooltip } from "../ui/tooltip";
+import { annotateEntitlement, matchesPermissionSearch } from "./permission-utils";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
-import type { PermissionDefinition, PermissionRecord } from "./types";
+import { usePermissionCatalog } from "./use-permission-catalog";
+import type { PermissionDefinition, PermissionRecord, PermissionUiStatus } from "./types";
 
 export interface PermissionManagementProps {
   /** The application's permission catalog (see `PermissionDefinition`) — the entire set of permissions this page browses. This module never fetches a server-side catalog and never edits a permission's display copy; both are the consuming application's configuration. */
@@ -36,10 +38,11 @@ export function PermissionManagement({ permissions, breadcrumb, className }: Per
 
   const [query, setQuery] = React.useState("");
 
-  const records = React.useMemo(() => {
-    const resolved = resolvePermissionCatalog(permissions, t).flatMap((group) => group.permissions);
-    return annotateEntitlement(resolved, entitlement);
-  }, [permissions, t, entitlement]);
+  const { recordsById } = usePermissionCatalog(permissions);
+  const records = React.useMemo(
+    () => annotateEntitlement([...recordsById.values()], entitlement),
+    [recordsById, entitlement],
+  );
 
   const filtered = React.useMemo(
     () => records.filter((record) => matchesPermissionSearch(record, query)),
@@ -61,7 +64,7 @@ export function PermissionManagement({ permissions, breadcrumb, className }: Per
     {
       id: "status",
       header: t("permissions.columns.status"),
-      cell: (row) => <PermissionStatusBadge entitled={row.entitled} />,
+      cell: (row) => <PermissionStatusBadge entitled={row.entitled} status={row.status} disabledReason={row.disabledReason} />,
       className: "w-1 whitespace-nowrap",
     },
   ];
@@ -104,8 +107,30 @@ export function PermissionManagement({ permissions, breadcrumb, className }: Per
   );
 }
 
-function PermissionStatusBadge({ entitled }: { entitled?: boolean | "unknown" }) {
+function PermissionStatusBadge({
+  entitled,
+  status,
+  disabledReason,
+}: {
+  entitled?: boolean | "unknown";
+  status: PermissionUiStatus;
+  disabledReason?: string;
+}) {
   const { t } = useTranslation();
+  // A `status: "disabled"` permission (app-level, e.g. "not implemented here yet") takes
+  // precedence over the tenant-entitlement badge below — it's a stronger, unconditional
+  // statement than "your plan doesn't currently include this."
+  if (status === "disabled") {
+    const reason = disabledReason ?? t("assignment.disabledDefaultReason");
+    return (
+      <Tooltip content={reason}>
+        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-muted-foreground/50" />
+          {t("permissions.status.disabled")}
+        </span>
+      </Tooltip>
+    );
+  }
   if (entitled === "unknown") {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
