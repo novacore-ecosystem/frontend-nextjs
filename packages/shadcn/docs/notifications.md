@@ -93,3 +93,59 @@ visual, e.g. a per-category icon:
 ```
 
 Omit it for no leading visual at all.
+
+## `useNotifications` — the reference data-fetching implementation
+
+`NotificationBell` still owns no data fetching itself (see above) — but if your backend matches
+`@novacore/frontend-foundation`'s new `NotificationEndpoints`/`NotificationHub` contract,
+`useNotifications` is a ready-made cursor-pagination + realtime-fallback hook that pairs with it
+directly, built on the shared `HttpClient`:
+
+```tsx
+import { NotificationBell, useNotifications } from "@novacore/frontend-next-shadcn";
+
+function AppNotificationBell({ httpClient, hub }: { httpClient: HttpClient; hub?: NotificationRealtimeHub }) {
+  const notifications = useNotifications(httpClient, { hub, locale });
+
+  return (
+    <NotificationBell
+      items={notifications.items}
+      unreadCount={notifications.unreadCount}
+      loading={notifications.loading}
+      error={notifications.error}
+      onRetry={notifications.refresh}
+      hasMore={notifications.hasMore}
+      loadingMore={notifications.loadingMore}
+      onLoadMore={notifications.loadMore}
+      onMarkAsRead={notifications.markAsRead}
+      onMarkAllAsRead={notifications.markAllAsRead}
+    />
+  );
+}
+```
+
+- **Cursor pagination**: `refresh()`/`loadMore()` drive `NotificationEndpoints.list`'s
+  `{ cursor?, limit }` request / `CursorPaginatedResult` response directly — no page-number
+  bookkeeping to reimplement per app.
+- **`unreadCount`** is derived from the currently **loaded** `items` only (there is no dedicated
+  unread-count endpoint in `NotificationEndpoints` today) — prefer a real backend total if/when
+  one exists.
+- **`markAsRead`/`markAllAsRead`** are optimistic (flip locally, then call the backend) and roll
+  back on failure, surfacing the failure via `translateError()` in `error`.
+- **Realtime fallback, by design**: `hub` (a `RealtimeClient.forHub(NotificationHub)` result) is
+  optional and `undefined` by default. When it's omitted, this hook **never attempts any realtime
+  call at all** — no retry loop against a connection that doesn't exist — and reports
+  `realtimeAvailable: false`, so the host can render a distinct "real-time updates unavailable"
+  state instead of silently behaving as if live delivery were working:
+
+  ```tsx
+  {!notifications.realtimeAvailable ? <span className="text-xs text-muted-foreground">Real-time updates unavailable</span> : null}
+  ```
+
+  When `hub` **is** supplied, the hook subscribes to `NotificationCreated` and prepends pushed
+  notifications to `items` (de-duplicated by id).
+
+See `@novacore/frontend-foundation`'s `docs`/doc comments for `NotificationEndpoints`/
+`NotificationHub` for the backend-confirmation status of each endpoint (`list` targets the
+already-confirmed `GET /notifications/mine`; `markAsRead`/`markAllAsRead` and the hub's name are
+forward-looking, adjust them there if your backend differs).
