@@ -1,9 +1,12 @@
 import type {
   accessControlNavigation as enAccessControlNavigation,
   assignment as enAssignment,
+  auditLog as enAuditLog,
   permissions as enPermissions,
   positions as enPositions,
+  quickReview as enQuickReview,
   roleAssignment as enRoleAssignment,
+  roleEditor as enRoleEditor,
   roles as enRoles,
   userAuthorizationDetail as enUserAuthorizationDetail,
   userPermissions as enUserPermissions,
@@ -235,6 +238,80 @@ export const userPermissions = {
       "Trang này chỉ quản lý phân quyền — việc tạo người dùng, các bộ lọc tìm kiếm ngoài từ khóa, và thông tin hồ sơ thuộc về hệ thống quản lý người dùng riêng của ứng dụng, không phải ở đây.",
   },
 } as const satisfies typeof enUserPermissions;
+
+export const auditLog = {
+  title: "Lịch sử thay đổi",
+  titleFor: "Lịch sử thay đổi — {{name}}",
+  trigger: "Xem lịch sử thay đổi",
+  loading: "Đang tải…",
+  empty: "Chưa có thay đổi nào.",
+  systemActor: "Hệ thống",
+  viewDetail: "Xem chi tiết",
+  backToList: "Quay lại",
+  noChangeData: "Không tìm thấy dữ liệu thay đổi cho mục này.",
+  pageOf: "Trang {{page}} / {{total}}",
+  columns: {
+    time: "Thời gian",
+    actor: "Người thực hiện",
+    permissionChanges: "Thay đổi quyền hạn",
+    roleChanges: "Thay đổi vai trò",
+  },
+  granted: "Đã cấp ({{count}})",
+  revoked: "Đã thu hồi ({{count}})",
+  groups: {
+    roles: "Vai trò",
+    rolesDescription: "Vai trò được gán hoặc gỡ bỏ trong lần thay đổi này.",
+    permissions: "Quyền hạn",
+    permissionsDescription: "Quyền hạn được cấp hoặc thu hồi trực tiếp trong lần thay đổi này.",
+  },
+} as const satisfies typeof enAuditLog;
+
+export const quickReview = {
+  trigger: "Xem nhanh",
+  title: "Xem nhanh",
+  loadingDetail: "Đang tải chi tiết quyền hạn…",
+  errorDetail: "Không thể tải chi tiết quyền hạn. Vui lòng thử lại.",
+  stats: {
+    roles: "Vai trò",
+    total: "Tổng số",
+    direct: "Trực tiếp",
+    fromRoles: "Từ vai trò",
+  },
+  rolePermissions: {
+    title: "Quyền từ vai trò",
+    subtitle: "Quyền được kế thừa từ các vai trò đã gán cho người dùng này.",
+    empty: "Chưa có vai trò nào được gán.",
+    roleEmpty: "Vai trò này chưa có quyền nào.",
+    loading: "Đang tải quyền của vai trò…",
+  },
+  directPermissions: {
+    title: "Quyền trực tiếp",
+    subtitle: "Quyền được cấp trực tiếp cho người dùng này, không qua vai trò.",
+    empty: "Không có quyền nào được cấp trực tiếp.",
+  },
+  rootBadge: {
+    title: "ROOT",
+    subtitle: "Toàn quyền hệ thống — bỏ qua mọi kiểm tra quyền khác.",
+  },
+  editPermissions: "Sửa quyền & vai trò",
+} as const satisfies typeof enQuickReview;
+
+export const roleEditor = {
+  createTitle: "Tạo vai trò",
+  editTitle: "Sửa vai trò",
+  back: "Quay lại danh sách vai trò",
+  notFound: "Không tìm thấy vai trò này.",
+  fields: {
+    name: "Tên",
+    namePlaceholder: "VD: Quản lý kho",
+    description: "Mô tả",
+    descriptionPlaceholder: "Vai trò này dùng để làm gì",
+  },
+  permissionsSectionTitle: "Quyền của vai trò",
+  save: "Lưu",
+  createSuccess: "Đã tạo vai trò.",
+  updateSuccess: "Đã cập nhật vai trò.",
+} as const satisfies typeof enRoleEditor;
 
 export const userAuthorizationDetail = {
   title: "Phân quyền người dùng",

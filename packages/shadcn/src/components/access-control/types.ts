@@ -101,6 +101,20 @@ export interface SubjectOption {
   id: string;
   displayName: string;
   secondaryText?: string;
+  /**
+   * Everything below is optional, cheap-to-compute summary data for `UserPermissionAssignment`'s
+   * list columns and its quick-review popover — an adapter that can't cheaply provide one of
+   * these (e.g. it would cost an extra per-row query) simply omits it, and the corresponding
+   * column/section hides itself rather than showing a misleading zero. None of this is used for
+   * authorization decisions, only for display.
+   */
+  roleNames?: string[];
+  /** Total effective permission count (direct + from every assigned role), if cheap to compute. */
+  totalPermissionCount?: number;
+  /** Of `totalPermissionCount`, how many are granted directly (not via a role). */
+  directPermissionCount?: number;
+  /** Of `totalPermissionCount`, how many come from an assigned role (may overlap with direct — this is a display count, not a set size). */
+  rolePermissionCount?: number;
 }
 
 /** One label/value pair of read-only profile metadata — open-ended so an application supplies only fields it actually has (status, department, position, tenant, ...) rather than this package inventing a fixed schema no backend may match. */
@@ -255,6 +269,55 @@ export interface RoleAssignmentService {
   assignRoles(subjectType: RoleAssignableSubjectType, subjectId: string, mutation: AssignmentMutation): Promise<void>;
 }
 
+/** One granted or revoked item (a permission or a role) inside an `AuditLogChangeDetail` group. */
+export interface AuditLogChangeItem {
+  id: string;
+  displayName: string;
+}
+
+/**
+ * One row of a subject's permission/role change history — deliberately count-only (no item
+ * names) so the list view stays cheap to fetch/render at scale; `AuditLogChangeDetail` (fetched
+ * lazily, only when a row is expanded) carries the actual granted/revoked items. `actorName: null`
+ * means the change was made by the system (e.g. a seed/migration), not a human actor.
+ */
+export interface AuditLogEntry {
+  id: string;
+  changeTime: string;
+  actorName: string | null;
+  permissionGrantedCount: number;
+  permissionRevokedCount: number;
+  roleGrantedCount: number;
+  roleRevokedCount: number;
+}
+
+/** The full grant/revoke breakdown for one `AuditLogEntry`, fetched on demand when its row is expanded. */
+export interface AuditLogChangeDetail {
+  id: string;
+  changeTime: string;
+  actorName: string | null;
+  grantedPermissions: AuditLogChangeItem[];
+  revokedPermissions: AuditLogChangeItem[];
+  grantedRoles: AuditLogChangeItem[];
+  revokedRoles: AuditLogChangeItem[];
+}
+
+/**
+ * Optional — a consuming application without a real audit-log backend yet simply omits this from
+ * `AccessControlServices`, and every component that can show a "view change history" action
+ * (`RoleEditorPage`, `UserPermissionAssignment`'s per-row action, ...) hides that action entirely
+ * rather than rendering a broken/empty state. `list` powers `PermissionAuditHistory`'s table;
+ * `getDetail` is called lazily, only when one row's detail is actually opened.
+ */
+export interface AuditLogService {
+  list(
+    subjectType: AccessControlSubjectType,
+    subjectId: string,
+    request: CriteriaRequest,
+  ): Promise<PaginatedResult<AuditLogEntry>>;
+  getDetail(subjectType: AccessControlSubjectType, subjectId: string, entryId: string): Promise<AuditLogChangeDetail | null>;
+}
+
 /**
  * The full adapter surface a consuming application provides to `<AccessControlProvider>`.
  * Deliberately excludes the permission catalog — unlike roles/positions/assignments, the
@@ -262,10 +325,15 @@ export interface RoleAssignmentService {
  * flows into components as a `permissions: PermissionDefinition[]` prop instead (see
  * `docs/access-control.md`). Also excludes subject/user search — too application-specific to
  * standardize here, passed directly to `UserPermissionAssignment` as a `subjectProvider` prop.
+ *
+ * `auditLogs` is the one genuinely optional service (see its own doc comment) — every other key
+ * here is either required outright or required only when the relevant component is actually
+ * mounted (see `useAccessControlService`'s per-key error).
  */
 export interface AccessControlServices {
   roles: RoleService;
   positions: PositionService;
   assignments: PermissionAssignmentService;
   roleAssignments: RoleAssignmentService;
+  auditLogs?: AuditLogService;
 }

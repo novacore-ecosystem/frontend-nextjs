@@ -1,9 +1,12 @@
 import type {
   accessControlNavigation as enAccessControlNavigation,
   assignment as enAssignment,
+  auditLog as enAuditLog,
   permissions as enPermissions,
   positions as enPositions,
+  quickReview as enQuickReview,
   roleAssignment as enRoleAssignment,
+  roleEditor as enRoleEditor,
   roles as enRoles,
   userAuthorizationDetail as enUserAuthorizationDetail,
   userPermissions as enUserPermissions,
@@ -228,6 +231,80 @@ export const userPermissions = {
     notUserManagement: "此页面仅用于管理权限——用户创建、关键字之外的搜索筛选以及资料信息属于此应用程序自己的用户管理，不在此处。",
   },
 } as const satisfies typeof enUserPermissions;
+
+export const auditLog = {
+  title: "变更历史",
+  titleFor: "变更历史 — {{name}}",
+  trigger: "查看变更历史",
+  loading: "加载中…",
+  empty: "暂无变更记录。",
+  systemActor: "系统",
+  viewDetail: "查看详情",
+  backToList: "返回",
+  noChangeData: "未找到此条记录的变更数据。",
+  pageOf: "第 {{page}} / {{total}} 页",
+  columns: {
+    time: "时间",
+    actor: "操作人",
+    permissionChanges: "权限变更",
+    roleChanges: "角色变更",
+  },
+  granted: "已授予 ({{count}})",
+  revoked: "已撤销 ({{count}})",
+  groups: {
+    roles: "角色",
+    rolesDescription: "此次变更中分配或移除的角色。",
+    permissions: "权限",
+    permissionsDescription: "此次变更中直接授予或撤销的权限。",
+  },
+} as const satisfies typeof enAuditLog;
+
+export const quickReview = {
+  trigger: "快速查看",
+  title: "快速查看",
+  loadingDetail: "正在加载权限详情…",
+  errorDetail: "无法加载权限详情，请重试。",
+  stats: {
+    roles: "角色",
+    total: "总计",
+    direct: "直接授予",
+    fromRoles: "来自角色",
+  },
+  rolePermissions: {
+    title: "来自角色的权限",
+    subtitle: "继承自该用户已分配角色的权限。",
+    empty: "尚未分配任何角色。",
+    roleEmpty: "该角色暂无权限。",
+    loading: "正在加载角色权限…",
+  },
+  directPermissions: {
+    title: "直接权限",
+    subtitle: "直接授予该用户、未经角色的权限。",
+    empty: "没有直接授予的权限。",
+  },
+  rootBadge: {
+    title: "ROOT",
+    subtitle: "系统完全权限 — 跳过所有其他权限检查。",
+  },
+  editPermissions: "编辑权限与角色",
+} as const satisfies typeof enQuickReview;
+
+export const roleEditor = {
+  createTitle: "创建角色",
+  editTitle: "编辑角色",
+  back: "返回角色列表",
+  notFound: "未找到该角色。",
+  fields: {
+    name: "名称",
+    namePlaceholder: "例如：仓库管理员",
+    description: "描述",
+    descriptionPlaceholder: "此角色的用途",
+  },
+  permissionsSectionTitle: "角色权限",
+  save: "保存",
+  createSuccess: "角色已创建。",
+  updateSuccess: "角色已更新。",
+} as const satisfies typeof enRoleEditor;
 
 export const userAuthorizationDetail = {
   title: "用户权限详情",

@@ -213,6 +213,10 @@ export type {
   AccessControlSubjectType,
   AssignedPermissions,
   AssignmentMutation,
+  AuditLogChangeDetail,
+  AuditLogChangeItem,
+  AuditLogEntry,
+  AuditLogService,
   EffectivePermission,
   EffectivePermissionSource,
   EntitlementStatus,
@@ -274,6 +278,14 @@ export {
 } from "./components/access-control/position-role-assignment";
 export { UserRoleAssignment, type UserRoleAssignmentProps } from "./components/access-control/user-role-assignment";
 export { EffectivePermissions, type EffectivePermissionsProps } from "./components/access-control/effective-permissions";
+export {
+  PermissionAuditHistory,
+  type PermissionAuditHistoryProps,
+} from "./components/access-control/permission-audit-history";
+export {
+  PermissionAuditDialog,
+  type PermissionAuditDialogProps,
+} from "./components/access-control/permission-audit-dialog";
 export {
   UserAuthorizationDetail,
   type UserAuthorizationDetailProps,

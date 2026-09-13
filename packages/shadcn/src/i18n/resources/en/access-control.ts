@@ -227,6 +227,80 @@ export const userPermissions = {
   },
 };
 
+export const auditLog = {
+  title: "Change history",
+  titleFor: "Change history — {{name}}",
+  trigger: "View change history",
+  loading: "Loading…",
+  empty: "No changes yet.",
+  systemActor: "System",
+  viewDetail: "View detail",
+  backToList: "Back",
+  noChangeData: "No change data found for this entry.",
+  pageOf: "Page {{page}} of {{total}}",
+  columns: {
+    time: "Time",
+    actor: "Actor",
+    permissionChanges: "Permission changes",
+    roleChanges: "Role changes",
+  },
+  granted: "Granted ({{count}})",
+  revoked: "Revoked ({{count}})",
+  groups: {
+    roles: "Roles",
+    rolesDescription: "Roles assigned or removed in this change.",
+    permissions: "Permissions",
+    permissionsDescription: "Permissions granted or revoked directly in this change.",
+  },
+};
+
+export const quickReview = {
+  trigger: "Quick review",
+  title: "Quick review",
+  loadingDetail: "Loading permission detail…",
+  errorDetail: "Could not load permission detail. Please try again.",
+  stats: {
+    roles: "Roles",
+    total: "Total",
+    direct: "Direct",
+    fromRoles: "From roles",
+  },
+  rolePermissions: {
+    title: "Permissions from roles",
+    subtitle: "Permissions inherited from this user's assigned roles.",
+    empty: "No roles assigned yet.",
+    roleEmpty: "This role has no permissions yet.",
+    loading: "Loading role permissions…",
+  },
+  directPermissions: {
+    title: "Direct permissions",
+    subtitle: "Permissions granted to this user directly, not through a role.",
+    empty: "No permissions granted directly.",
+  },
+  rootBadge: {
+    title: "ROOT",
+    subtitle: "Full system access — bypasses every other permission check.",
+  },
+  editPermissions: "Edit permissions & roles",
+};
+
+export const roleEditor = {
+  createTitle: "Create role",
+  editTitle: "Edit role",
+  back: "Back to roles",
+  notFound: "This role could not be found.",
+  fields: {
+    name: "Name",
+    namePlaceholder: "e.g. Warehouse Manager",
+    description: "Description",
+    descriptionPlaceholder: "What this role is for",
+  },
+  permissionsSectionTitle: "Role permissions",
+  save: "Save",
+  createSuccess: "Role created.",
+  updateSuccess: "Role updated.",
+};
+
 export const userAuthorizationDetail = {
   title: "User Authorization",
   description: "Manage this user's roles and direct permissions.",
