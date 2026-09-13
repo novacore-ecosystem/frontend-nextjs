@@ -38,7 +38,16 @@ export const TabsContent = React.forwardRef<HTMLDivElement, React.ComponentProps
   ({ className, ...props }, ref) => (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn("mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
+      className={cn(
+        // `!hidden` (important) is load-bearing, not decorative: Radix hides an inactive tab via
+        // the `hidden` HTML attribute, but any `flex`/`grid`/etc. class a consumer adds to
+        // `className` (e.g. `flex flex-1 flex-col`) is author-origin CSS and unconditionally beats
+        // the browser's `[hidden]{display:none}` (user-agent origin), regardless of source order
+        // or specificity — the inactive tab silently keeps rendering at full height. Forcing
+        // `!important` here is the only way to guarantee `data-[state=inactive]` always wins.
+        "mt-2 data-[state=inactive]:!hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        className,
+      )}
       {...props}
     />
   ),
