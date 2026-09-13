@@ -1,6 +1,7 @@
 "use client";
 
 import type { CriteriaFilter } from "@novacore/frontend-foundation";
+import { History, X } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "../../i18n";
 import { useDebouncedValue } from "../../hooks/use-debounced-value";
@@ -9,12 +10,15 @@ import { HowTo } from "../admin/how-to";
 import { AdminPage, PageHeader, Toolbar } from "../admin/page";
 import { ConfirmDialog } from "../composed/confirm-dialog";
 import { SearchInput } from "../composed/search-input";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { useAccessControlService } from "./access-control-provider";
+import { useAccessControlService, useAccessControlServices } from "./access-control-provider";
 import { PermissionAssignment } from "./permission-assignment";
+import { PermissionAuditDialog } from "./permission-audit-dialog";
 import { PermissionTree } from "./permission-tree";
 import { deriveUnavailablePermissionIds, matchesPermissionSearch } from "./permission-utils";
+import { SubjectQuickReviewDialog } from "./subject-quick-review-dialog";
 import { useTenantEntitlement } from "./tenant-entitlement-provider";
 import { usePermissionCatalog } from "./use-permission-catalog";
 import { UserRoleAssignment } from "./user-role-assignment";
@@ -90,6 +94,7 @@ export function UserPermissionAssignment({
   const roleService = useAccessControlService("roles");
   const assignments = useAccessControlService("assignments");
   const roleAssignments = useAccessControlService("roleAssignments");
+  const { auditLogs } = useAccessControlServices();
   const entitlement = useTenantEntitlement();
 
   const [query, setQuery] = React.useState("");
@@ -114,6 +119,8 @@ export function UserPermissionAssignment({
   const [applying, setApplying] = React.useState(false);
   const [applyError, setApplyError] = React.useState<string | null>(null);
   const [applySuccess, setApplySuccess] = React.useState(false);
+  const [quickReviewSubject, setQuickReviewSubject] = React.useState<SubjectOption | null>(null);
+  const [auditSubject, setAuditSubject] = React.useState<SubjectOption | null>(null);
 
   const { groups, recordsById } = usePermissionCatalog(permissions);
   const unavailableIds = React.useMemo(
@@ -250,6 +257,59 @@ export function UserPermissionAssignment({
       cell: (row) => row.secondaryText ?? "—",
       className: "text-muted-foreground",
     },
+    {
+      id: "roles",
+      header: t("userPermissions.columns.roles"),
+      cell: (row) =>
+        row.roleNames && row.roleNames.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {row.roleNames.map((name) => (
+              <Badge key={name} variant="secondary">
+                {name}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
+      id: "permissions",
+      header: t("userPermissions.columns.permissions"),
+      cell: (row) =>
+        row.totalPermissionCount != null ? (
+          <div>
+            <p className="font-medium">{row.totalPermissionCount}</p>
+            {row.directPermissionCount != null && row.rolePermissionCount != null ? (
+              <p className="text-xs text-muted-foreground">
+                {t("userPermissions.columns.permissionBreakdown", {
+                  direct: row.directPermissionCount,
+                  fromRoles: row.rolePermissionCount,
+                })}
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
+      id: "quickActions",
+      header: "",
+      className: "w-1 text-right",
+      cell: (row) => (
+        <div className="flex justify-end gap-1">
+          {auditLogs ? (
+            <Button variant="ghost" size="sm" aria-label={t("auditLog.trigger")} onClick={() => setAuditSubject(row)}>
+              <History className="h-4 w-4" />
+            </Button>
+          ) : null}
+          <Button variant="ghost" size="sm" onClick={() => setQuickReviewSubject(row)}>
+            {t("quickReview.trigger")}
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   const filteredRoles = React.useMemo(() => {
@@ -298,7 +358,24 @@ export function UserPermissionAssignment({
   const selectedIds = React.useMemo(() => rows.filter((row) => selected.has(row.id)).map((row) => row.id), [rows, selected]);
   const selectedCount = selected.size;
   const singleSelectedId = selectedCount === 1 ? [...selected.keys()][0] : undefined;
+  const singleSelectedSubject = singleSelectedId ? selected.get(singleSelectedId) : undefined;
   const selectedRoleRowIds = filteredRoles.filter((role) => draftRoleIds.includes(role.id)).map((role) => role.id);
+
+  // Review-panel pills — resolved from data already loaded for the tree/table above (the full
+  // `roles` catalog and the permission catalog's `recordsById`), never a new fetch.
+  const roleNameById = React.useMemo(() => new Map(roles.map((role) => [role.id, role.name])), [roles]);
+  const draftRolePills = React.useMemo(
+    () => draftRoleIds.map((id) => ({ id, label: roleNameById.get(id) ?? id })),
+    [draftRoleIds, roleNameById],
+  );
+  const draftPermissionPills = React.useMemo(
+    () => draftPermissionIds.map((id) => ({ id, label: recordsById.get(id)?.displayName ?? id })),
+    [draftPermissionIds, recordsById],
+  );
+
+  function selectSubjectForEditing(subject: SubjectOption) {
+    setSelected(new Map([[subject.id, subject]]));
+  }
 
   return (
     <AdminPage className={className}>
@@ -343,6 +420,14 @@ export function UserPermissionAssignment({
         </p>
       ) : selectedCount === 1 && singleSelectedId ? (
         <div className="flex flex-col gap-3">
+          {singleSelectedSubject && (singleSelectedSubject.roleNames || singleSelectedSubject.directPermissionCount != null) ? (
+            <p className="text-xs text-muted-foreground">
+              {t("userPermissions.summary.chip", {
+                roles: singleSelectedSubject.roleNames?.length ?? "—",
+                direct: singleSelectedSubject.directPermissionCount ?? "—",
+              })}
+            </p>
+          ) : null}
           <Tabs defaultValue="roles">
             <TabsList>
               <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
@@ -362,106 +447,169 @@ export function UserPermissionAssignment({
           ) : null}
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="text-sm font-medium">{t("userPermissions.bulk.title", { count: selectedCount })}</h3>
-              <p className="text-sm text-muted-foreground">
-                {bulkMode === "grant" ? t("userPermissions.bulk.description") : t("userPermissions.bulk.revoke.description")}
-              </p>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-medium">{t("userPermissions.bulk.title", { count: selectedCount })}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {bulkMode === "grant" ? t("userPermissions.bulk.description") : t("userPermissions.bulk.revoke.description")}
+                </p>
+              </div>
+              <div className="inline-flex shrink-0 rounded-md border border-border p-0.5">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={bulkMode === "grant" ? "primary" : "ghost"}
+                  onClick={() => {
+                    setBulkMode("grant");
+                    setApplySuccess(false);
+                  }}
+                >
+                  {t("userPermissions.bulk.mode.grant")}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={bulkMode === "revoke" ? "primary" : "ghost"}
+                  onClick={() => {
+                    setBulkMode("revoke");
+                    setApplySuccess(false);
+                  }}
+                >
+                  {t("userPermissions.bulk.mode.revoke")}
+                </Button>
+              </div>
             </div>
-            <div className="inline-flex shrink-0 rounded-md border border-border p-0.5">
+
+            {bulkMode === "grant" ? (
+              <Tabs defaultValue="roles">
+                <TabsList>
+                  <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
+                  <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="roles" className="flex flex-col gap-3">
+                  <SearchInput value={roleQuery} onValueChange={setRoleQuery} placeholder={t("roleAssignment.searchPlaceholder")} />
+                  <DataTable
+                    data={filteredRoles}
+                    columns={roleColumns}
+                    getRowId={(row) => row.id}
+                    emptyMessage={t("roleAssignment.empty")}
+                    selectable
+                    selectedRowIds={selectedRoleRowIds}
+                    onSelectedRowIdsChange={handleDraftRoleIdsChange}
+                  />
+                </TabsContent>
+                <TabsContent value="directPermissions">
+                  <PermissionTree
+                    groups={groups}
+                    selectedIds={draftPermissionIds}
+                    onSelectedIdsChange={setDraftPermissionIds}
+                    unavailableIds={unavailableIds}
+                  />
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <SearchInput
+                  value={revokeQuery}
+                  onValueChange={setRevokeQuery}
+                  placeholder={t("userPermissions.bulk.revoke.searchPlaceholder")}
+                />
+                <DataTable
+                  data={revokeCandidates}
+                  columns={revokeColumns}
+                  getRowId={(row) => row.id}
+                  emptyMessage={t("userPermissions.bulk.revoke.empty")}
+                  selectable
+                  selectedRowIds={revokePermissionId ? [revokePermissionId] : []}
+                  onSelectedRowIdsChange={(ids) => setRevokePermissionId(ids[ids.length - 1] ?? null)}
+                />
+              </div>
+            )}
+
+            {applySuccess ? (
+              <p className="text-sm text-primary">
+                {bulkMode === "grant" ? t("userPermissions.bulk.assigned") : t("userPermissions.bulk.revoke.revoked")}
+              </p>
+            ) : null}
+            <div className="flex justify-end">
               <Button
-                type="button"
-                size="sm"
-                variant={bulkMode === "grant" ? "primary" : "ghost"}
                 onClick={() => {
-                  setBulkMode("grant");
+                  setApplyError(null);
                   setApplySuccess(false);
+                  setConfirmOpen(true);
                 }}
+                disabled={
+                  bulkMode === "grant"
+                    ? draftPermissionIds.length === 0 && draftRoleIds.length === 0
+                    : !revokePermissionId
+                }
               >
-                {t("userPermissions.bulk.mode.grant")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={bulkMode === "revoke" ? "primary" : "ghost"}
-                onClick={() => {
-                  setBulkMode("revoke");
-                  setApplySuccess(false);
-                }}
-              >
-                {t("userPermissions.bulk.mode.revoke")}
+                {bulkMode === "grant" ? t("userPermissions.bulk.assign") : t("userPermissions.bulk.revoke.trigger")}
               </Button>
             </div>
           </div>
 
-          {bulkMode === "grant" ? (
-            <Tabs defaultValue="roles">
-              <TabsList>
-                <TabsTrigger value="roles">{t("userPermissions.tabs.roles")}</TabsTrigger>
-                <TabsTrigger value="directPermissions">{t("userPermissions.tabs.directPermissions")}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="roles" className="flex flex-col gap-3">
-                <SearchInput value={roleQuery} onValueChange={setRoleQuery} placeholder={t("roleAssignment.searchPlaceholder")} />
-                <DataTable
-                  data={filteredRoles}
-                  columns={roleColumns}
-                  getRowId={(row) => row.id}
-                  emptyMessage={t("roleAssignment.empty")}
-                  selectable
-                  selectedRowIds={selectedRoleRowIds}
-                  onSelectedRowIdsChange={handleDraftRoleIdsChange}
-                />
-              </TabsContent>
-              <TabsContent value="directPermissions">
-                <PermissionTree
-                  groups={groups}
-                  selectedIds={draftPermissionIds}
-                  onSelectedIdsChange={setDraftPermissionIds}
-                  unavailableIds={unavailableIds}
-                />
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <SearchInput
-                value={revokeQuery}
-                onValueChange={setRevokeQuery}
-                placeholder={t("userPermissions.bulk.revoke.searchPlaceholder")}
-              />
-              <DataTable
-                data={revokeCandidates}
-                columns={revokeColumns}
-                getRowId={(row) => row.id}
-                emptyMessage={t("userPermissions.bulk.revoke.empty")}
-                selectable
-                selectedRowIds={revokePermissionId ? [revokePermissionId] : []}
-                onSelectedRowIdsChange={(ids) => setRevokePermissionId(ids[ids.length - 1] ?? null)}
-              />
-            </div>
-          )}
-
-          {applySuccess ? (
-            <p className="text-sm text-primary">
-              {bulkMode === "grant" ? t("userPermissions.bulk.assigned") : t("userPermissions.bulk.revoke.revoked")}
-            </p>
-          ) : null}
-          <div className="flex justify-end">
-            <Button
-              onClick={() => {
-                setApplyError(null);
-                setApplySuccess(false);
-                setConfirmOpen(true);
-              }}
-              disabled={
-                bulkMode === "grant"
-                  ? draftPermissionIds.length === 0 && draftRoleIds.length === 0
-                  : !revokePermissionId
-              }
-            >
-              {bulkMode === "grant" ? t("userPermissions.bulk.assign") : t("userPermissions.bulk.revoke.trigger")}
-            </Button>
+          <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/30 p-4 lg:sticky lg:top-4">
+            <h4 className="text-sm font-medium">{t("userPermissions.bulk.review.title")}</h4>
+            {bulkMode === "grant" ? (
+              <>
+                <div>
+                  <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {t("userPermissions.bulk.review.rolesLabel")}
+                  </p>
+                  {draftRolePills.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">—</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {draftRolePills.map((pill) => (
+                        <RemovablePill
+                          key={pill.id}
+                          label={pill.label}
+                          onRemove={() => setDraftRoleIds((prev) => prev.filter((id) => id !== pill.id))}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {t("userPermissions.bulk.review.permissionsLabel")}
+                  </p>
+                  {draftPermissionPills.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">—</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {draftPermissionPills.map((pill) => (
+                        <RemovablePill
+                          key={pill.id}
+                          label={pill.label}
+                          onRemove={() => setDraftPermissionIds((prev) => prev.filter((id) => id !== pill.id))}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {draftRolePills.length === 0 && draftPermissionPills.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">{t("userPermissions.bulk.review.empty")}</p>
+                ) : null}
+              </>
+            ) : (
+              <div>
+                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("userPermissions.bulk.review.revokeLabel")}
+                </p>
+                {revokePermissionId ? (
+                  <RemovablePill
+                    label={recordsById.get(revokePermissionId)?.displayName ?? revokePermissionId}
+                    onRemove={() => setRevokePermissionId(null)}
+                  />
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("userPermissions.bulk.review.empty")}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -496,6 +644,48 @@ export function UserPermissionAssignment({
         error={applyError}
         onConfirm={() => void handleApply()}
       />
+
+      {quickReviewSubject ? (
+        <SubjectQuickReviewDialog
+          open={quickReviewSubject !== null}
+          onOpenChange={(open) => {
+            if (!open) setQuickReviewSubject(null);
+          }}
+          subject={quickReviewSubject}
+          permissions={permissions}
+          roles={roles}
+          onEditPermissions={() => selectSubjectForEditing(quickReviewSubject)}
+        />
+      ) : null}
+
+      {auditSubject ? (
+        <PermissionAuditDialog
+          open={auditSubject !== null}
+          onOpenChange={(open) => {
+            if (!open) setAuditSubject(null);
+          }}
+          subjectType="user"
+          subjectId={auditSubject.id}
+          subjectLabel={auditSubject.displayName}
+        />
+      ) : null}
     </AdminPage>
+  );
+}
+
+/** One removable pill in the bulk grant/revoke review panel — clicking the `X` un-checks the underlying role/permission via the caller's own draft-state setter (see `UserPermissionAssignment`'s review panel). */
+function RemovablePill({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <Badge variant="secondary" className="gap-1 py-0.5 pr-1">
+      <span>{label}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={label}
+        className="rounded-full p-0.5 text-muted-foreground hover:bg-background/60 hover:text-foreground"
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </Badge>
   );
 }

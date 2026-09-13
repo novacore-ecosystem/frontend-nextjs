@@ -196,6 +196,9 @@ export const userPermissions = {
   columns: {
     name: "Tên",
     secondary: "",
+    roles: "Vai trò",
+    permissions: "Quyền hạn",
+    permissionBreakdown: "{{direct}} trực tiếp · {{fromRoles}} từ vai trò",
   },
   selectedCount: "Đã chọn {{count}}",
   clearSelection: "Bỏ chọn",
@@ -228,6 +231,16 @@ export const userPermissions = {
       confirmButton: "Thu hồi",
       revoked: "Đã thu hồi quyền ở những nơi đang được cấp.",
     },
+    review: {
+      title: "Xem lại",
+      rolesLabel: "Vai trò sẽ cấp",
+      permissionsLabel: "Quyền hạn sẽ cấp",
+      revokeLabel: "Quyền hạn sẽ thu hồi",
+      empty: "Chưa chọn gì cả — hãy chọn vai trò hoặc quyền hạn ở trên.",
+    },
+  },
+  summary: {
+    chip: "{{roles}} vai trò, {{direct}} quyền trực tiếp đang có",
   },
   howTo: {
     title: "Về quyền người dùng",

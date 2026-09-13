@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { AccessControlProvider } from "../../src/components/access-control/access-control-provider";
 import { UserPermissionAssignment } from "../../src/components/access-control/user-permission-assignment";
 import { createMockServices, createMockSubjectProvider, MOCK_PERMISSIONS } from "./mocks";
-import type { RoleRecord, SubjectOption } from "../../src/components/access-control/types";
+import type { AuditLogService, RoleRecord, SubjectOption } from "../../src/components/access-control/types";
 
 const SEED_USERS: SubjectOption[] = [
   { id: "user-1", displayName: "John Doe", secondaryText: "john@example.com" },
@@ -172,5 +172,93 @@ describe("UserPermissionAssignment", () => {
 
     expect(screen.queryByText("1 selected")).not.toBeInTheDocument();
     expect(screen.getByText("Select one or more users above to manage their authorization.")).toBeInTheDocument();
+  });
+
+  it("the list shows the subject's optional Roles/Permissions summary when the adapter supplies it, and — otherwise", async () => {
+    // A dedicated fixture (not the shared SEED_USERS/SEED_ROLES) — the role name here must stay
+    // unique to this test so it can't collide with the "Order Manager" role row rendered by the
+    // bulk-selection tests elsewhere in this file.
+    const usersWithSummary: SubjectOption[] = [
+      {
+        id: "user-1",
+        displayName: "Alice Summary",
+        secondaryText: "alice@example.com",
+        roleNames: ["Support Lead"],
+        totalPermissionCount: 3,
+        directPermissionCount: 1,
+        rolePermissionCount: 2,
+      },
+      { id: "user-2", displayName: "Bob NoSummary", secondaryText: "bob@example.com" },
+    ];
+    const services = createMockServices({ roles: SEED_ROLES });
+    const subjectProvider = createMockSubjectProvider(usersWithSummary);
+    render(
+      <AccessControlProvider services={services}>
+        <UserPermissionAssignment permissions={MOCK_PERMISSIONS} subjectProvider={subjectProvider} />
+      </AccessControlProvider>,
+    );
+
+    const rowWithData = await rowFor("Alice Summary");
+    expect(within(rowWithData).getByText("Support Lead")).toBeInTheDocument();
+    expect(within(rowWithData).getByText("3")).toBeInTheDocument();
+    expect(within(rowWithData).getByText("1 direct · 2 from roles")).toBeInTheDocument();
+
+    const rowWithoutData = await rowFor("Bob NoSummary");
+    // Roles column and Permissions column both degrade to "—" rather than a fabricated 0.
+    expect(within(rowWithoutData).getAllByText("—").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("the Quick review action opens a read-only popup with stat tiles and the subject's roles/direct permissions", async () => {
+    renderUserPermissionAssignment({
+      assignments: { "user:user-1": ["order:view"] },
+      roleAssignments: { "user:user-1": ["role-1"] },
+    });
+    const row = await rowFor("John Doe");
+
+    fireEvent.click(within(row).getByRole("button", { name: "Quick review" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("John Doe")).toBeInTheDocument();
+    // Stat tiles: role count is resolved from the real fetch (1), the rest from SubjectOption's display-only fields.
+    await waitFor(() => expect(within(dialog).getAllByText("1").length).toBeGreaterThan(0));
+    expect(within(dialog).getByText("Permissions from roles")).toBeInTheDocument();
+    expect(within(dialog).getByText("Direct permissions")).toBeInTheDocument();
+    expect(within(dialog).getByText("Order Manager")).toBeInTheDocument();
+
+    // Two "Close"-named buttons exist (the dialog's built-in X control plus the explicit footer
+    // button) — the footer one is rendered first in document order.
+    fireEvent.click(within(dialog).getAllByRole("button", { name: "Close" })[0]);
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+
+  it("the per-row Audit history action only renders when the AccessControlProvider was given an auditLogs service", async () => {
+    const baseServices = createMockServices({ roles: SEED_ROLES });
+    const subjectProvider = createMockSubjectProvider(SEED_USERS);
+
+    const { unmount } = render(
+      <AccessControlProvider services={baseServices}>
+        <UserPermissionAssignment permissions={MOCK_PERMISSIONS} subjectProvider={subjectProvider} />
+      </AccessControlProvider>,
+    );
+    await screen.findByText("John Doe");
+    expect(screen.queryByRole("button", { name: "View change history" })).not.toBeInTheDocument();
+    unmount();
+
+    const auditLogs: AuditLogService = {
+      async list() {
+        return { items: [], pageNumber: 1, pageSize: 10, totalCount: 0, hasNextPage: false, hasPreviousPage: false, totalPages: 1 };
+      },
+      async getDetail() {
+        return null;
+      },
+    };
+    render(
+      <AccessControlProvider services={{ ...baseServices, auditLogs }}>
+        <UserPermissionAssignment permissions={MOCK_PERMISSIONS} subjectProvider={subjectProvider} />
+      </AccessControlProvider>,
+    );
+    const row = await rowFor("John Doe");
+    fireEvent.click(within(row).getByRole("button", { name: "View change history" }));
+    expect(await screen.findByText("Change history — John Doe")).toBeInTheDocument();
   });
 });

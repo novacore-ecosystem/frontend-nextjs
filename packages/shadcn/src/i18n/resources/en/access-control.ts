@@ -183,6 +183,9 @@ export const userPermissions = {
   columns: {
     name: "Name",
     secondary: "",
+    roles: "Roles",
+    permissions: "Permissions",
+    permissionBreakdown: "{{direct}} direct · {{fromRoles}} from roles",
   },
   selectedCount: "{{count}} selected",
   clearSelection: "Clear selection",
@@ -215,6 +218,16 @@ export const userPermissions = {
       confirmButton: "Revoke",
       revoked: "Permission revoked where held.",
     },
+    review: {
+      title: "Review",
+      rolesLabel: "Roles to grant",
+      permissionsLabel: "Permissions to grant",
+      revokeLabel: "Permission to revoke",
+      empty: "Nothing selected yet — check roles or permissions above.",
+    },
+  },
+  summary: {
+    chip: "{{roles}} role(s), {{direct}} direct permission(s) currently held",
   },
   howTo: {
     title: "About user permissions",

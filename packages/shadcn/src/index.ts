@@ -309,6 +309,10 @@ export {
   type UserPermissionAssignmentFilterRenderProps,
 } from "./components/access-control/user-permission-assignment";
 export {
+  SubjectQuickReviewDialog,
+  type SubjectQuickReviewDialogProps,
+} from "./components/access-control/subject-quick-review-dialog";
+export {
   createAccessControlNavigation,
   useAccessControlNavigation,
   type AccessControlNavigationOptions,

@@ -191,6 +191,9 @@ export const userPermissions = {
   columns: {
     name: "姓名",
     secondary: "",
+    roles: "角色",
+    permissions: "权限",
+    permissionBreakdown: "{{direct}} 项直接 · {{fromRoles}} 项来自角色",
   },
   selectedCount: "已选择 {{count}} 项",
   clearSelection: "清除选择",
@@ -223,6 +226,16 @@ export const userPermissions = {
       confirmButton: "撤销",
       revoked: "已在拥有该权限的用户处将其撤销。",
     },
+    review: {
+      title: "审阅",
+      rolesLabel: "待授予的角色",
+      permissionsLabel: "待授予的权限",
+      revokeLabel: "待撤销的权限",
+      empty: "尚未选择任何内容——请在上方勾选角色或权限。",
+    },
+  },
+  summary: {
+    chip: "当前拥有 {{roles}} 个角色，{{direct}} 项直接权限",
   },
   howTo: {
     title: "关于用户权限",
