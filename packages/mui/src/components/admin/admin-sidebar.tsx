@@ -90,7 +90,7 @@ export function AdminSidebar({
           {header}
         </MuiBox>
       ) : null}
-      <MuiBox sx={{ flex: 1, overflowY: "auto", py: 1.5, px: 1.5 }}>
+      <MuiBox sx={{ flex: 1, minHeight: 0, overflowY: "auto", py: 1.5, px: 1.5 }}>
         <MuiList disablePadding sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {groups.map((group) => (
             <SidebarGroupView

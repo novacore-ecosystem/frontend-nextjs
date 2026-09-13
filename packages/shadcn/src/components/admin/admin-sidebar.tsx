@@ -83,7 +83,7 @@ export function AdminSidebar({
           {header}
         </div>
       ) : null}
-      <ScrollArea className="flex-1" hideScrollbar>
+      <ScrollArea className="min-h-0 flex-1" hideScrollbar>
         <nav className="flex flex-col gap-4 p-3">
           {groups.map((group, index) => (
             <React.Fragment key={group.id}>
