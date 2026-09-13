@@ -108,4 +108,42 @@ describe("RoleManagement", () => {
     });
     await waitFor(() => expect(screen.queryByText("Support Agent")).not.toBeInTheDocument());
   });
+
+  describe("page-based editing (getCreateHref/getEditHref)", () => {
+    function renderPageBased() {
+      const services = createMockServices({ roles: SEED_ROLES, assignments: { "role:role-1": ["order:view"] } });
+      render(
+        <PermissionProvider permissions={[AccessControlPermissions.role.view, AccessControlPermissions.role.manage]}>
+          <AccessControlProvider services={services}>
+            <RoleManagement
+              permissions={MOCK_PERMISSIONS}
+              getCreateHref={() => "/access-control/roles/new"}
+              getEditHref={(id) => `/access-control/roles/${id}`}
+            />
+          </AccessControlProvider>
+        </PermissionProvider>,
+      );
+      return { services };
+    }
+
+    it("renders Create role as a link instead of opening the create sheet", async () => {
+      renderPageBased();
+      await screen.findByText("Warehouse Manager");
+
+      const link = screen.getByRole("link", { name: "Create role" });
+      expect(link).toHaveAttribute("href", "/access-control/roles/new");
+      fireEvent.click(link);
+      expect(screen.queryByRole("heading", { name: "Create role" })).not.toBeInTheDocument();
+    });
+
+    it("renders each row's Edit action as a link instead of opening the edit sheet", async () => {
+      renderPageBased();
+      const row = (await screen.findByText("Warehouse Manager")).closest("tr")!;
+
+      const link = within(row).getByRole("link", { name: "Edit" });
+      expect(link).toHaveAttribute("href", "/access-control/roles/role-1");
+      fireEvent.click(link);
+      expect(screen.queryByLabelText(/^Name/)).not.toBeInTheDocument();
+    });
+  });
 });

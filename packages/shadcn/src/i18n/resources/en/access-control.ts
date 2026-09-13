@@ -296,6 +296,7 @@ export const roleEditor = {
     descriptionPlaceholder: "What this role is for",
   },
   permissionsSectionTitle: "Role permissions",
+  permissionsCreateHint: "Save the role first to assign its permissions.",
   save: "Save",
   createSuccess: "Role created.",
   updateSuccess: "Role updated.",

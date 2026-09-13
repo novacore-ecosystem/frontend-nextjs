@@ -308,6 +308,7 @@ export const roleEditor = {
     descriptionPlaceholder: "Vai trò này dùng để làm gì",
   },
   permissionsSectionTitle: "Quyền của vai trò",
+  permissionsCreateHint: "Lưu vai trò trước để có thể gán quyền.",
   save: "Lưu",
   createSuccess: "Đã tạo vai trò.",
   updateSuccess: "Đã cập nhật vai trò.",

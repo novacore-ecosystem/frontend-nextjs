@@ -89,6 +89,7 @@ export {
 export { PositionSelector, type PositionSelectorProps } from "../components/access-control/position-selector";
 export { PermissionManagement, type PermissionManagementProps } from "../components/access-control/permission-management";
 export { RoleManagement, type RoleManagementProps } from "../components/access-control/role-management";
+export { RoleEditorPage, type RoleEditorPageProps } from "../components/access-control/role-editor-page";
 export { PositionManagement, type PositionManagementProps } from "../components/access-control/position-management";
 export {
   UserPermissionAssignment,

@@ -30,11 +30,37 @@ export interface RoleManagementProps {
   breadcrumb?: React.ReactNode;
   /** Forces view-only: hides Create/Edit/Delete regardless of the current actor's permissions. */
   readOnly?: boolean;
+  /**
+   * When supplied (together with `getEditHref`), switches this page to page-based editing:
+   * the "Create role" action becomes a plain `<a>` to `getCreateHref()` (e.g. a dedicated
+   * `RoleEditorPage` route) instead of opening `RoleCreateSheet`. A plain link, not `next/link` —
+   * this package stays router-agnostic (same convention as `UserPermissionAssignment`'s
+   * `getDetailHref`). Omit both `getCreateHref`/`getEditHref` to keep the original Sheet-based
+   * create/edit flow (`RoleCreateSheet`/`RoleEditSheet`) — fully backward compatible.
+   */
+  getCreateHref?: () => string;
+  /**
+   * When supplied (together with `getCreateHref`), each row's "Edit" action becomes a plain
+   * `<a>` to `getEditHref(roleId)` instead of opening `RoleEditSheet`. See `getCreateHref`'s
+   * doc comment.
+   */
+  getEditHref?: (roleId: string) => string;
   className?: string;
 }
 
-/** The complete Role Management page (section 6): search, create, edit (details + permission assignment), delete. */
-export function RoleManagement({ permissions, breadcrumb, readOnly, className }: RoleManagementProps) {
+/**
+ * The complete Role Management page (section 6): search, create, edit (details + permission
+ * assignment), delete.
+ *
+ * Two mutually-consistent editing modes:
+ * - **Sheet-based (default)** — when `getCreateHref`/`getEditHref` are omitted, Create/Edit open
+ *   `RoleCreateSheet`/`RoleEditSheet` in place, as before.
+ * - **Page-based** — when both `getCreateHref`/`getEditHref` are supplied, Create/Edit become
+ *   plain links to the consuming app's own routes (typically rendering `RoleEditorPage`), and
+ *   `RoleCreateSheet`/`RoleEditSheet` are never mounted. Use this to route role editing to a
+ *   dedicated page instead of a Sheet+Tabs popup.
+ */
+export function RoleManagement({ permissions, breadcrumb, readOnly, getCreateHref, getEditHref, className }: RoleManagementProps) {
   const { t } = useTranslation();
   const roles = useAccessControlService("roles");
   const { can } = usePermission();
@@ -54,6 +80,8 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
 
   const canManage = !readOnly && can(AccessControlPermissions.role.manage);
+  // Page-based editing only kicks in when BOTH hrefs are supplied — see `RoleManagementProps` doc comments.
+  const pageBased = Boolean(getCreateHref && getEditHref);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -113,9 +141,15 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
       header: "",
       cell: (row) => (
         <div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => setEditingRole(row)}>
-            {t("common.actions.edit")}
-          </Button>
+          {pageBased && getEditHref ? (
+            <Button variant="ghost" size="sm" asChild>
+              <a href={getEditHref(row.id)}>{t("common.actions.edit")}</a>
+            </Button>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setEditingRole(row)}>
+              {t("common.actions.edit")}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(row)}>
             {t("common.actions.delete")}
           </Button>
@@ -133,9 +167,15 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
         breadcrumb={breadcrumb}
         actions={
           canManage ? (
-            <PermissionButton permission={AccessControlPermissions.role.manage} onClick={() => setCreateOpen(true)}>
-              {t("roles.create.trigger")}
-            </PermissionButton>
+            pageBased && getCreateHref ? (
+              <Button asChild>
+                <a href={getCreateHref()}>{t("roles.create.trigger")}</a>
+              </Button>
+            ) : (
+              <PermissionButton permission={AccessControlPermissions.role.manage} onClick={() => setCreateOpen(true)}>
+                {t("roles.create.trigger")}
+              </PermissionButton>
+            )
           ) : undefined
         }
       />
@@ -159,7 +199,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
         <p>{t("roles.howTo.vsPosition")}</p>
       </HowTo>
 
-      {canManage ? (
+      {canManage && !pageBased ? (
         <RoleCreateSheet
           open={createOpen}
           onOpenChange={setCreateOpen}
@@ -171,7 +211,7 @@ export function RoleManagement({ permissions, breadcrumb, readOnly, className }:
         />
       ) : null}
 
-      {editingRole ? (
+      {!pageBased && editingRole ? (
         <RoleEditSheet
           role={editingRole}
           permissions={permissions}

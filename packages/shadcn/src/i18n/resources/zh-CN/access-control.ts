@@ -301,6 +301,7 @@ export const roleEditor = {
     descriptionPlaceholder: "此角色的用途",
   },
   permissionsSectionTitle: "角色权限",
+  permissionsCreateHint: "请先保存角色，然后再分配权限。",
   save: "保存",
   createSuccess: "角色已创建。",
   updateSuccess: "角色已更新。",
