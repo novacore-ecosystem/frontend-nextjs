@@ -18,6 +18,7 @@ import { filter } from "./filter";
 import { notifications } from "./notifications";
 import { pagination } from "./pagination";
 import { profile } from "./profile";
+import { registrationDefaults } from "./registration-defaults";
 import { sort } from "./sort";
 import { states } from "./states";
 import { tenantSelector } from "./tenant-selector";
@@ -57,4 +58,5 @@ export const en = {
   userAuthorizationDetail,
   auditLog,
   quickReview,
+  registrationDefaults,
 };

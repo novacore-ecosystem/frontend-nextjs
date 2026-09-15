@@ -43,6 +43,10 @@
       "types": "./dist/exports/notifications.d.ts",
       "import": "./dist/exports/notifications.js"
     },
+    "./registration-defaults": {
+      "types": "./dist/exports/registration-defaults.d.ts",
+      "import": "./dist/exports/registration-defaults.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
