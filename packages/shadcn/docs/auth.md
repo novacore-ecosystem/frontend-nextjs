@@ -30,22 +30,39 @@ all and keep your own adapter; there's no partial-match escape hatch.
 ## `useAuth`
 
 ```tsx
-const { session, loading, error, login, logout, refreshToken, forgotPassword, resendEmail, register, clearError } =
+const { session, loading, error, login, logout, refreshToken, forgotPassword, resendEmail, register, confirmEmail, clearError } =
   useAuth(httpClient, { locale, tenantTranslations, onSessionChange });
 ```
 
-- **`session: AuthSession | null`** — the current in-memory `{ accessToken, refreshToken?,
-  expiresAt? }`, set by `login`/`refreshToken`, cleared by `logout`. This hook never persists it
-  anywhere (no `localStorage`, no cookie) — wire `onSessionChange` to whatever storage/token
-  provider your app already uses, e.g. the same store your `HttpClientOptions.tokenProvider`
-  reads from.
+**The backend issues no bearer token anywhere** — confirmed by a full audit of `Auth.API`
+(2026-09-15): `login`/`refreshToken` set `AccessToken`/`RefreshToken` as HTTP-only cookies and
+return an empty response body, never a token JavaScript can read. So:
+
+- **`session: AuthSession | null`** — now just `{ user: UserProfile }`. A successful `login`/
+  `refreshToken` fetches the current user (`UserEndpoints.getMe`) and that becomes the session;
+  there is no token to hold. `null` when signed out. This hook never persists it anywhere (no
+  `localStorage`, no cookie — the browser already holds the real session via its cookies) — wire
+  `onSessionChange` to wherever your app tracks "is there a user" (a Zustand store, React
+  context).
+- Your `HttpClient` must be constructed with `withCredentials: true` for the cookies to actually
+  flow, and with `X-Tenant-Client-Key`/`X-App-Key` as default headers where your deployment needs
+  them (see `AuthEndpoints`'s module doc comment in `@novacore/frontend-foundation` — these are
+  per-deployment constants, not per-call request fields, since the backend reads them as headers,
+  not JSON body fields).
 - **`loading`/`error`** — shared across every action below (a login/register/forgot-password
   screen only ever has one in flight at a time). `error` is always the result of
   `translateError()` — never a raw `HttpError.code` or an untranslated backend message.
-- **`login`/`refreshToken`/`register`** resolve to the response, or `null` on failure (check
-  `error`). **`logout`/`forgotPassword`/`resendEmail`** resolve to a boolean.
-- `logout()`/`refreshToken()` reuse the current `session.refreshToken` when the request argument
-  is omitted.
+- **`login`/`refreshToken`** resolve to the new `session`, or `null` on failure (check `error`).
+  **`logout`/`forgotPassword`/`resendEmail`/`register`/`confirmEmail`** resolve to a boolean —
+  none of them return meaningful response data on the real backend.
+- `logout()`/`refreshToken()` take no arguments — the refresh token is a cookie the browser sends
+  automatically, never held client-side.
+- `register()` creates the account and dispatches a verification email, but issues no session —
+  follow up with `confirmEmail()` once the user has the emailed link, then `login()`.
+- A login attempt against an account whose email isn't confirmed fails with
+  `MessageCode.EmailNotVerified` ("704") — `translateError()` already resolves this to a
+  localized message; offer a `resendEmail({ email, purpose: "EmailVerification" })` action from
+  that error state rather than just showing the message.
 
 ## `useUserProfile`
 

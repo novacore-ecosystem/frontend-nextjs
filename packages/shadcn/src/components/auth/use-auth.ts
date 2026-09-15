@@ -4,15 +4,14 @@ import {
   AuthEndpoints,
   HttpError,
   translateError,
+  UserEndpoints,
   type AuthSession,
+  type ConfirmEmailRequest,
   type ForgotPasswordRequest,
   type HttpClient,
   type Locale,
   type LoginRequest,
-  type LogoutRequest,
-  type RefreshTokenRequest,
   type RegisterRequest,
-  type RegisterResponse,
   type ResendEmailRequest,
   type TranslationBundle,
 } from "@novacore/frontend-foundation";
@@ -23,26 +22,29 @@ export interface UseAuthOptions {
   locale?: Locale;
   /** Tenant-specific error message overrides, forwarded to `translateError()` — same shape as `I18nProvider`'s `tenantTranslations`. */
   tenantTranslations?: TranslationBundle;
-  /** Called whenever the in-memory session changes: after a successful `login`/`refreshToken` (with the new session) and after `logout` (with `null`). Wire this to wherever your app actually keeps the token (memory, a cookie, `usePersistentState`, the same store your `HttpClientOptions.tokenProvider` reads from) — this hook itself never touches storage. */
+  /** Called whenever the in-memory session changes: after a successful `login`/`refreshToken` (with the new session) and after `logout` (with `null`). Wire this to wherever your app already tracks "is there a user" (a Zustand store, React context, `usePersistentState`) — this hook itself never touches storage, and there is no token to persist (see `AuthSession`'s doc comment). */
   onSessionChange?: (session: AuthSession | null) => void;
 }
 
 export interface UseAuthResult {
-  /** The current in-memory session, or `null` when signed out. Not persisted by this hook itself — see `onSessionChange`. */
+  /** The current session, or `null` when signed out. Not persisted by this hook itself — see `onSessionChange`. */
   session: AuthSession | null;
-  /** `true` while any action below is in flight. Shared across actions since a login/register screen only ever has one in flight at a time — track your own per-field state if you need finer granularity. */
+  /** `true` while any action below is in flight. Shared across actions since a login/register/forgot-password screen only ever has one in flight at a time — track your own per-field state if you need finer granularity. */
   loading: boolean;
   /** Localized message for the most recently failed action, via `translateError()` — never a raw backend code, and never an untranslated message. `null` after a successful action or `clearError()`. */
   error: string | null;
   clearError: () => void;
   login: (request: LoginRequest) => Promise<AuthSession | null>;
-  /** Resolves `true` on success (including "already logged out") and `false` on failure — check `error` for why. */
-  logout: (request?: LogoutRequest) => Promise<boolean>;
-  /** Reuses the current session's `refreshToken` when `request` is omitted. */
-  refreshToken: (request?: RefreshTokenRequest) => Promise<AuthSession | null>;
+  /** No request — the backend reads the refresh-token cookie automatically. Resolves `true` on success (including "already logged out") and `false` on failure — check `error` for why. */
+  logout: () => Promise<boolean>;
+  /** No request — same cookie-carried refresh token as `logout`. */
+  refreshToken: () => Promise<AuthSession | null>;
   forgotPassword: (request: ForgotPasswordRequest) => Promise<boolean>;
   resendEmail: (request: ResendEmailRequest) => Promise<boolean>;
-  register: (request: RegisterRequest) => Promise<RegisterResponse | null>;
+  /** The backend issues no tokens on register — a successful call just means the account was created and a verification email dispatched, never an authenticated session. Follow up with `confirmEmail` once the user has the link. */
+  register: (request: RegisterRequest) => Promise<boolean>;
+  /** Completes the token-based email-verification link from `register`/`resendEmail`'s dispatched email. */
+  confirmEmail: (request: ConfirmEmailRequest) => Promise<boolean>;
 }
 
 /** Normalizes whatever `HttpClient.execute` throws into `translateError()`'s input shape — the one place this hook touches `HttpError` internals. */
@@ -53,25 +55,31 @@ function toTranslatableError(err: unknown): { messageCode?: string | null; messa
 }
 
 /**
- * Session/auth-action hook built directly on `@novacore/frontend-foundation`'s new
- * `AuthEndpoints` + the shared `HttpClient` — the intended shared replacement for the
+ * Session/auth-action hook built directly on `@novacore/frontend-foundation`'s `AuthEndpoints` +
+ * `UserEndpoints.getMe` + the shared `HttpClient` — the intended shared replacement for the
  * bespoke Zustand session store and hand-rolled error mapping nova-console/nova-wcm each
- * currently maintain independently (see `.wolf/STATUS.md`; migrating those apps onto this
- * hook is a separate follow-up task, not done here).
+ * currently maintain independently (see `.wolf/STATUS.md`; migrating those apps onto this hook
+ * is a separate follow-up task, not done here).
  *
- * Every failure is resolved to a localized string via `translateError()` before it ever
- * reaches `error` — callers never see a raw `HttpError.code`/backend message. Loading/error/
- * data state is deliberately simple (one shared `loading`/`error`, plus `session` as the one
- * piece of durable data this hook tracks) since a login/register/forgot-password screen only
- * ever has one action in flight at a time.
+ * **The backend issues no bearer token anywhere** — `login`/`refreshToken` set `AccessToken`/
+ * `RefreshToken` as HTTP-only cookies (never visible to JavaScript) and return an empty
+ * response body. So `session` here is not a token pair: on a successful `login`/`refreshToken`,
+ * this hook fetches the current user (`UserEndpoints.getMe`) and that becomes the session. Your
+ * `HttpClient` must be configured with `withCredentials: true` (`HttpClientOptions`) for the
+ * cookies to actually be sent/received, and with `X-Tenant-Client-Key`/`X-App-Key` as default
+ * headers where your deployment needs them (see `AuthEndpoints`'s module doc comment in
+ * `@novacore/frontend-foundation` — these are per-deployment constants, not per-call request
+ * fields).
  *
- * This hook does **not** persist the session anywhere (no `localStorage`, no cookie) — that
- * decision varies too much per application's security posture to standardize here. Wire
- * `onSessionChange` to whatever storage/token-provider your app already uses.
+ * Every failure is resolved to a localized string via `translateError()` before it ever reaches
+ * `error` — callers never see a raw `HttpError.code` or backend message. Loading/error/data state
+ * is deliberately simple (one shared `loading`/`error`, plus `session` as the one piece of
+ * durable data this hook tracks) since a login/register/forgot-password screen only ever has one
+ * action in flight at a time.
  *
  * ```tsx
- * const auth = useAuth(httpClient, { locale, onSessionChange: setStoredSession });
- * await auth.login({ usernameOrEmail, password });
+ * const auth = useAuth(httpClient, { locale, onSessionChange: setIsAuthenticated });
+ * await auth.login({ email, password });
  * ```
  */
 export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): UseAuthResult {
@@ -79,8 +87,6 @@ export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): U
   const [session, setSession] = React.useState<AuthSession | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const sessionRef = React.useRef<AuthSession | null>(session);
-  sessionRef.current = session;
 
   const updateSession = React.useCallback(
     (next: AuthSession | null) => {
@@ -106,39 +112,38 @@ export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): U
     [locale, tenantTranslations],
   );
 
+  /** Shared by `login`/`refreshToken` — the backend confirms the cookie session but never returns who it belongs to, so both fetch the profile themselves. */
+  const loadSession = React.useCallback(async () => {
+    const user = await httpClient.execute(UserEndpoints.getMe);
+    const next: AuthSession = { user };
+    updateSession(next);
+    return next;
+  }, [httpClient, updateSession]);
+
   const login = React.useCallback(
     (request: LoginRequest) =>
       run(async () => {
-        const result = await httpClient.execute(AuthEndpoints.login, request);
-        updateSession(result);
-        return result;
+        await httpClient.execute(AuthEndpoints.login, request);
+        return loadSession();
       }),
-    [httpClient, run, updateSession],
+    [httpClient, run, loadSession],
   );
 
-  const logout = React.useCallback(
-    async (request?: LogoutRequest) => {
-      const result = await run(async () => {
-        await httpClient.execute(AuthEndpoints.logout, {
-          refreshToken: request?.refreshToken ?? sessionRef.current?.refreshToken,
-        });
-        updateSession(null);
-      });
-      return result !== null;
-    },
-    [httpClient, run, updateSession],
-  );
+  const logout = React.useCallback(async () => {
+    const result = await run(async () => {
+      await httpClient.execute(AuthEndpoints.logout);
+      updateSession(null);
+    });
+    return result !== null;
+  }, [httpClient, run, updateSession]);
 
   const refreshToken = React.useCallback(
-    (request?: RefreshTokenRequest) =>
+    () =>
       run(async () => {
-        const result = await httpClient.execute(AuthEndpoints.refreshToken, {
-          refreshToken: request?.refreshToken ?? sessionRef.current?.refreshToken,
-        });
-        updateSession(result);
-        return result;
+        await httpClient.execute(AuthEndpoints.refreshToken);
+        return loadSession();
       }),
-    [httpClient, run, updateSession],
+    [httpClient, run, loadSession],
   );
 
   const forgotPassword = React.useCallback(
@@ -158,14 +163,37 @@ export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): U
   );
 
   const register = React.useCallback(
-    (request: RegisterRequest) => run(() => httpClient.execute(AuthEndpoints.register, request)),
+    async (request: RegisterRequest) => {
+      const result = await run(() => httpClient.execute(AuthEndpoints.register, request));
+      return result !== null;
+    },
+    [httpClient, run],
+  );
+
+  const confirmEmail = React.useCallback(
+    async (request: ConfirmEmailRequest) => {
+      const result = await run(() => httpClient.execute(AuthEndpoints.confirmEmail, request));
+      return result !== null;
+    },
     [httpClient, run],
   );
 
   const clearError = React.useCallback(() => setError(null), []);
 
   return React.useMemo(
-    () => ({ session, loading, error, clearError, login, logout, refreshToken, forgotPassword, resendEmail, register }),
-    [session, loading, error, clearError, login, logout, refreshToken, forgotPassword, resendEmail, register],
+    () => ({
+      session,
+      loading,
+      error,
+      clearError,
+      login,
+      logout,
+      refreshToken,
+      forgotPassword,
+      resendEmail,
+      register,
+      confirmEmail,
+    }),
+    [session, loading, error, clearError, login, logout, refreshToken, forgotPassword, resendEmail, register, confirmEmail],
   );
 }
