@@ -22,6 +22,12 @@ export interface InitialAuthStateCookies {
   refreshToken?: string;
 }
 
+/** The exact cookie names Auth's `CurrentUserService` sets/reads (`BuildingBlock.Web/CurrentUser/CurrentUserService.cs`) — read cookies by these names rather than hardcoding the strings per app. */
+export const AUTH_COOKIE_NAMES = {
+  accessToken: "AccessToken",
+  refreshToken: "RefreshToken",
+} as const;
+
 export interface InitialAuthState {
   hasAccessToken: boolean;
   hasRefreshToken: boolean;

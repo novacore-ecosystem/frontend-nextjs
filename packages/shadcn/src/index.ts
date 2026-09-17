@@ -366,7 +366,12 @@ export { TenantSelector, type TenantSelectorProps } from "./components/tenant/Te
 export type { TenantOption, TenantDirectoryService } from "./components/tenant/types";
 
 // Bootstrap
-export { buildInitialAuthState, type InitialAuthState, type InitialAuthStateCookies } from "./lib/initial-auth-state";
+export {
+  buildInitialAuthState,
+  AUTH_COOKIE_NAMES,
+  type InitialAuthState,
+  type InitialAuthStateCookies,
+} from "./lib/initial-auth-state";
 export {
   BOOTSTRAP_VERSION_COOKIE_NAME,
   parseBootstrapVersionCookie,
