@@ -365,5 +365,20 @@ export { useTenantLoginConfiguration } from "./lib/tenant-login-config";
 export { TenantSelector, type TenantSelectorProps } from "./components/tenant/TenantSelector";
 export type { TenantOption, TenantDirectoryService } from "./components/tenant/types";
 
+// Bootstrap
+export { buildInitialAuthState, type InitialAuthState, type InitialAuthStateCookies } from "./lib/initial-auth-state";
+export {
+  BOOTSTRAP_VERSION_COOKIE_NAME,
+  parseBootstrapVersionCookie,
+  writeBootstrapVersionCookie,
+  clearBootstrapVersionCookie,
+} from "./lib/bootstrap-marker-cookie";
+export { shouldFetchBootstrapOnServer, type BootstrapSsrDecisionInput } from "./lib/bootstrap-ssr";
+export {
+  useBootstrapRealtime,
+  type BootstrapRealtimeHub,
+  type UseBootstrapRealtimeOptions,
+} from "./components/bootstrap/use-bootstrap-realtime";
+
 // Utility
 export { cn } from "./lib/cn";

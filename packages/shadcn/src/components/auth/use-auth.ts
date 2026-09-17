@@ -24,6 +24,8 @@ export interface UseAuthOptions {
   tenantTranslations?: TranslationBundle;
   /** Called whenever the in-memory session changes: after a successful `login`/`refreshToken` (with the new session) and after `logout` (with `null`). Wire this to wherever your app already tracks "is there a user" (a Zustand store, React context, `usePersistentState`) — this hook itself never touches storage, and there is no token to persist (see `AuthSession`'s doc comment). */
   onSessionChange?: (session: AuthSession | null) => void;
+  /** Called after a successful `login`/`refreshToken` with the tenant's current Bootstrap Version (`null` for Root) — the response body's only field (see `AuthEndpoints`'s module doc comment in `@novacore/frontend-foundation`). Wire this to `BootstrapRefreshCoordinator.refreshBootstrap(version)` so a stale locally-cached Bootstrap is caught immediately after any auth event, without waiting on a SignalR round trip. */
+  onBootstrapVersion?: (version: number | null) => void;
 }
 
 export interface UseAuthResult {
@@ -62,8 +64,9 @@ function toTranslatableError(err: unknown): { messageCode?: string | null; messa
  * is a separate follow-up task, not done here).
  *
  * **The backend issues no bearer token anywhere** — `login`/`refreshToken` set `AccessToken`/
- * `RefreshToken` as HTTP-only cookies (never visible to JavaScript) and return an empty
- * response body. So `session` here is not a token pair: on a successful `login`/`refreshToken`,
+ * `RefreshToken` as HTTP-only cookies (never visible to JavaScript); the response body carries
+ * only the tenant's current Bootstrap Version (see `onBootstrapVersion`). So `session` here is
+ * not a token pair: on a successful `login`/`refreshToken`,
  * this hook fetches the current user (`UserEndpoints.getMe`) and that becomes the session. Your
  * `HttpClient` must be configured with `withCredentials: true` (`HttpClientOptions`) for the
  * cookies to actually be sent/received, and with `X-Tenant-Client-Key`/`X-App-Key` as default
@@ -83,7 +86,7 @@ function toTranslatableError(err: unknown): { messageCode?: string | null; messa
  * ```
  */
 export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): UseAuthResult {
-  const { locale, tenantTranslations, onSessionChange } = options;
+  const { locale, tenantTranslations, onSessionChange, onBootstrapVersion } = options;
   const [session, setSession] = React.useState<AuthSession | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -123,10 +126,11 @@ export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): U
   const login = React.useCallback(
     (request: LoginRequest) =>
       run(async () => {
-        await httpClient.execute(AuthEndpoints.login, request);
+        const { version } = await httpClient.execute(AuthEndpoints.login, request);
+        onBootstrapVersion?.(version);
         return loadSession();
       }),
-    [httpClient, run, loadSession],
+    [httpClient, run, loadSession, onBootstrapVersion],
   );
 
   const logout = React.useCallback(async () => {
@@ -140,10 +144,11 @@ export function useAuth(httpClient: HttpClient, options: UseAuthOptions = {}): U
   const refreshToken = React.useCallback(
     () =>
       run(async () => {
-        await httpClient.execute(AuthEndpoints.refreshToken);
+        const { version } = await httpClient.execute(AuthEndpoints.refreshToken);
+        onBootstrapVersion?.(version);
         return loadSession();
       }),
-    [httpClient, run, loadSession],
+    [httpClient, run, loadSession, onBootstrapVersion],
   );
 
   const forgotPassword = React.useCallback(
