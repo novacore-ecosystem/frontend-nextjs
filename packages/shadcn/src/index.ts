@@ -384,6 +384,7 @@ export {
   type BootstrapRealtimeHub,
   type UseBootstrapRealtimeOptions,
 } from "./components/bootstrap/use-bootstrap-realtime";
+export { createLocalStorageBootstrapStorage } from "./lib/bootstrap-local-storage";
 
 // Utility
 export { cn } from "./lib/cn";
