@@ -73,6 +73,27 @@ export function NotificationBell<T extends NotificationItem = NotificationItem>(
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
 
+  // Auto "load more" when the end of the list scrolls into view. Fires at most once per loaded item
+  // count, so a failed request (count unchanged) can't spin in a retry loop - the manual button below
+  // stays the retry path.
+  // State (not a ref object) so the effect re-runs once the portaled sheet actually mounts the node.
+  const [sentinelNode, setSentinelNode] = React.useState<HTMLDivElement | null>(null);
+  const requestedForCount = React.useRef(-1);
+  const itemCount = items.length;
+  React.useEffect(() => {
+    if (!open || !hasMore || loadingMore || !onLoadMore || !sentinelNode || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting) || requestedForCount.current === itemCount) return;
+        requestedForCount.current = itemCount;
+        onLoadMore();
+      },
+      { rootMargin: "120px" },
+    );
+    observer.observe(sentinelNode);
+    return () => observer.disconnect();
+  }, [open, hasMore, loadingMore, onLoadMore, itemCount, sentinelNode]);
+
   return (
     <>
       <button
@@ -147,7 +168,7 @@ export function NotificationBell<T extends NotificationItem = NotificationItem>(
                 })}
 
                 {hasMore ? (
-                  <div className="flex justify-center py-3">
+                  <div ref={setSentinelNode} className="flex justify-center py-3">
                     {loadingMore ? (
                       <Loader2 className="size-4 animate-spin text-muted-foreground" />
                     ) : (

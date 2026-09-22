@@ -69,7 +69,7 @@ export function SheetContent({
       <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed z-50 flex flex-col gap-4 border-border bg-card p-0 shadow-lg outline-none",
+          "fixed z-50 flex flex-col gap-4 border-border bg-card p-0 text-card-foreground shadow-lg outline-none",
           SIDE_CLASSES[side],
           SIZE_CLASSES[size],
           className,

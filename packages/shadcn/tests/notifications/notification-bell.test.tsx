@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NotificationBell } from "../../src/components/notifications/notification-bell";
 import type { NotificationItem, NotificationRenderRegistry } from "../../src/components/notifications/types";
 
@@ -89,6 +89,58 @@ describe("NotificationBell", () => {
     rerender(<NotificationBell items={ITEMS} unreadCount={0} hasMore onLoadMore={onLoadMore} open />);
     fireEvent.click(screen.getByText("Load more"));
     expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
+
+  describe("auto load more", () => {
+    let trigger: (isIntersecting: boolean) => void;
+
+    beforeEach(() => {
+      vi.stubGlobal(
+        "IntersectionObserver",
+        class {
+          constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+            trigger = (isIntersecting) => callback([{ isIntersecting }]);
+          }
+          observe() {}
+          disconnect() {}
+        },
+      );
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("requests the next page when the end of the list scrolls into view", () => {
+      const onLoadMore = vi.fn();
+      render(<NotificationBell items={ITEMS} unreadCount={0} hasMore onLoadMore={onLoadMore} open />);
+
+      trigger(false);
+      expect(onLoadMore).not.toHaveBeenCalled();
+      trigger(true);
+      expect(onLoadMore).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not re-request for the same item count (a failed page cannot loop), only after more items load", () => {
+      const onLoadMore = vi.fn();
+      const { rerender } = render(<NotificationBell items={ITEMS} unreadCount={0} hasMore onLoadMore={onLoadMore} open />);
+      trigger(true);
+      rerender(<NotificationBell items={ITEMS} unreadCount={0} hasMore onLoadMore={onLoadMore} open />);
+      trigger(true);
+      expect(onLoadMore).toHaveBeenCalledTimes(1);
+
+      const more = [...ITEMS, { ...ITEMS[1]!, id: "n3" }];
+      rerender(<NotificationBell items={more} unreadCount={0} hasMore onLoadMore={onLoadMore} open />);
+      trigger(true);
+      expect(onLoadMore).toHaveBeenCalledTimes(2);
+    });
+
+    it("does nothing while a page is loading or when there is no more", () => {
+      const onLoadMore = vi.fn();
+      const { rerender } = render(<NotificationBell items={ITEMS} unreadCount={0} hasMore loadingMore onLoadMore={onLoadMore} open />);
+      rerender(<NotificationBell items={ITEMS} unreadCount={0} onLoadMore={onLoadMore} open />);
+      expect(onLoadMore).not.toHaveBeenCalled();
+    });
   });
 
   it("applies renderConfig to rows inside the drawer", () => {
